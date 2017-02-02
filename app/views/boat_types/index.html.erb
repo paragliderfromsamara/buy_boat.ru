@@ -1,0 +1,51 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Boat Types</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Series</th>
+      <th>Body type</th>
+      <th>Description</th>
+      <th>Base cost</th>
+      <th>Min hp</th>
+      <th>Max hp</th>
+      <th>Hull width</th>
+      <th>Hull length</th>
+      <th>Is deprecated</th>
+      <th>Is active</th>
+      <th>Creator</th>
+      <th>Modifier</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @boat_types.each do |boat_type| %>
+      <tr>
+        <td><%= boat_type.name %></td>
+        <td><%= boat_type.series %></td>
+        <td><%= boat_type.body_type %></td>
+        <td><%= boat_type.description %></td>
+        <td><%= boat_type.base_cost %></td>
+        <td><%= boat_type.min_hp %></td>
+        <td><%= boat_type.max_hp %></td>
+        <td><%= boat_type.hull_width %></td>
+        <td><%= boat_type.hull_length %></td>
+        <td><%= boat_type.is_deprecated %></td>
+        <td><%= boat_type.is_active %></td>
+        <td><%= boat_type.creator_id %></td>
+        <td><%= boat_type.modifier_id %></td>
+        <td><%= link_to 'Show', boat_type %></td>
+        <td><%= link_to 'Edit', edit_boat_type_path(boat_type) %></td>
+        <td><%= link_to 'Destroy', boat_type, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Boat Type', new_boat_type_path %>

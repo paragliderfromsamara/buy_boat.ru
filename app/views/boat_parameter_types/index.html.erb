@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Boat Parameter Types</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Short name</th>
+      <th>Measure</th>
+      <th>Value type</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @boat_parameter_types.each do |boat_parameter_type| %>
+      <tr>
+        <td><%= boat_parameter_type.name %></td>
+        <td><%= boat_parameter_type.short_name %></td>
+        <td><%= boat_parameter_type.measure %></td>
+        <td><%= boat_parameter_type.value_type %></td>
+        <td><%= link_to 'Show', boat_parameter_type %></td>
+        <td><%= link_to 'Edit', edit_boat_parameter_type_path(boat_parameter_type) %></td>
+        <td><%= link_to 'Destroy', boat_parameter_type, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Boat Parameter Type', new_boat_parameter_type_path %>

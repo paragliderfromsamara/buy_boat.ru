@@ -1,0 +1,24 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @boat_parameter_type.name %>
+</p>
+
+<p>
+  <strong>Short name:</strong>
+  <%= @boat_parameter_type.short_name %>
+</p>
+
+<p>
+  <strong>Measure:</strong>
+  <%= @boat_parameter_type.measure %>
+</p>
+
+<p>
+  <strong>Value type:</strong>
+  <%= @boat_parameter_type.value_type %>
+</p>
+
+<%= link_to 'Edit', edit_boat_parameter_type_path(@boat_parameter_type) %> |
+<%= link_to 'Back', boat_parameter_types_path %>

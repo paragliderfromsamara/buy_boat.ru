@@ -1,0 +1,51 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  first_name: MyString
+  last_name: MyString
+  third_name: MyString
+  email: MyString
+  phone_number: MyString
+  post_index: 1
+  salt: MyString
+  encrypted_password: MyString
+  user_type_id: 1
+
+two:
+  first_name: MyString
+  last_name: MyString
+  third_name: MyString
+  email: MyString
+  phone_number: MyString
+  post_index: 1
+  salt: MyString
+  encrypted_password: MyString
+  user_type_id: 1
+
+
+manager:
+  first_name: manager First Name
+  last_name: manager Last Name
+  third_name: manager Third Name
+  email: manager_mail@admin_mail.com
+  encrypted_password: adminpassword
+  salt: managersalt
+  user_type_id: 100500
+  
+customer:
+  first_name: Customer First Name
+  last_name: Customer Last Name
+  third_name: Customer Third Name
+  email: Customer_mail@Customer_mail.com
+  encrypted_password: Customerpassword
+  salt: Customersalt
+  user_type_id: 500100
+  
+banned:
+  first_name: Banned First Name
+  last_name: Banned Last Name
+  third_name: Banned Third Name
+  email: Banned_mail@Customer_mail.com
+  encrypted_password: Bannedpassword
+  salt: Bannedsalt
+  user_type_id: 600600

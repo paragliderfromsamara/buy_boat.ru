@@ -1,0 +1,18 @@
+Rails.application.routes.draw do
+
+  root to: 'pages#index'
+  
+  get "/cabinet", to: "sessions#current_user_page", as: :my
+  get "/signin", to: "sessions#new"
+  post "/signin", to: "sessions#new"
+  get "/signout", to: "sessions#destroy"
+  get "/signup", to: "users#new"
+  resources :sessions, only: [:new, :create, :destroy]
+  resources :boat_parameter_values
+  resources :boat_parameter_types
+  resources :boat_types
+  resources :users
+  
+  
+  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+end

@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Boat type:</strong>
+  <%= @boat_parameter_value.boat_type_id %>
+</p>
+
+<p>
+  <strong>Boat parameter type:</strong>
+  <%= @boat_parameter_value.boat_parameter_type_id %>
+</p>
+
+<p>
+  <strong>Bool value:</strong>
+  <%= @boat_parameter_value.bool_value %>
+</p>
+
+<p>
+  <strong>Integer value:</strong>
+  <%= @boat_parameter_value.integer_value %>
+</p>
+
+<p>
+  <strong>Float value:</strong>
+  <%= @boat_parameter_value.float_value %>
+</p>
+
+<p>
+  <strong>String value:</strong>
+  <%= @boat_parameter_value.string_value %>
+</p>
+
+<%= link_to 'Edit', edit_boat_parameter_value_path(@boat_parameter_value) %> |
+<%= link_to 'Back', boat_parameter_values_path %>

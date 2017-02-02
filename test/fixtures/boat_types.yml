@@ -1,0 +1,31 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  series: MyString
+  body_type: MyString
+  description: MyString
+  base_cost: 1.5
+  min_hp: 1
+  max_hp: 1
+  hull_width: 1.5
+  hull_length: 1.5
+  is_deprecated: 
+  is_active: 
+  creator_id: 1
+  modifier_id: 1
+
+two:
+  name: MyString
+  series: MyString
+  body_type: MyString
+  description: MyString
+  base_cost: 1.5
+  min_hp: 1
+  max_hp: 1
+  hull_width: 1.5
+  hull_length: 1.5
+  is_deprecated: 
+  is_active: 
+  creator_id: 1
+  modifier_id: 1

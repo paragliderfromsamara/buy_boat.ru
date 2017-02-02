@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  boat_type_id: 1
+  boat_parameter_type_id: 1
+  bool_value: 
+  integer_value: 1
+  float_value: 1.5
+  string_value: MyString
+
+two:
+  boat_type_id: 1
+  boat_parameter_type_id: 1
+  bool_value: 
+  integer_value: 1
+  float_value: 1.5
+  string_value: MyString

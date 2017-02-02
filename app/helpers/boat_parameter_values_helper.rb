@@ -1,0 +1,2 @@
+module BoatParameterValuesHelper
+end

@@ -1,0 +1,37 @@
+<%= form_for(boat_parameter_type) do |f| %>
+  <% if boat_parameter_type.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(boat_parameter_type.errors.count, "error") %> prohibited this boat_parameter_type from being saved:</h2>
+
+      <ul>
+      <% boat_parameter_type.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :short_name %>
+    <%= f.text_field :short_name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :measure %>
+    <%= f.text_field :measure %>
+  </div>
+
+  <div class="field">
+    <%= f.label :value_type %>
+    <%= f.text_field :value_type %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

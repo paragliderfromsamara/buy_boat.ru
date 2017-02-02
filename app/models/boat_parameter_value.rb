@@ -1,0 +1,2 @@
+class BoatParameterValue < ApplicationRecord
+end

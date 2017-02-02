@@ -1,0 +1,2 @@
+class BoatParameterType < ApplicationRecord
+end
