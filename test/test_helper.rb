@@ -15,6 +15,10 @@ class ActiveSupport::TestCase
     rand 10**(n-1) .. 10**n
   end
   
+  def rand_email
+    %{#{default_string}@#{default_string}.com}
+  end
+  
   def default_string(n=6, is_ru = false)
     s = ""
     al =  alphabet(is_ru)

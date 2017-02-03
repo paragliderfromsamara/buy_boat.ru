@@ -25,10 +25,11 @@ class UsersController < ApplicationController
   # POST /users.json
   def create
     @user = User.new(user_params)
-
     respond_to do |format|
-      if @user.save
-        format.html { redirect_to my_path, notice: 'User was successfully created.' }
+      if @user.save   
+       # url = is_admin? ? user_path(@user) : my_path
+        sign_in @user if !signed_in?
+        format.html { redirect_to current_user == @user ? my_path : @user, notice: 'User was successfully created.' }
         format.json { render :show, status: :created, location: @user }
       else
         format.html { render :new }
@@ -64,20 +65,23 @@ class UsersController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def check_grants
+      #find in helpers/grants_helper.rb
       f = false
+      url = root_path
       case action_name
       when "index"
         f = could_see_users_list?
       when "show"
         f = could_see_user?
       when "new", "create"
-        f = could_see_user?
+        f = could_add_user?
+        url = my_path 
       when "destroy"
         f = could_destroy_user?
       when "edit", "update"
         f = could_modify_user?
       end
-      redirect_to root_path if !f 
+      redirect_to url if !f 
     end
     
     def set_user

@@ -9,6 +9,23 @@
   </head>
 
   <body>
+    <ul>  
+        <% if signed_in? %>
+            <li>
+                <%= link_to "Личный кабинет", my_path %>
+            </li>
+            <li>
+                <%= link_to "Выйти", signout_path %>
+            </li>
+        <%else%>
+            <li>
+                <%= link_to "Вход", signin_path %>
+            </li>
+            <li>
+                <%= link_to "Регистрация", signup_path %>
+            </li>
+        <% end %>
+    </ul>
     <%= yield %>
   </body>
 </html>

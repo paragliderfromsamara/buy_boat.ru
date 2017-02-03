@@ -17,11 +17,12 @@ class User < ApplicationRecord
 				    uniqueness: {case_sensitive: false, message: "E-mail уже используется"}
   
   def self.default_user_type_id
-    User.count == 0 ? 100500 : 500100
+    User.count == 0 ? 131313 : 500100
   end
   
   def self.user_types
     [
+      {id: 131313, name: "admin"},
       {id: 100500, name: "manager"},
       {id: 500100, name: "customer"}, 
       {id: 600600, name: "banned"}
@@ -66,7 +67,7 @@ class User < ApplicationRecord
     creator = User.find_by(salt: self.creator_salt, email: self.creator_email)
     default_value = new_record? ? User.default_user_type_id : user_type_id_was
     if !creator.nil?
-      self.user_type_id = (creator.user_type == "manager") ? self.user_type_id : default_value
+      self.user_type_id = (creator.user_type == "admin") ? self.user_type_id : default_value
     else
       self.user_type_id = default_value
     end

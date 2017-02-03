@@ -3,58 +3,202 @@ require 'test_helper'
 class UsersControllerTest < ActionDispatch::IntegrationTest
   setup do
     @default_password = default_string
-    @user = users(:one)
-    @manager = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:manager).salt, creator_email: users(:manager).email, user_type_id:100500)
+    @manager = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:manager).user_type_id)
     @customer = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password)
-    
+    @banned = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:banned).user_type_id)
+    @admin = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:admin).user_type_id)
   end
 
   test "Тест просмотра страниц users_controller для пользователя Guest" do
     u = guest_visit
-    
     u.visit_index
     
+    u.visit_show_page(users(:admin))
     u.visit_show_page(@manager)
     u.visit_show_page(@customer)
-    
+    u.visit_show_page(users(:banned))
+
+    u.visit_edit_page(users(:admin))
     u.visit_edit_page(@manager)
     u.visit_edit_page(@customer)
+    u.visit_edit_page(users(:banned))
     
+    u.do_update(users(:admin))
     u.do_update(@manager)
     u.do_update(@customer)
+    u.do_update(users(:banned))
     
+    u.do_destroy(users(:admin))
     u.do_destroy(@manager)
     u.do_destroy(@customer)
+    u.do_destroy(users(:banned))
     
-    u.visit_new(true)
-    u.do_create(true)
+    u.visit_new(true, my_path)
+    u.do_create(true, my_path)
   end
   
   
   test "Тест просмотра страниц users_controller для пользователя Manager" do 
-    customer_for_delete = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password)
-    manager_for_delete = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:manager).salt, creator_email: users(:manager).email, user_type_id:100500)
+    assert_equal @manager.user_type_id, users(:manager).user_type_id
+    manager_for_delete = users(:destroy_test_manager)
+    customer_for_delete = users(:destroy_test_customer)
+    admin_for_delete = users(:destroy_test_admin)
+    banned_for_delete = users(:destroy_test_banned)
     m = login(@manager.email, @default_password)
     
     m.visit_index(true)
     
+    m.visit_new(false, my_path)
+    m.do_create(false, my_path)
+    
     m.visit_show_page(@manager, true, "свою")
-    m.visit_show_page(users(:manager), true, "чужую")
-    m.visit_show_page(@customer, true)
+    m.visit_show_page(users(:manager), true)
+    m.visit_show_page(users(:customer), true)
+    m.visit_show_page(users(:admin), true)
+    m.visit_show_page(users(:banned), true)
     
-    m.visit_edit_page(@customer, true)
     m.visit_edit_page(@manager, true, "свою")
-    m.visit_edit_page(users(:manager), true, "чужого")
+    m.visit_edit_page(users(:manager))
+    m.visit_edit_page(users(:admin))
+    m.visit_edit_page(users(:banned))
+    m.visit_edit_page(users(:customer))
     
-    m.do_update(@customer, true)
     m.do_update(@manager, true, "свой")
-    m.do_update(users(:manager), false, "чужой")
+    m.do_update(users(:customer))
+    m.do_update(users(:manager))
+    m.do_update(users(:admin))
+    m.do_update(users(:banned))
     
-    m.do_destroy(manager_for_delete, false)
-    m.do_destroy(customer_for_delete, true)
-    m.do_destroy(@manager, true)
+    m.do_destroy(manager_for_delete)
+    m.do_destroy(customer_for_delete)
+    m.do_destroy(admin_for_delete)
+    m.do_destroy(banned_for_delete)
+    m.do_destroy(@manager, true, "свой")
+    
+
   end
 
+  test "Тест просмотра страниц users_controller для пользователя Customer" do 
+    assert_equal @customer.user_type_id, users(:customer).user_type_id
+    manager_for_delete = users(:destroy_test_manager)
+    customer_for_delete = users(:destroy_test_customer)
+    admin_for_delete = users(:destroy_test_admin)
+    banned_for_delete = users(:destroy_test_banned)
+    c = login(@customer.email, @default_password)
+    
+    c.visit_index(false)
+    
+    c.visit_new(false, my_path)
+    c.do_create(false, my_path)
+    
+    c.visit_show_page(@customer, true, "свою")
+    c.visit_show_page(users(:customer))
+    c.visit_show_page(users(:manager))
+    c.visit_show_page(users(:admin))
+    c.visit_show_page(users(:banned))
+    
+    c.visit_edit_page(@customer, true, "свою")
+    c.visit_edit_page(users(:manager))
+    c.visit_edit_page(users(:admin))
+    c.visit_edit_page(users(:banned))
+    c.visit_edit_page(users(:customer))
+    
+    c.do_update(@customer, true, "свой")
+    c.do_update(users(:manager))
+    c.do_update(users(:admin))
+    c.do_update(users(:banned))
+    c.do_update(users(:customer))
+    
+    c.do_destroy(manager_for_delete)
+    c.do_destroy(customer_for_delete)
+    c.do_destroy(admin_for_delete)
+    c.do_destroy(banned_for_delete)
+    c.do_destroy(@customer, true, "свой")
+    
+
+  end
+  
+  test "Тест просмотра страниц users_controller для пользователя Banned" do
+    assert_equal @banned.user_type_id, users(:banned).user_type_id 
+    manager_for_delete = users(:destroy_test_manager)
+    customer_for_delete = users(:destroy_test_customer)
+    admin_for_delete = users(:destroy_test_admin)
+    banned_for_delete = users(:destroy_test_banned)
+    c = login(@banned.email, @default_password)
+    
+    c.visit_index(false)
+    
+    c.visit_new(false, my_path)
+    c.do_create(false, my_path)
+    
+    c.visit_show_page(@banned, true, "свою")
+    c.visit_show_page(users(:manager))
+    c.visit_show_page(users(:banned))
+    c.visit_show_page(users(:admin))
+    c.visit_show_page(users(:customer))
+    
+    c.visit_edit_page(@banned, false, "свою")
+    c.visit_edit_page(users(:manager))
+    c.visit_edit_page(users(:admin))
+    c.visit_edit_page(users(:banned))
+    c.visit_edit_page(users(:customer))
+    
+    c.do_update(@banned, false, "свой")
+    c.do_update(users(:manager))
+    c.do_update(users(:admin))
+    c.do_update(users(:banned))
+    c.do_update(users(:customer))
+    
+    c.do_destroy(manager_for_delete)
+    c.do_destroy(customer_for_delete)
+    c.do_destroy(admin_for_delete)
+    c.do_destroy(banned_for_delete)
+    c.do_destroy(@banned, false, "свой")
+    
+
+  end
+  
+  test "Тест просмотра страниц users_controller для пользователя Admin" do
+    assert_equal @admin.user_type_id, users(:admin).user_type_id 
+    manager_for_delete = users(:destroy_test_manager)
+    customer_for_delete = users(:destroy_test_customer)
+    admin_for_delete = users(:destroy_test_admin)
+    banned_for_delete = users(:destroy_test_banned)
+    c = login(@admin.email, @default_password)
+    
+    c.visit_index(true)
+    
+    c.visit_new(true)
+    c.do_create(true, "user_page")
+    
+    c.visit_show_page(@admin, true, "свою")
+    c.visit_show_page(users(:manager), true)
+    c.visit_show_page(users(:banned), true)
+    c.visit_show_page(users(:admin), true)
+    c.visit_show_page(users(:customer), true)
+    
+    c.visit_edit_page(@admin, true, "свою")
+    c.visit_edit_page(users(:manager), true)
+    c.visit_edit_page(users(:admin), false)
+    c.visit_edit_page(users(:banned), true)
+    c.visit_edit_page(users(:customer), true)
+    
+    c.do_update(@admin, true, "свой")
+    c.do_update(users(:manager), true)
+    c.do_update(users(:admin), false)
+    c.do_update(users(:banned), true)
+    c.do_update(users(:customer), true)
+    
+    
+    
+    c.do_destroy(manager_for_delete, true)
+    c.do_destroy(customer_for_delete, true)
+    c.do_destroy(admin_for_delete, false)
+    c.do_destroy(banned_for_delete, true)
+    c.do_destroy(@admin, true, "свой")
+    
+
+  end
   
   private
 
@@ -95,29 +239,30 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           red_link = could_visit ? (m=="чужой" ? user_path(user) : my_path) : root_path
           new_names = {first_name: default_string, last_name: default_string}
           put user_path(user), params: {user: new_names}
+          user.reload
           if could_visit
-            assert_equal User.find_by(email: user.email).first_name, new_names[:first_name], message: "Не удалось обновить #{m} аккаунт #{user.user_type}"
+            assert_equal user.first_name, new_names[:first_name], message: "Не удалось обновить #{m} аккаунт #{user.user_type}"
           else
-            assert_not_equal User.find_by(email: user.email).first_name, new_names[:first_name], message: "Удалось обновить #{m} аккаунт #{user.user_type}"
+            assert_not_equal user.first_name, new_names[:first_name], message: "Удалось обновить #{m} аккаунт #{user.user_type}"
           end
           assert_redirected_to red_link, "Переадресации на #{red_link} не произошло"
         end
       
-        def do_create(could_visit = false)
-          user_data = {email: %{#{default_string}@test_mail.com}.downcase, first_name: default_string, last_name: default_string, password: @default_password, password_confirmation: @default_password}
-          count_before = User.count
-          post users_path, params: {user: user_data}
+        def do_create(could_visit = false, url = root_path)
+          user_data = {email: rand_email, first_name: default_string, last_name: default_string, password: @default_password, password_confirmation: @default_password}
+          message = ""
           if could_visit
-            assert_not_nil User.find_by(email: user_data[:email].downcase)
-            #assert_difference 'User.count', 1, "Не удалось зарегистрировать новый аккаунт #{flash[:alert]}" do
-            #  post users_path, params: {user: user_data}
-            #end
+            assert_difference 'User.count', 1, "Не удалось зарегистрировать новый аккаунт #{flash[:alert]}" do
+              post users_url, params: {user: user_data}
+            end
+            url = (url == "user_page") ? user_path(User.last) : url 
+            message = "Не удалось перейти на страницу пользовалея группой #{User.last.user_type} по адресу  #{url}"
           else
-            assert_nil User.find_by(email: user_data[:email].downcase)
-            #assert_no_difference 'User.count', "Удалось зарегистрировать новый аккаунт" do
-            #  post users_path, params: {user: user_data}
-            #end
+            assert_no_difference 'User.count', "Удалось зарегистрировать новый аккаунт" do
+              post users_url, params: {user: user_data}
+            end
           end
+          assert_redirected_to url, message 
         end
         
         def do_destroy(user, could_visit = false, m="чужой")
@@ -133,12 +278,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           end
         end
         
-        def visit_new(could_visit = false)
+        def visit_new(could_visit = false, url = nil)
           get new_user_path
           if could_visit
             assert_response :success, "Не удалось зайти на страницу регистрации"
           else
-            assert_redirected_to my_path, "Не был переадресован на страницу своего аккаунта"
+            assert_redirected_to my_path, "Не был переадресован на страницу своего аккаунта" 
           end
         end
         
@@ -146,6 +291,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       def guest_visit
         open_session do |sess|
           sess.extend(CustomDsl)
+          sess.get "/signout"
         end
       end
       
