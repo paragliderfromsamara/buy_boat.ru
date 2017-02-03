@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>BuyBoatRu</title>
+    <title><%= @title.nil? ? "Купи себе лодку" : @title %></title>
     <%= csrf_meta_tags %>
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
@@ -9,23 +9,37 @@
   </head>
 
   <body>
-    <ul>  
-        <% if signed_in? %>
-            <li>
-                <%= link_to "Личный кабинет", my_path %>
-            </li>
-            <li>
-                <%= link_to "Выйти", signout_path %>
-            </li>
-        <%else%>
-            <li>
-                <%= link_to "Вход", signin_path %>
-            </li>
-            <li>
-                <%= link_to "Регистрация", signup_path %>
-            </li>
-        <% end %>
-    </ul>
-    <%= yield %>
+      <div id = "top">
+          <ul>  
+              <% if signed_in? %>
+                  <li>
+                      <%= link_to "Личный кабинет", my_path %>
+                  </li>
+                  <li>
+                      <%= link_to "Выйти", signout_path %>
+                  </li>
+              <%else%>
+                  <li>
+                      <%= link_to "Вход", signin_path %>
+                  </li>
+                  <li>
+                      <%= link_to "Регистрация", signup_path %>
+                  </li>
+              <% end %>
+          </ul>
+      </div>
+      <div id = "middle">
+          <%if !@header.blank? %>
+              <h1>
+                  <%= @header %>
+              </h1>
+          <%end%>
+          <div id = "content">
+              <%= yield %>
+          </div>
+      </div>
+      <div id = "footer">
+      </div>
+
   </body>
 </html>

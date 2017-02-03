@@ -22,15 +22,11 @@ class User < ApplicationRecord
   
   def self.user_types
     [
-      {id: 131313, name: "admin"},
-      {id: 100500, name: "manager"},
-      {id: 500100, name: "customer"}, 
-      {id: 600600, name: "banned"}
+      {id: 131313, name: "admin", ru_name: 'Администратор'},
+      {id: 100500, name: "manager", ru_name: 'Менеджер'},
+      {id: 500100, name: "customer", ru_name: 'Клиент'}, 
+      {id: 600600, name: "banned", ru_name: 'Заблокирован'}
     ]
-  end
-  
-  def is_attribute?(attribute)
-    user_type == send(attribute)
   end
   
   def user_type
@@ -54,9 +50,9 @@ class User < ApplicationRecord
 	  (user && user.salt == cookie_salt) ? user : nil
   end  
   
-  private
   
 
+  private
   
   def make_to_lower_case_email #преобразует введённый email в нижний регистр, перед сохранением в БД
     self.email.downcase!
@@ -90,5 +86,6 @@ class User < ApplicationRecord
 	  Digest::SHA2.hexdigest(string)
   end
   
+
   
 end

@@ -13,42 +13,51 @@
   
   <div class="field">
     <%= f.label :email %>
-    <%= f.text_field :email %>
+    <%= f.text_field :email, placeholder: "example@example.com" %>
   </div>
   
   <div class="field">
-    <%= f.label :password %>
+    <%= f.label :password, "Пароль" %>
     <%= f.password_field :password %>
   </div>
   
   <div class="field">
-    <%= f.label :password_confirmation %>
+    <%= f.label :password_confirmation, "Подтверждение"  %>
     <%= f.password_field :password_confirmation %>
   </div>
   
+  <% if is_admin? && @user != current_user && current_user.user_type == "admin" %>
   <div class="field">
-    <%= f.label :first_name %>
+    <%= f.hidden_field :creator_salt, value: current_user.salt %>
+    <%= f.hidden_field :creator_email, value: current_user.email %>
+    <%= f.label :user_type_id, "Тип пользователя" %>
+    <%= my_collection_select_from_hash(User.user_types, "user", "user_type_id", "", :id, :ru_name, user.new_record? ? nil : user.user_type_id).html_safe %>
+  </div>  
+  <% end %>
+  
+  <div class="field">
+    <%= f.label :first_name, "Имя" %>
     <%= f.text_field :first_name %>
   </div>
 
   <div class="field">
-    <%= f.label :last_name %>
+    <%= f.label :last_name, "Фамилия" %>
     <%= f.text_field :last_name %>
   </div>
 
   <div class="field">
-    <%= f.label :third_name %>
+    <%= f.label :third_name, "Отчество" %>
     <%= f.text_field :third_name %>
   </div>
 
 
   <div class="field">
-    <%= f.label :phone_number %>
+    <%= f.label :phone_number, "Контактный телефон" %>
     <%= f.text_field :phone_number %>
   </div>
 
   <div class="field">
-    <%= f.label :post_index %>
+    <%= f.label :post_index, "Почтовый индекс" %>
     <%= f.number_field :post_index %>
   </div>
 

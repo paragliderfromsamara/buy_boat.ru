@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy]
-  before_action :check_grants
+  before_action :prepare_view
   # GET /users
   # GET /users.json
   def index
@@ -14,7 +14,7 @@ class UsersController < ApplicationController
 
   # GET /users/new
   def new
-    @user = User.new
+    @user = User.new 
   end
 
   # GET /users/1/edit
@@ -64,21 +64,26 @@ class UsersController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def check_grants
+    def prepare_view
       #find in helpers/grants_helper.rb
       f = false
-      url = root_path
+      url = "/404"
       case action_name
       when "index"
+        @title = @header = "Список пользователей" 
         f = could_see_users_list?
       when "show"
+        @title = @header = is_admin? && current_user != @user ? "Личный кабинет пользователя #{@user.email}"  : "Личный кабинет" 
         f = could_see_user?
       when "new", "create"
+        @title = @header = "Регистрация на сайте" 
         f = could_add_user?
         url = my_path 
       when "destroy"
+        @title = @header = "Удаление пользователя"
         f = could_destroy_user?
       when "edit", "update"
+        @title = @header = "Редактирование пользователя" 
         f = could_modify_user?
       end
       redirect_to url if !f 
@@ -90,6 +95,6 @@ class UsersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :third_name, :email, :phone_number, :post_index, :password, :password_confirmation, :user_type_id)
+      params.require(:user).permit(:first_name, :last_name, :third_name, :email, :phone_number, :post_index, :password, :password_confirmation, :user_type_id, :creator_salt, :creator_email)
     end
 end

@@ -7,6 +7,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     @customer = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password)
     @banned = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:banned).user_type_id)
     @admin = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:admin).user_type_id)
+    @admin_2 = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:admin).user_type_id)
+    @manager_2 = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:manager).user_type_id)
   end
 
   test "Тест просмотра страниц users_controller для пользователя Guest" do
@@ -200,9 +202,25 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   end
   
+  test "Для Admin при создании/редактировании пользователя должны добавляться скрытые поля creator_email и creator_salt" do
+    admin = login @admin_2.email, @default_password
+    guest = guest_visit
+    admin.check_creator_salt_email_salt_and_user_type_id(1)
+    guest.check_creator_salt_email_salt_and_user_type_id(0)
+  end
+  
   private
 
       module CustomDsl
+        
+        def check_creator_salt_email_salt_and_user_type_id(idx = 0)
+          get signup_path
+          assert_response :success, "Не удалось зайти на страницу регистрации"
+          assert_select "input#user_creator_salt", idx, message: "#{ "Не " if idx == 0}найдено поле input#user_creator_salt"
+          assert_select "input#user_creator_email", idx,  message: "#{ "Не " if idx == 0}найдено поле input#user_creator_email"
+          assert_select "select#user_user_type_id", idx, message: "#{ "Не " if idx == 0}найдено поле select#user_user_type_id"
+        end
+        
         def browses_site
           get root_path
           assert_response :success, "Не удалось зайти на сайт"
@@ -213,7 +231,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           if could_visit
             assert_response :success, "Не удалось посмотреть страницу с пользователями"
           else
-            assert_redirected_to root_path, "Удалось посмотреть страницу с пользователями"
+            assert_redirected_to  "/404", "Удалось посмотреть страницу с пользователями"
           end
         end
         
@@ -222,7 +240,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           if could_visit
             assert_response :success, "Не удалось посмотреть #{m} страницу пользователя #{user.user_type}"
           else
-            assert_redirected_to root_path, "Удалось посмотреть #{m} страницу пользователя #{user.user_type}"
+            assert_redirected_to "/404", "Удалось посмотреть #{m} страницу пользователя #{user.user_type}"
           end
         end
         
@@ -231,12 +249,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           if could_visit
             assert_response :success, "Не удалось посмотреть страницу редактирования #{m} аккаунта #{user.user_type}"
           else
-            assert_redirected_to root_path, "Удалось посмотреть страницу редактирования #{m} аккаунта #{user.user_type}"
+            assert_redirected_to "/404", "Удалось посмотреть страницу редактирования #{m} аккаунта #{user.user_type}"
           end
         end
         
         def do_update(user, could_visit = false, m="чужой")
-          red_link = could_visit ? (m=="чужой" ? user_path(user) : my_path) : root_path
+          red_link = could_visit ? (m=="чужой" ? user_path(user) : my_path) :  "/404"
           new_names = {first_name: default_string, last_name: default_string}
           put user_path(user), params: {user: new_names}
           user.reload
@@ -248,7 +266,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to red_link, "Переадресации на #{red_link} не произошло"
         end
       
-        def do_create(could_visit = false, url = root_path)
+        def do_create(could_visit = false, url =  "/404")
           user_data = {email: rand_email, first_name: default_string, last_name: default_string, password: @default_password, password_confirmation: @default_password}
           message = ""
           if could_visit
@@ -266,13 +284,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
         
         def do_destroy(user, could_visit = false, m="чужой")
-          red_link = could_visit ? my_path : root_path
+          red_link = could_visit ? my_path : "/404"
           if could_visit
             assert_difference 'User.count', -1, "#{m} аккаунт должен быть удален" do
               delete user_path(user)
             end
           else
-            assert_no_difference 'User.count', "#{m} аккаунт не должен быть удален" do
+            assert_no_difference 'User.count', "#{m} аккаунт не должен быть удален у пользователя #{user.user_type}" do
               delete user_path(user)
             end
           end

@@ -42,7 +42,6 @@ class BoatTypesControllerTest < ActionDispatch::IntegrationTest
     assert_difference('BoatType.count', -1) do
       delete boat_type_url(@boat_type)
     end
-
     assert_redirected_to boat_types_url
   end
 end
