@@ -2,6 +2,7 @@ Rails.application.routes.draw do
 
   root to: 'pages#index'
   
+  get "/check_user", to: "users#check", as: :check_user
   get "/cabinet", to: "sessions#current_user_page", as: :my
   get "/signin", to: "sessions#new", as: :signin
   post "/signin", to: "sessions#new"

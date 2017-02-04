@@ -9,8 +9,27 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     @admin = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:admin).user_type_id)
     @admin_2 = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:admin).user_type_id)
     @manager_2 = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:manager).user_type_id)
+    @customer_2 = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password)
   end
-
+  
+  test "Тест идентификации аккауна и проверки email адреса через action check" do
+    just_signup_test_user = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password)
+    g_session = guest_visit
+    signed_session = login @customer_2.email, @default_password 
+    
+    g_session.visit_check("Гость")
+    g_session.visit_check("Гость", nil, just_signup_test_user.email)
+    g_session.visit_check("Гость", just_signup_test_user.athority_mail_key)
+    g_session.visit_check("Гость", just_signup_test_user.athority_mail_key, @customer_2.email)
+    g_session.visit_check("Гость", just_signup_test_user.athority_mail_key, just_signup_test_user.email, true)
+    
+    signed_session.visit_check("#{@customer_2.user_type}")
+    signed_session.visit_check("#{@customer_2.user_type}", nil, @customer_2.email)
+    signed_session.visit_check("#{@customer_2.user_type}", @customer_2.athority_mail_key)
+    signed_session.visit_check("#{@customer_2.user_type}", @customer_2.athority_mail_key, just_signup_test_user.email)
+    signed_session.visit_check("#{@customer_2.user_type}", @customer_2.athority_mail_key, @customer_2.email, true)
+  end
+  
   test "Тест просмотра страниц users_controller для пользователя Guest" do
     u = guest_visit
     u.visit_index
@@ -273,14 +292,20 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
             assert_difference 'User.count', 1, "Не удалось зарегистрировать новый аккаунт #{flash[:alert]}" do
               post users_url, params: {user: user_data}
             end
-            url = (url == "user_page") ? user_path(User.last) : url 
+            user = User.last
+            url = (url == "user_page") ? user_path(user) : url 
             message = "Не удалось перейти на страницу пользовалея группой #{User.last.user_type} по адресу  #{url}"
+            
+            welcome_mail = ActionMailer::Base.deliveries.last
+            assert_equal "Проверка учётной записи", welcome_mail.subject, message: "Заголовок отправленного письма не верный"
+            assert_equal user.email, welcome_mail.to[0], message: "Заголовок отправленного письма не верный"
           else
             assert_no_difference 'User.count', "Удалось зарегистрировать новый аккаунт" do
               post users_url, params: {user: user_data}
             end
           end
           assert_redirected_to url, message 
+          assert_equal "Аккаунт успешно зарегестрирован, на электронный адрес #{user.email} отправлено проверочное письмо", flash[:notice] if could_visit
         end
         
         def do_destroy(user, could_visit = false, m="чужой")
@@ -302,6 +327,27 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
             assert_response :success, "Не удалось зайти на страницу регистрации"
           else
             assert_redirected_to my_path, "Не был переадресован на страницу своего аккаунта" 
+          end
+        end
+         
+        def visit_check(user_type, key=nil, email=nil, is_going_change=false)
+          user = email.nil? ? nil : User.find_by(email: email.downcase)
+          is_checked_email_was = user.nil? ? nil : user.is_checked_email
+          get check_user_path params: {key: key, email: email}
+          if key.nil? or email.nil? or user.is_checked_email
+            assert_redirected_to "/404", "#{user_type}. Не произошла переадресация при отсутствующих входных параметрах для пользоватея #{user_type}"
+          else
+            assert_not user.nil?, "#{user_type}. Пользователь с указанным email не найден"
+            user.reload
+            flag = is_checked_email_was != user.is_checked_email
+            if is_going_change
+              assert flag, message: "#{user_type}. Флаг должен был измениться со значения #{is_checked_email_was} на #{user.is_checked_email}"
+              assert_redirected_to my_path, "#{user_type}. После изменения пользователь должен быть перенаправлена на свою страницу"
+              assert_equal flash[:notice], "E-mail успешно подтверждён", message: "#{user_type} увидел хуету"
+            else
+              assert_not flag, message: "#{user_type}. Флаг НЕ должен был измениться со значения #{is_checked_email_was} на #{user.is_checked_email}"
+              assert_redirected_to "/404", "#{user_type}. Если флаг не был изменен по причине его положительного состояния, то должен быть перенаправлен на /404"
+            end
           end
         end
         

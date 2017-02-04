@@ -1,19 +1,15 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Users</h1>
-
 <table>
   <thead>
     <tr>
-      <th>First name</th>
-      <th>Last name</th>
-      <th>Third name</th>
+      <th>Имя</th>
+      <th>Фамили</th>
+      <th>Отчество</th>
       <th>Email</th>
-      <th>Phone number</th>
-      <th>Post index</th>
-      <th>Salt</th>
-      <th>Encrypted password</th>
-      <th>User type</th>
+      <th>Контактный номер</th>
+      <th>Почтовый индекс</th>
+      <th>Тип пользователя</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -27,12 +23,10 @@
         <td><%= user.email %></td>
         <td><%= user.phone_number %></td>
         <td><%= user.post_index %></td>
-        <td><%= user.salt %></td>
-        <td><%= user.encrypted_password %></td>
-        <td><%= user.user_type_id %></td>
-        <td><%= link_to 'Show', user %></td>
-        <td><%= link_to 'Edit', edit_user_path(user) %></td>
-        <td><%= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= user.user_type_ru %></td>
+        <td><%= link_to 'Перейти', user if could_see_user?(user)%></td>
+        <td><%= link_to 'Редактировать', edit_user_path(user) if could_modify_user?(user) %></td>
+        <td><%= link_to 'Удалить', user, method: :delete, data: { confirm: 'Are you sure?' } if could_destroy_user?(user)%></td>
       </tr>
     <% end %>
   </tbody>
@@ -40,4 +34,4 @@
 
 <br>
 
-<%= link_to 'New User', new_user_path %>
+<%= link_to 'Добавить пользователя', new_user_path if could_add_user? %>

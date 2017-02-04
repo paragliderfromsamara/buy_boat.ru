@@ -29,5 +29,9 @@ class ActiveSupport::TestCase
     end 
     return s
   end
+  
+  def secure_hash(string)
+    Digest::SHA2.hexdigest(string)
+  end
   # Add more helper methods to be used by all tests here...
 end

@@ -26,24 +26,14 @@
 </p>
 
 <p>
-  <strong>Post index:</strong>
+  <strong>Почтовый индекс:</strong>
   <%= @user.post_index %>
 </p>
-
+<%if is_manager? %>
 <p>
-  <strong>Salt:</strong>
-  <%= @user.salt %>
+  <strong>Тип пользователя:</strong>
+  <%= @user.user_type_ru %>
 </p>
-
-<p>
-  <strong>Encrypted password:</strong>
-  <%= @user.encrypted_password %>
-</p>
-
-<p>
-  <strong>User type:</strong>
-  <%= @user.user_type_id %>
-</p>
-
-<%= link_to 'Edit', edit_user_path(@user) %> |
-<%= link_to 'Back', users_path %>
+<%end %>
+<%= link_to 'Изменить', edit_user_path(@user) if could_modify_user?%>  
+<%= link_to 'К списку пользователей', users_path if could_see_users_list? %>

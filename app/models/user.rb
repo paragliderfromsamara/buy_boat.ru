@@ -1,8 +1,8 @@
 class User < ApplicationRecord
   attr_accessor :password,  :old_password, :current_password, :creator_salt, :creator_email
   
-  before_save :encrypt_password, :set_default_user_type
-  before_validation :make_to_lower_case_email
+  before_save :encrypt_password, :set_default_user_type, :check_email_update
+  before_validation :check_email_update
   
   
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
@@ -15,6 +15,7 @@ class User < ApplicationRecord
   validates :email,  :presence => {:message => "Поле 'E-mail' не должно быть пустым"},
 				    format: {with: email_regex, message: "Поле 'E-mail' не соответсвует формату адреса электронной почты 'user@mail-provider.ru'"},
 				    uniqueness: {case_sensitive: false, message: "E-mail уже используется"}
+            #:on => :create
   
   def self.default_user_type_id
     User.count == 0 ? 131313 : 500100
@@ -22,17 +23,19 @@ class User < ApplicationRecord
   
   def self.user_types
     [
+      {id: 500100, name: "customer", ru_name: 'Клиент'}, 
       {id: 131313, name: "admin", ru_name: 'Администратор'},
       {id: 100500, name: "manager", ru_name: 'Менеджер'},
-      {id: 500100, name: "customer", ru_name: 'Клиент'}, 
       {id: 600600, name: "banned", ru_name: 'Заблокирован'}
     ]
   end
   
+  def user_type_ru
+    get_type[:ru_name]
+  end
+  
   def user_type
-    t = "customer"
-    User.user_types.each {|i| return i[:name] if i[:id] == self.user_type_id}
-    return t
+    get_type[:name]
   end
   #user_types end
   
@@ -50,12 +53,30 @@ class User < ApplicationRecord
 	  (user && user.salt == cookie_salt) ? user : nil
   end  
   
+  def self.athority_mail(key, r_email)
+    return nil if key.nil? || r_email.nil?
+    return nil if (u = find_by(email: r_email.downcase)).nil?
+    return nil if !(u.athority_mail_key == key) || u.is_checked_email
+    u.update_attribute(:is_checked_email, true)
+    return u
+  end
   
+  def athority_mail_key #шифрует пароль
+    encrypt %{#{self.email}--#{self.created_at}}
+  end
 
   private
   
-  def make_to_lower_case_email #преобразует введённый email в нижний регистр, перед сохранением в БД
-    self.email.downcase!
+  
+  def get_type
+    t = User.user_types.first
+    User.user_types.each {|i| return i if i[:id] == self.user_type_id}
+    return t
+  end
+  
+  def check_email_update #преобразует введённый email в нижний регистр, перед сохранением в БД
+    email.downcase!
+    self.is_checked_email = email == email_was
   end
   
   def set_default_user_type #устанавливает тип пользователя по умолчанию, перед сохранением в БД
@@ -71,7 +92,7 @@ class User < ApplicationRecord
   
   def encrypt_password
     self.salt = make_salt if new_record?
-	  self.encrypted_password = encrypt(password) if !password.blank? or password_confirmation != password
+	  self.encrypted_password = encrypt(password) if !password.blank?
   end	
   
   def encrypt(string)

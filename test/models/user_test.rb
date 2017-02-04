@@ -4,7 +4,9 @@ class UserTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
-
+  setup do 
+    @mail_authority_test_user = User.create(email: %{#{default_string}@fuckyou.com}, password: "123456", password_confirmation: "123456")
+  end
   test "Тест сохранения сохранения пароля" do
     user = User.new(email: %{#{default_string}@fuckyou.com}, password: "123456", password_confirmation: "123456")
     assert user.save, "Тест пользователь не сохранился"
@@ -152,4 +154,21 @@ class UserTest < ActiveSupport::TestCase
     assert_equal u.reload.user_type_id, b.user_type_id, "User_type_id не должен сбрасываться при обновлении пользователем не имеющим прав"
     
   end
+  
+  test "Тест функций athority_mail_key и self.athority_mail(key, r_email)" do
+    control_string = secure_hash("#{ @mail_authority_test_user.salt}--#{@mail_authority_test_user.email}--#{@mail_authority_test_user.created_at}")
+    assert_equal @mail_authority_test_user.athority_mail_key, control_string, "athority_mail_key не соответсвует контрольному"  
+    
+    assert_equal User.athority_mail(@mail_authority_test_user.athority_mail_key, @mail_authority_test_user.email.upcase), @mail_authority_test_user, message: "User.athority_mail не прошла проверка" 
+    assert @mail_authority_test_user.reload.is_checked_email, "is_checked_email не обновился при поддтверждении email адреса"
+    
+    assert_nil User.athority_mail(@mail_authority_test_user.athority_mail_key, %{#{default_string}@fuckyou.com}), "User.athority_mail прошел проверку пользователь с неправильной связкой key, email"
+    assert_nil User.athority_mail(@mail_authority_test_user.athority_mail_key, users(:customer).email), "User.athority_mail прошел проверку пользователь с чужим email"
+  
+    was = @mail_authority_test_user.reload.is_checked_email
+    @mail_authority_test_user.update_attribute(:email, %{#{default_string}@fuckyou.com})
+    @mail_authority_test_user.reload
+    assert_not @mail_authority_test_user.is_checked_email, "is_checked_email не стал false при обновлении почтового адреса был #{was} и сейчас #{@mail_authority_test_user.reload.is_checked_email}"
+  end
+
 end

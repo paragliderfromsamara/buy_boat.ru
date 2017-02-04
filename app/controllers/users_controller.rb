@@ -20,7 +20,7 @@ class UsersController < ApplicationController
   # GET /users/1/edit
   def edit
   end
-
+  
   # POST /users
   # POST /users.json
   def create
@@ -29,7 +29,8 @@ class UsersController < ApplicationController
       if @user.save   
        # url = is_admin? ? user_path(@user) : my_path
         sign_in @user if !signed_in?
-        format.html { redirect_to current_user == @user ? my_path : @user, notice: 'User was successfully created.' }
+        UserMailer.welcome(@user).deliver_now
+        format.html { redirect_to current_user == @user ? my_path : @user, notice: "Аккаунт успешно зарегестрирован, на электронный адрес #{@user.email} отправлено проверочное письмо" }
         format.json { render :show, status: :created, location: @user }
       else
         format.html { render :new }
@@ -61,7 +62,15 @@ class UsersController < ApplicationController
       format.json { head :no_content }
     end
   end
-
+  
+  def check
+    user = User.athority_mail(params[:key], params[:email])
+    redirect_to "/404" and return if user.nil?
+    sign_in user if !signed_in?
+    flash[:notice] = "E-mail успешно подтверждён" 
+    redirect_to my_path
+  end
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def prepare_view
@@ -85,8 +94,10 @@ class UsersController < ApplicationController
       when "edit", "update"
         @title = @header = "Редактирование пользователя" 
         f = could_modify_user?
+      when "check"
+        f = (!params[:key].nil? && !params[:email].nil?)
       end
-      redirect_to url if !f 
+      redirect_to url and return if !f 
     end
     
     def set_user
