@@ -1,8 +1,9 @@
+
+
 <%= form_for(user) do |f| %>
   <% if user.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
-
       <ul>
       <% user.errors.full_messages.each do |message| %>
         <li><%= message %></li>
@@ -10,21 +11,33 @@
       </ul>
     </div>
   <% end %>
-  
+  <%= f.hidden_field :update_type, value: @update_type if !@update_type.nil? %>
+  <% if @show_email %>
   <div class="field">
     <%= f.label :email %>
     <%= f.text_field :email, placeholder: "example@example.com" %>
   </div>
+  <%end%>
   
-  <div class="field">
-    <%= f.label :password, "Пароль" %>
-    <%= f.password_field :password %>
-  </div>
+  <% if @show_control_password %>
+      <div class="field">
+        <%= f.label :control_password, @show_passwords && !@show_secondary ? "Предыдущий пароль" : "Пароль" %>
+        <%= f.password_field :control_password %>
+      </div>
+  <%end%>
   
-  <div class="field">
-    <%= f.label :password_confirmation, "Подтверждение"  %>
-    <%= f.password_field :password_confirmation %>
-  </div>
+  <% if @show_passwords %>
+      <div class="field">
+        <%= f.label :password, @show_secondary ? "Пароль" :  "Новый пароль" %>
+        <%= f.password_field :password %>
+      </div>
+      <div class="field">
+        <%= f.label :password_confirmation, "Подтверждение"  %>
+        <%= f.password_field :password_confirmation %>
+      </div>
+  <%end%>
+  
+  <% if @show_secondary %>
   
   <% if is_admin? && @user != current_user && current_user.user_type == "admin" %>
   <div class="field">
@@ -60,6 +73,8 @@
     <%= f.label :post_index, "Почтовый индекс" %>
     <%= f.number_field :post_index %>
   </div>
+  <%end%>
+ 
 
 
   <div class="actions">

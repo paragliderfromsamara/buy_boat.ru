@@ -19,12 +19,13 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
+    
   end
   
   # POST /users
   # POST /users.json
   def create
-    @user = User.new(user_params)
+    @user = User.new(full_user_params)
     respond_to do |format|
       if @user.save   
        # url = is_admin? ? user_path(@user) : my_path
@@ -42,9 +43,16 @@ class UsersController < ApplicationController
   # PATCH/PUT /users/1
   # PATCH/PUT /users/1.json
   def update
+    if @show_email
+      usr_from_params = email_update
+    elsif @show_passwords
+      usr_from_params = password_update
+    else
+      usr_from_params = secondary_user_params
+    end  
     respond_to do |format|
-      if @user.update(user_params)
-        format.html { redirect_to current_user == @user ? my_path : @user, notice: 'User was successfully updated.' }
+      if @user.update(usr_from_params)
+        format.html { redirect_to current_user == @user ? my_path : @user, notice: @notice_text }
         format.json { render :show, status: :ok, location: @user }
       else
         format.html { render :edit }
@@ -88,12 +96,28 @@ class UsersController < ApplicationController
         @title = @header = "Регистрация на сайте" 
         f = could_add_user?
         url = my_path 
+        @show_passwords = @show_email = @show_secondary = true
+        @show_control_password = false 
       when "destroy"
         @title = @header = "Удаление пользователя"
         f = could_destroy_user?
       when "edit", "update"
-        @title = @header = "Редактирование пользователя" 
         f = could_modify_user?
+        @update_type = params[:user].nil?  ? params[:update_type] : params[:user][:update_type]
+        @show_passwords = @update_type == "password"
+        @show_email = @update_type == "email"
+        @show_control_password = @show_email || @show_passwords
+        @show_secondary = !@show_control_password
+        if @show_passwords
+          @title = @header = "Изменение пароля"
+          @notice_text = "Пароль успешно обновлён" 
+        elsif @show_email
+          @title = @header = "Изменение контактного email адреса" 
+          @notice_text = "Email успешно обновлён" 
+        else
+          @title = @header = "Изменение общей информации" 
+          @notice_text = "Информация успешно обновлена" 
+        end
       when "check"
         f = (!params[:key].nil? && !params[:email].nil?)
       end
@@ -105,7 +129,16 @@ class UsersController < ApplicationController
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
-    def user_params
+    def full_user_params
       params.require(:user).permit(:first_name, :last_name, :third_name, :email, :phone_number, :post_index, :password, :password_confirmation, :user_type_id, :creator_salt, :creator_email)
+    end
+    def secondary_user_params
+       params.require(:user).permit(:first_name, :last_name, :third_name, :phone_number, :post_index, :user_type_id, :creator_salt, :creator_email)
+    end
+    def password_update
+      params.require(:user).permit(:control_password, :password, :password_confirmation)
+    end
+    def email_update
+      params.require(:user).permit(:control_password, :email)
     end
 end

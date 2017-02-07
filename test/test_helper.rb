@@ -6,6 +6,23 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
   
+  def create_users_list(password="123456")
+    v = {}
+    User.user_types.each {|t| v[t[:name].to_sym] = User.create(
+                                                                first_name: default_string,
+                                                                last_name: default_string,
+                                                                third_name: default_string,
+                                                                email: rand_email,
+                                                                password: password,
+                                                                password_confirmation: password,
+                                                                creator_salt: users(:admin).salt,
+                                                                creator_email: users(:admin).email,
+                                                                user_type_id: t[:id]
+                                                                
+                          )}
+    return v
+  end
+  
   def alphabet(ru = false)
     "абвгдеёжзийклмнопрстуфхцчшщъыьэюя" if ru
     "abcdefghijklmnopqrstuvwxyz"

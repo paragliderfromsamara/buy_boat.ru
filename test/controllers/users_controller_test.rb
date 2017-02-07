@@ -3,226 +3,156 @@ require 'test_helper'
 class UsersControllerTest < ActionDispatch::IntegrationTest
   setup do
     @default_password = default_string
-    @manager = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:manager).user_type_id)
-    @customer = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password)
-    @banned = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:banned).user_type_id)
-    @admin = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:admin).user_type_id)
-    @admin_2 = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:admin).user_type_id)
-    @manager_2 = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password, creator_salt: users(:admin).salt, creator_email: users(:admin).email, user_type_id:users(:manager).user_type_id)
-    @customer_2 = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password)
+    #@users_for_actions = @users_for_another_destroy = @users_for_self_destroy = @users_for_update = {}
+    @users_for_self_destroy = create_users_list(@default_password)
+    @users_for_actions = create_users_list(@default_password)
+    @users_for_another_destroy = create_users_list(@default_password)
+  end
+  
+  test "Тест создания пользователей для тестирования" do 
+    assert @users_for_self_destroy.values.size == User.user_types.size, "Количество пользователей для удаления себя не соответствует ожиданию"
+    assert @users_for_another_destroy.values.size == User.user_types.size, "Количество пользователей для которых будет удалять другой чувак не соответствует ожиданию"
+    assert @users_for_actions.values.size == User.user_types.size, "Количество пользователей для тестирования экшнов не соответствует ожиданию"
+
+
+    User.user_types.each do |t|
+        assert_equal @users_for_self_destroy[t[:name].to_sym].user_type_id, t[:id], "Не удалось выставить верный user_type_id для пользователя группы #{t[:name]} того кто будет удалять себя"  
+        assert_equal @users_for_another_destroy[t[:name].to_sym].user_type_id, t[:id], "Не удалось выставить верный user_type_id для пользователя группы #{t[:name]} того которого будет удалять другой"  
+        assert_equal @users_for_actions[t[:name].to_sym].user_type_id, t[:id], "Не удалось выставить верный user_type_id для пользователя группы #{t[:name]} того которого будет делать хуйню"  
+    end
+  end 
+  
+  test "Тест на посещение страницы удаления своего аккаунта" do 
+    @users_for_self_destroy.values.each do |u|
+      s = login(u.email, @default_password)
+      s.do_destroy(u, u.user_type != "banned", 'Свой')
+    end
+  end
+  
+  test "Тест на посещение страницы удаления чужого аккаунта" do 
+    @users_for_actions.values.each do |u|
+      s = login(u.email, @default_password)
+      test_usrs = create_users_list(@default_password)
+      test_usrs.values.each do |w|
+        s.do_destroy(w, u.user_type == "admin" && w.user_type != "admin", "чужой", u.user_type)
+      end
+      s.sign_out
+    end
+  end
+  
+  test "Тест на посещение чужого аккаунта" do 
+    test_usrs = create_users_list(@default_password)
+    @users_for_actions.values.each do |u|
+      s = login(u.email, @default_password)
+      test_usrs.values.each do |w|
+        s.visit_show_page(w, u.user_type == "admin" || u.user_type == "manager", "чужой")
+      end
+      s.sign_out
+    end
+  end
+  
+  test "Тест на посещение своего аккаунта" do 
+    @users_for_actions.values.each do |u|
+      s = login(u.email, @default_password)
+      s.visit_show_page(u, true, "свою")
+      s.sign_out
+    end
+  end
+  
+  test "Тест на посещение страницы редактирования своего аккаунта" do 
+    @users_for_actions.values.each do |u|
+      s = login(u.email, @default_password)
+      s.visit_edit_page(u, u.user_type != "banned", "своего")
+      s.sign_out
+    end
+  end
+  
+  test "Тест на посещение страницы редактирования чужого аккаунта" do 
+    test_usrs = create_users_list(@default_password)
+    @users_for_actions.values.each do |u|
+      s = login(u.email, @default_password)
+      test_usrs.values.each do |w|
+        s.visit_edit_page(w, u.user_type == "admin" && w.user_type != "admin" , "чужого")
+      end
+      s.sign_out
+    end
+  end
+  
+  test "Тест на посещение страницы списка пользователей" do 
+    @users_for_actions.values.each do |u|
+      s = login(u.email, @default_password)
+      s.visit_index(u.user_type == "admin" || u.user_type == "manager", u.user_type)
+      s.sign_out
+    end
+  end
+  
+  test "Тест на посещение страницы регистрации нового пользователя и на возможность его создания" do 
+    @users_for_actions.values.each do |u|
+      s = login(u.email, @default_password)
+      s.visit_new(u.user_type == "admin" , my_path)
+      s.do_create(u.user_type == "admin" , u.user_type == "admin" ? "user_page" : my_path)
+      s.sign_out
+    end
+  end
+  
+  test "Тест на обновление чужого аккаунта" do 
+    @users_for_actions.values.each do |u|
+      test_usrs = create_users_list(@default_password)
+      s = login(u.email, @default_password)
+      test_usrs.values.each do |w|
+        s.do_update(w, u.user_type == "admin" && w.user_type != "admin")
+      end
+      s.sign_out
+    end
+  end
+  
+  test "Тест на обновление своего аккаунта" do 
+    test_usrs = create_users_list(@default_password)
+    test_usrs.values.each do |u|
+      s = login(u.email, @default_password)
+        s.do_update(u, u.user_type != "banned", "свой")
+      s.sign_out
+    end
   end
   
   test "Тест идентификации аккауна и проверки email адреса через action check" do
+    test_usrs = create_users_list(@default_password)
     just_signup_test_user = User.create(email: "#{default_string}@test.com", password: @default_password, password_confirmation: @default_password)
     g_session = guest_visit
-    signed_session = login @customer_2.email, @default_password 
+    signed_session = login test_usrs[:customer].email, @default_password 
     
     g_session.visit_check("Гость")
     g_session.visit_check("Гость", nil, just_signup_test_user.email)
     g_session.visit_check("Гость", just_signup_test_user.athority_mail_key)
-    g_session.visit_check("Гость", just_signup_test_user.athority_mail_key, @customer_2.email)
+    g_session.visit_check("Гость", just_signup_test_user.athority_mail_key, test_usrs[:customer].email)
     g_session.visit_check("Гость", just_signup_test_user.athority_mail_key, just_signup_test_user.email, true)
     
-    signed_session.visit_check("#{@customer_2.user_type}")
-    signed_session.visit_check("#{@customer_2.user_type}", nil, @customer_2.email)
-    signed_session.visit_check("#{@customer_2.user_type}", @customer_2.athority_mail_key)
-    signed_session.visit_check("#{@customer_2.user_type}", @customer_2.athority_mail_key, just_signup_test_user.email)
-    signed_session.visit_check("#{@customer_2.user_type}", @customer_2.athority_mail_key, @customer_2.email, true)
+    signed_session.visit_check("#{test_usrs[:customer].user_type}")
+    signed_session.visit_check("#{test_usrs[:customer].user_type}", nil, test_usrs[:customer].email)
+    signed_session.visit_check("#{test_usrs[:customer].user_type}", test_usrs[:customer].athority_mail_key)
+    signed_session.visit_check("#{test_usrs[:customer].user_type}", test_usrs[:customer].athority_mail_key, just_signup_test_user.email)
+    signed_session.visit_check("#{test_usrs[:customer].user_type}", test_usrs[:customer].athority_mail_key, test_usrs[:customer].email, true)
   end
   
   test "Тест просмотра страниц users_controller для пользователя Guest" do
     u = guest_visit
+    test_usrs = create_users_list(@default_password)
     u.visit_index
-    
-    u.visit_show_page(users(:admin))
-    u.visit_show_page(@manager)
-    u.visit_show_page(@customer)
-    u.visit_show_page(users(:banned))
-
-    u.visit_edit_page(users(:admin))
-    u.visit_edit_page(@manager)
-    u.visit_edit_page(@customer)
-    u.visit_edit_page(users(:banned))
-    
-    u.do_update(users(:admin))
-    u.do_update(@manager)
-    u.do_update(@customer)
-    u.do_update(users(:banned))
-    
-    u.do_destroy(users(:admin))
-    u.do_destroy(@manager)
-    u.do_destroy(@customer)
-    u.do_destroy(users(:banned))
-    
+    test_usrs.values.each do |user| 
+      u.visit_show_page(user)
+      u.visit_edit_page(user)
+      u.do_update(user)
+      u.do_destroy(user)
+    end   
+     
     u.visit_new(true, my_path)
     u.do_create(true, my_path)
   end
   
   
-  test "Тест просмотра страниц users_controller для пользователя Manager" do 
-    assert_equal @manager.user_type_id, users(:manager).user_type_id
-    manager_for_delete = users(:destroy_test_manager)
-    customer_for_delete = users(:destroy_test_customer)
-    admin_for_delete = users(:destroy_test_admin)
-    banned_for_delete = users(:destroy_test_banned)
-    m = login(@manager.email, @default_password)
-    
-    m.visit_index(true)
-    
-    m.visit_new(false, my_path)
-    m.do_create(false, my_path)
-    
-    m.visit_show_page(@manager, true, "свою")
-    m.visit_show_page(users(:manager), true)
-    m.visit_show_page(users(:customer), true)
-    m.visit_show_page(users(:admin), true)
-    m.visit_show_page(users(:banned), true)
-    
-    m.visit_edit_page(@manager, true, "свою")
-    m.visit_edit_page(users(:manager))
-    m.visit_edit_page(users(:admin))
-    m.visit_edit_page(users(:banned))
-    m.visit_edit_page(users(:customer))
-    
-    m.do_update(@manager, true, "свой")
-    m.do_update(users(:customer))
-    m.do_update(users(:manager))
-    m.do_update(users(:admin))
-    m.do_update(users(:banned))
-    
-    m.do_destroy(manager_for_delete)
-    m.do_destroy(customer_for_delete)
-    m.do_destroy(admin_for_delete)
-    m.do_destroy(banned_for_delete)
-    m.do_destroy(@manager, true, "свой")
-    
-
-  end
-
-  test "Тест просмотра страниц users_controller для пользователя Customer" do 
-    assert_equal @customer.user_type_id, users(:customer).user_type_id
-    manager_for_delete = users(:destroy_test_manager)
-    customer_for_delete = users(:destroy_test_customer)
-    admin_for_delete = users(:destroy_test_admin)
-    banned_for_delete = users(:destroy_test_banned)
-    c = login(@customer.email, @default_password)
-    
-    c.visit_index(false)
-    
-    c.visit_new(false, my_path)
-    c.do_create(false, my_path)
-    
-    c.visit_show_page(@customer, true, "свою")
-    c.visit_show_page(users(:customer))
-    c.visit_show_page(users(:manager))
-    c.visit_show_page(users(:admin))
-    c.visit_show_page(users(:banned))
-    
-    c.visit_edit_page(@customer, true, "свою")
-    c.visit_edit_page(users(:manager))
-    c.visit_edit_page(users(:admin))
-    c.visit_edit_page(users(:banned))
-    c.visit_edit_page(users(:customer))
-    
-    c.do_update(@customer, true, "свой")
-    c.do_update(users(:manager))
-    c.do_update(users(:admin))
-    c.do_update(users(:banned))
-    c.do_update(users(:customer))
-    
-    c.do_destroy(manager_for_delete)
-    c.do_destroy(customer_for_delete)
-    c.do_destroy(admin_for_delete)
-    c.do_destroy(banned_for_delete)
-    c.do_destroy(@customer, true, "свой")
-    
-
-  end
-  
-  test "Тест просмотра страниц users_controller для пользователя Banned" do
-    assert_equal @banned.user_type_id, users(:banned).user_type_id 
-    manager_for_delete = users(:destroy_test_manager)
-    customer_for_delete = users(:destroy_test_customer)
-    admin_for_delete = users(:destroy_test_admin)
-    banned_for_delete = users(:destroy_test_banned)
-    c = login(@banned.email, @default_password)
-    
-    c.visit_index(false)
-    
-    c.visit_new(false, my_path)
-    c.do_create(false, my_path)
-    
-    c.visit_show_page(@banned, true, "свою")
-    c.visit_show_page(users(:manager))
-    c.visit_show_page(users(:banned))
-    c.visit_show_page(users(:admin))
-    c.visit_show_page(users(:customer))
-    
-    c.visit_edit_page(@banned, false, "свою")
-    c.visit_edit_page(users(:manager))
-    c.visit_edit_page(users(:admin))
-    c.visit_edit_page(users(:banned))
-    c.visit_edit_page(users(:customer))
-    
-    c.do_update(@banned, false, "свой")
-    c.do_update(users(:manager))
-    c.do_update(users(:admin))
-    c.do_update(users(:banned))
-    c.do_update(users(:customer))
-    
-    c.do_destroy(manager_for_delete)
-    c.do_destroy(customer_for_delete)
-    c.do_destroy(admin_for_delete)
-    c.do_destroy(banned_for_delete)
-    c.do_destroy(@banned, false, "свой")
-    
-
-  end
-  
-  test "Тест просмотра страниц users_controller для пользователя Admin" do
-    assert_equal @admin.user_type_id, users(:admin).user_type_id 
-    manager_for_delete = users(:destroy_test_manager)
-    customer_for_delete = users(:destroy_test_customer)
-    admin_for_delete = users(:destroy_test_admin)
-    banned_for_delete = users(:destroy_test_banned)
-    c = login(@admin.email, @default_password)
-    
-    c.visit_index(true)
-    
-    c.visit_new(true)
-    c.do_create(true, "user_page")
-    
-    c.visit_show_page(@admin, true, "свою")
-    c.visit_show_page(users(:manager), true)
-    c.visit_show_page(users(:banned), true)
-    c.visit_show_page(users(:admin), true)
-    c.visit_show_page(users(:customer), true)
-    
-    c.visit_edit_page(@admin, true, "свою")
-    c.visit_edit_page(users(:manager), true)
-    c.visit_edit_page(users(:admin), false)
-    c.visit_edit_page(users(:banned), true)
-    c.visit_edit_page(users(:customer), true)
-    
-    c.do_update(@admin, true, "свой")
-    c.do_update(users(:manager), true)
-    c.do_update(users(:admin), false)
-    c.do_update(users(:banned), true)
-    c.do_update(users(:customer), true)
-    
-    
-    
-    c.do_destroy(manager_for_delete, true)
-    c.do_destroy(customer_for_delete, true)
-    c.do_destroy(admin_for_delete, false)
-    c.do_destroy(banned_for_delete, true)
-    c.do_destroy(@admin, true, "свой")
-    
-
-  end
-  
   test "Для Admin при создании/редактировании пользователя должны добавляться скрытые поля creator_email и creator_salt" do
-    admin = login @admin_2.email, @default_password
+    users = create_users_list(@default_password)
+    admin = login users[:admin].email, @default_password
     guest = guest_visit
     admin.check_creator_salt_email_salt_and_user_type_id(1)
     guest.check_creator_salt_email_salt_and_user_type_id(0)
@@ -231,6 +161,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   private
 
       module CustomDsl
+        def sign_out
+          get signout_path
+        end
         
         def check_creator_salt_email_salt_and_user_type_id(idx = 0)
           get signup_path
@@ -245,12 +178,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_response :success, "Не удалось зайти на сайт"
         end
         
-        def visit_index(could_visit = false)
+        def visit_index(could_visit = false, user_type = "")
           get users_path
           if could_visit
-            assert_response :success, "Не удалось посмотреть страницу с пользователями"
+            assert_response :success, "Не удалось посмотреть страницу с пользователями пользователю #{user_type}"
           else
-            assert_redirected_to  "/404", "Удалось посмотреть страницу с пользователями"
+            assert_redirected_to  "/404", "Удалось посмотреть страницу с пользователями пользователю #{user_type}"
           end
         end
         
@@ -267,6 +200,30 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           get edit_user_path(user)
           if could_visit
             assert_response :success, "Не удалось посмотреть страницу редактирования #{m} аккаунта #{user.user_type}"
+            assert_select "#user_email", 0, message: "На странице изменения общих параметров не должно быть поля email"
+            assert_select "#user_control_password", 0, message: "На странице изменения общих параметров не должно быть поля для контрольного пароля"
+            assert_select "#user_password", 0, message: "На странице изменения общих параметров не должно быть поля для пароля"
+            assert_select "#user_password_confirmation", 0, message: "На странице изменения общих параметров не должно быть поля для подтверждения пароля"
+            #редактирование пароля
+            get edit_user_path(id: user.id, update_type: "password")
+            assert_response :success, "Не удалось посмотреть страницу редактирования #{m} пароля"
+            assert_select "#user_control_password", 1, message: "На странице изменения пароля должно быть поле для контрольного пароля"
+            assert_select "#user_password", 1, message: "На странице изменения пароля должно быть поле для пароля"
+            assert_select "#user_password_confirmation", 1, message: "На странице изменения пароля должно быть поле для подтверждения пароля"
+            assert_select "#user_update_type", 1, message: "На странице изменения пароля должно быть полe update_type"
+            assert_select "#user_email", 0, message: "На странице изменения пароля не должно быть поля email"
+            assert_select "#user_first_name", 0, message: "На странице изменения пароля не должно быть поля вторичных параметров"
+            assert_select "#user_last_name", 0, message: "На странице изменения пароля не должно быть поля вторичных параметров"
+            #редактирование email адреса
+            get edit_user_path(id: user.id, update_type: "email")
+            assert_response :success, "Не удалось посмотреть страницу редактирования #{m} пароля"
+            assert_select "#user_control_password", 1, message: "На странице изменения email должно быть поле для контрольного пароля"
+            assert_select "#user_update_type", 1, message: "На странице изменения email адреса должно быть полe update_type"
+            assert_select "#user_email", 1, message: "На странице изменения email должно быть поле email"
+            assert_select "#user_first_name", 0, message: "На странице изменения email не должно быть поля вторичных параметров"
+            assert_select "#user_last_name", 0, message: "На странице изменения общих параметров не должно быть поля вторичных параметров"
+            assert_select "#user_password", 0, message: "На странице изменения email не должно быть поля для пароля"
+            assert_select "#user_password_confirmation", 0, message: "На странице изменения email не должно быть поле для подтверждения пароля"
           else
             assert_redirected_to "/404", "Удалось посмотреть страницу редактирования #{m} аккаунта #{user.user_type}"
           end
@@ -278,7 +235,52 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           put user_path(user), params: {user: new_names}
           user.reload
           if could_visit
+            #обновление вторичной информации
             assert_equal user.first_name, new_names[:first_name], message: "Не удалось обновить #{m} аккаунт #{user.user_type}"
+            #обновление email адреса
+            p_was = user.encrypted_password
+            e_was = user.email
+            new_password = default_string
+            new_mail = rand_email
+            
+            put user_path(user), params: {user: {email: new_mail, first_name: default_string, last_name: default_string, password: new_password, password_confirmation: new_password}}
+           
+            follow_redirect!
+            user.reload
+            #get root_path
+            assert_equal p_was, user.encrypted_password, message: "Удалось обновить пароль без отправки контрольного пароля аккаунта #{user.user_type} "
+            assert_equal e_was, user.email, message: "Удалось обновить email без отправки контрольного пароля аккаунта #{user.user_type} "
+            
+            put user_path(user), params: {user: {email: new_mail , control_password: default_string, update_type: "email"}}
+            assert_response :success
+            assert_select "#user_control_password", 1, message: "На отрендеренной странице при ошибке изменения email должно быть поле для контрольного пароля"
+            assert_select "#user_email", 1, message: "На отрендеренной странице при ошибке изменения email должно быть поле email"
+            assert_select "#user_first_name", 0, message: "На отрендеренной странице при ошибке изменения email  не должно быть поля вторичных параметров"
+            assert_select "#user_last_name", 0, message: "На отрендеренной странице при ошибке изменения email не должно быть поля вторичных параметров"
+            assert_select "#user_password", 0, message: "На отрендеренной странице при ошибке изменения email не должно быть поля для пароля"
+            
+            put user_path(user), params: {user: {password: default_string, password_confirmation: default_string,control_password: default_string, update_type: "password"}}
+            assert_response :success
+            assert_select "#user_control_password", 1, message: "На отрендеренной странице при ошибке изменения password должно быть поле для контрольного пароля"
+            assert_select "#user_password", 1, message: "На отрендеренной странице при ошибке изменения password должно быть поле для пароля"
+            assert_select "#user_password_confirmation", 1, message: "На отрендеренной странице при ошибке изменения password должно быть поле для подтверждения пароля"
+            assert_select "#user_email", 0, message: "На отрендеренной странице при ошибке изменения password не должно быть поля email"
+            assert_select "#user_first_name", 0, message: "На отрендеренной странице при ошибке изменения password  не должно быть поля вторичных параметров"
+            assert_select "#user_last_name", 0, message: "На отрендеренной странице при ошибке изменения password не должно быть поля вторичных параметров"
+            
+            put user_path(user), params: {user: {email: new_mail , control_password: @default_password, update_type: "email"}}
+            user.reload
+            follow_redirect!
+            assert_equal p_was, user.encrypted_password, message: "Удалось обновить пароль без отправки контрольного пароля аккаунта #{user.user_type}"
+            assert_equal user.email, new_mail.downcase, message: "Не удалось обновить email c правильным контрольным паролем #{user.user_type} #{user.errors.full_messages}"
+            
+            put user_path(user), params: {user: {email: new_mail , control_password: @default_password, update_type: "password"}}
+            user.reload
+            #follow_redirect!
+            assert_equal p_was, user.encrypted_password, message: "Удалось обновить пароль без отправки контрольного пароля аккаунта #{user.user_type}"
+            assert_equal user.email, new_mail.downcase, message: "Не удалось обновить email c правильным контрольным паролем #{user.user_type} #{user.errors.full_messages}"
+            
+          
           else
             assert_not_equal user.first_name, new_names[:first_name], message: "Удалось обновить #{m} аккаунт #{user.user_type}"
           end
@@ -308,14 +310,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal "Аккаунт успешно зарегестрирован, на электронный адрес #{user.email} отправлено проверочное письмо", flash[:notice] if could_visit
         end
         
-        def do_destroy(user, could_visit = false, m="чужой")
+        def do_destroy(user, could_visit = false, m="чужой", user_type="")
           red_link = could_visit ? my_path : "/404"
           if could_visit
-            assert_difference 'User.count', -1, "#{m} аккаунт должен быть удален" do
+            assert_difference 'User.count', -1, "#{m} аккаунт должен быть удален пользователем #{user_type}" do
               delete user_path(user)
             end
           else
-            assert_no_difference 'User.count', "#{m} аккаунт не должен быть удален у пользователя #{user.user_type}" do
+            assert_no_difference 'User.count', "#{m} аккаунт не должен быть удален пользователем #{user_type}" do
               delete user_path(user)
             end
           end

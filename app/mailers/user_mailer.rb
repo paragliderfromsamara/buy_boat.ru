@@ -1,7 +1,7 @@
 class UserMailer < ApplicationMailer
   def welcome(user)
   	@user = user
-  	@target_link = "http://#{default_url_options[:host]}/check_user?email=#{user.email}&key=#{user.athority_mail_key}"
+  	@target_link = check_user_url(email: user.email, key:  user.athority_mail_key)
     mail(to: user.email, :subject => "Проверка учётной записи") do |format|
       format.text
       format.html

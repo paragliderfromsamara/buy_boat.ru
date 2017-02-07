@@ -1,7 +1,7 @@
 class SessionsController < ApplicationController
   
   def current_user_page
-    redirect_to(new_session_path) and return if !signed_in?
+    redirect_to(signin_path) and return if !signed_in?
     @user = current_user
     @title = "Личный кабинет"
     render "users/show"

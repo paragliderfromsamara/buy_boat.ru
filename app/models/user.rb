@@ -1,21 +1,37 @@
 class User < ApplicationRecord
-  attr_accessor :password,  :old_password, :current_password, :creator_salt, :creator_email
+  attr_accessor :password,  :control_password, :current_password, :creator_salt, :creator_email, :update_type
   
-  before_save :encrypt_password, :set_default_user_type, :check_email_update
+  before_save :encrypt_password, :set_default_user_type#, :check_email_update
   before_validation :check_email_update
+  before_validation :check_password_on_create, on: :create
   
   
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   validates :password, :presence => {:message => "Введите пароль длинной 6-40 символов"},
 					   :confirmation => {:message => "Введённый пароль не совпадает с подтверждением"},
 					   :length => {:within => 6..40, :message => "Длина пароля должна быть не менее 6 и не более 40 знаков"},
-					   :on => :create
+					   allow_nil: true
 
 
   validates :email,  :presence => {:message => "Поле 'E-mail' не должно быть пустым"},
 				    format: {with: email_regex, message: "Поле 'E-mail' не соответсвует формату адреса электронной почты 'user@mail-provider.ru'"},
 				    uniqueness: {case_sensitive: false, message: "E-mail уже используется"}
             #:on => :create
+  
+  
+  validate :check_control_password, on: :update, if: :is_pwd_or_email_update?
+  
+  def check_control_password 
+    err_txt = password.nil? ? "Не правильно введён пароль" : "Не правильно введён прежний пароль"
+    flag = true
+    if !control_password.nil?
+      flag = encrypt(control_password) == encrypted_password 
+    else
+      flag = false
+    end
+    errors.add(:control_password, err_txt) if !flag 
+    
+  end
   
   def self.default_user_type_id
     User.count == 0 ? 131313 : 500100
@@ -67,6 +83,15 @@ class User < ApplicationRecord
 
   private
   
+  def editor_is_admin?
+    u = User.find_by(salt: self.creator_salt, email: self.creator_email)
+    return false if u.nil?
+    return u.user_type == "admin"
+  end
+  
+  def is_pwd_or_email_update?
+    !password.blank? || email_changed?# and !email.blank?
+  end
   
   def get_type
     t = User.user_types.first
@@ -76,18 +101,17 @@ class User < ApplicationRecord
   
   def check_email_update #преобразует введённый email в нижний регистр, перед сохранением в БД
     email.downcase!
-    self.is_checked_email = email == email_was
+    self.is_checked_email = !email_changed? 
+  end
+  
+  def check_password_on_create
+    self.password = self.password_confirmation = "" if self.password.nil? 
   end
   
   def set_default_user_type #устанавливает тип пользователя по умолчанию, перед сохранением в БД
     return if user_type_id_was.nil? and !new_record? 
-    creator = User.find_by(salt: self.creator_salt, email: self.creator_email)
     default_value = new_record? ? User.default_user_type_id : user_type_id_was
-    if !creator.nil?
-      self.user_type_id = (creator.user_type == "admin") ? self.user_type_id : default_value
-    else
-      self.user_type_id = default_value
-    end
+    self.user_type_id = editor_is_admin? ? self.user_type_id : default_value
   end
   
   def encrypt_password

@@ -35,5 +35,10 @@
   <%= @user.user_type_ru %>
 </p>
 <%end %>
-<%= link_to 'Изменить', edit_user_path(@user) if could_modify_user?%>  
+<% if could_modify_user?%>
+<%= link_to 'Изменить общую информацию', edit_user_path(@user)%>  
+<%= link_to 'Изменить email', edit_user_path(id: @user.id, update_type: "email")%>
+<%= link_to 'Изменить пароль', edit_user_path(id: @user.id, update_type: "password")%>
+<%end %>
+
 <%= link_to 'К списку пользователей', users_path if could_see_users_list? %>
