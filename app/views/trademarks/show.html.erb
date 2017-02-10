@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @trademark.name %>
+</p>
+
+<p>
+  <strong>Www:</strong>
+  <%= @trademark.www %>
+</p>
+
+<p>
+  <strong>Email:</strong>
+  <%= @trademark.email %>
+</p>
+
+<p>
+  <strong>Phone:</strong>
+  <%= @trademark.phone %>
+</p>
+
+<p>
+  <strong>Logo:</strong>
+  <%= @trademark.logo %>
+</p>
+
+<p>
+  <strong>Creator:</strong>
+  <%= @trademark.creator_id %>
+</p>
+
+<p>
+  <strong>Updater:</strong>
+  <%= @trademark.updater_id %>
+</p>
+
+<%= link_to 'Edit', edit_trademark_path(@trademark) %> |
+<%= link_to 'Back', trademarks_path %>

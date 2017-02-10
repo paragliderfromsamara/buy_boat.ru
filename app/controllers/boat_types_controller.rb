@@ -10,6 +10,7 @@ class BoatTypesController < ApplicationController
   # GET /boat_types/1
   # GET /boat_types/1.json
   def show
+    @title = @header = @boat_type.catalog_name
   end
 
   # GET /boat_types/new
@@ -69,6 +70,6 @@ class BoatTypesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def boat_type_params
-      params.require(:boat_type).permit(:name, :series, :body_type, :description, :base_cost, :min_hp, :max_hp, :hull_width, :hull_length, :is_deprecated, :is_active, :creator_id, :modifier_id)
+      params.require(:boat_type).permit(:name, :series, :body_type, :description, :base_cost, :min_hp, :max_hp, :hull_width, :hull_length, :is_deprecated, :is_active, :creator_id, :modifier_id, :trademark_id)
     end
 end

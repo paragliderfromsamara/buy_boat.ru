@@ -12,5 +12,19 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require react
+//= require react_ujs
+//= require components
+//= require motion-ui
+//= require foundation-sites
 //= require turbolinks
 //= require_tree .
+    
+var rFunc = function()
+    {
+        ReactRailsUJS.mountComponents();
+        $(document).foundation();
+    }
+    
+document.addEventListener("turbolinks:load", rFunc);
+    

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ManufacturerTest < ActiveSupport::TestCase
+class BoatSeriesTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

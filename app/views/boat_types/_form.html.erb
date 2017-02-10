@@ -1,82 +1,119 @@
-<%= form_for(boat_type) do |f| %>
-  <% if boat_type.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(boat_type.errors.count, "error") %> prohibited this boat_type from being saved:</h2>
+<div class = "row">
+    <div class = "small-12 columns">
+        <%= form_for(boat_type) do |f| %>
+          <%= f.hidden_field :creator_id, value: current_user.id if boat_type.new_record? %>
+          <%= f.hidden_field :modifier_id, value: current_user.id %>
+          <% if boat_type.errors.any? %>
+            <div id="error_explanation">
+              <h2><%= pluralize(boat_type.errors.count, "error") %> prohibited this boat_type from being saved:</h2>
 
-      <ul>
-      <% boat_type.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
+              <ul>
+              <% boat_type.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+              </ul>
+            </div>
+          <% end %>
+          <div class = "row">
+              <div class="small-2 columns field">
+                <%= f.label :is_deprecated, "Устаревшая модель" %>
+                <%= f.check_box :is_deprecated %>
+              </div>
+          
+              <div class="small-2 columns end field">
+                <%= f.label :is_active, "Показывать в каталоге" %>
+                <%= f.check_box :is_active %>
+              </div>
+          </div>
+          <div class = "row">
+              <div class="small-3 columns field">
+                <%= f.label :trademark_id, "Марка лодки" %>
+                <%= f.collection_select :trademark_id, Trademark.all, :id, :name %>
+              </div>
+          
+              <div class="small-3 columns field">
+                  <%= f.label :boat_series_id, "Серия" %>
+                  <%= f.collection_select :boat_series_id, BoatSeries.all, :id, :name  %> 
+              </div>
+              
+              <div class="small-3 columns field">
+                <%= f.label :body_type, "Корпус" %>
+                <div class = "row">
+                    <div class="small-6 columns field">
+                        <%= f.text_field :body_type %>
+                    </div>
+                    <div class="small-6 columns field">
+                        <%= my_select_list(BoatType.body_types, "boat_type_body_type") %>
+                    </div>
+                </div>
+              </div>
+              
+              <div class="small-3 columns field">
+                <%= f.label :name, "Название лодки" %>
+                <%= f.text_field :name %>
+              </div>
+          </div>
+          <div class="field">
+            <%= f.label :description, "Текстовое описание" %>
+            <%= f.text_field :description %>
+          </div>
+
+          <div class="field">
+            <%= f.label :base_cost, "Базовая стоимость" %>
+            <%= f.text_field :base_cost %>
+          </div>
+          <div class = "row">
+              <div class="small-3 columns field">
+                <%= f.label :min_hp, "Минимальная мощность двигателя, л.с." %>
+               
+                <div class = "row">
+                    <div class="small-6 columns field">
+                         <%= f.number_field :min_hp %>
+                    </div>
+                    <div class="small-6 columns field">
+                        <%= my_select_list(BoatType.min_hp, "boat_type_min_hp") %>
+                    </div>
+                </div>
+                
+              </div>
+          
+              <div class="small-3 columns field">
+                <%= f.label :max_hp, "Максимальная мощность двигателя" %>
+                <div class = "row">
+                    <div class="small-6 columns field">
+                         <%= f.number_field :max_hp %>
+                    </div>
+                    <div class="small-6 columns field">
+                        <%= my_select_list(BoatType.max_hp, "boat_type_max_hp") %>
+                    </div>
+                </div>
+              </div>
+              
+              <div class="small-3 columns field">
+                <%= f.label :hull_width, "Ширина корпуса, мм" %>
+                <%= f.text_field :hull_width %>
+              </div>
+              
+              <div class="small-3 columns field">
+                <%= f.label :hull_length, "Длина корпуса, мм" %>
+                <%= f.text_field :hull_length %>
+              </div>
+          </div>
+
+
+
+
+
+          <div class="actions">
+            <button class = "success button" type = "submit">
+                <% if boat_type.new_record? %>
+                    Создать
+                <%else%>
+                    Сохранить изменения
+                <%end%>
+            </button>
+          </div>
+        <% end %>
     </div>
-  <% end %>
+</div>
 
-  <div class="field">
-    <%= f.label :name %>
-    <%= f.text_field :name %>
-  </div>
-
-  <div class="field">
-    <%= f.label :series %>
-    <%= f.text_field :series %>
-  </div>
-
-  <div class="field">
-    <%= f.label :body_type %>
-    <%= f.text_field :body_type %>
-  </div>
-
-  <div class="field">
-    <%= f.label :description %>
-    <%= f.text_field :description %>
-  </div>
-
-  <div class="field">
-    <%= f.label :base_cost %>
-    <%= f.text_field :base_cost %>
-  </div>
-
-  <div class="field">
-    <%= f.label :min_hp %>
-    <%= f.number_field :min_hp %>
-  </div>
-
-  <div class="field">
-    <%= f.label :max_hp %>
-    <%= f.number_field :max_hp %>
-  </div>
-
-  <div class="field">
-    <%= f.label :hull_width %>
-    <%= f.text_field :hull_width %>
-  </div>
-
-  <div class="field">
-    <%= f.label :hull_length %>
-    <%= f.text_field :hull_length %>
-  </div>
-
-  <div class="field">
-    <%= f.label :is_deprecated %>
-    <%= f.text_field :is_deprecated %>
-  </div>
-
-  <div class="field">
-    <%= f.label :is_active %>
-    <%= f.text_field :is_active %>
-  </div>
-
-  <div class="field">
-    <%= f.label :creator_id %>
-    <%= f.number_field :creator_id %>
-  </div>
-
-  <div class="field">
-    <%= f.label :modifier_id %>
-    <%= f.number_field :modifier_id %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit %>
-  </div>
-<% end %>

@@ -1,0 +1,13 @@
+<% if @user.errors.any? %>
+    <% @user.errors.keys.each do |k| %>
+        <% 
+            t = "" 
+              @user.errors[k].each{|val| t += "#{val} <br />"} 
+        %>
+        $("#<%= k.to_s %>_error").html("<%= t.html_safe %>").addClass("is-visible");
+    <%end%>
+<%else%>
+    Turbolinks.visit("<%= @url.html_safe %>")
+<%end%>
+
+

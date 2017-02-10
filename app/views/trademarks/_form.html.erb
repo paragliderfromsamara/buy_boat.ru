@@ -1,10 +1,10 @@
-<%= form_for(manufacturer) do |f| %>
-  <% if manufacturer.errors.any? %>
+<%= form_for(trademark) do |f| %>
+  <% if trademark.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(manufacturer.errors.count, "error") %> prohibited this manufacturer from being saved:</h2>
+      <h2><%= pluralize(trademark.errors.count, "error") %> prohibited this trademark from being saved:</h2>
 
       <ul>
-      <% manufacturer.errors.full_messages.each do |message| %>
+      <% trademark.errors.full_messages.each do |message| %>
         <li><%= message %></li>
       <% end %>
       </ul>
@@ -42,8 +42,8 @@
   </div>
 
   <div class="field">
-    <%= f.label :updator_id %>
-    <%= f.number_field :updator_id %>
+    <%= f.label :updater_id %>
+    <%= f.number_field :updater_id %>
   </div>
 
   <div class="actions">

@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   # GET /users
   # GET /users.json
   def index
-    @users = User.all
+    @users = User.select(:id, :first_name, :last_name, :third_name, :email, :user_type_id, :is_checked_email).map{|u| {id: u.id, first_name: u.first_name, last_name: u.last_name, last_name: u.last_name, email: u.email, user_type: u.user_type_ru}}
   end
 
   # GET /users/1
@@ -15,6 +15,7 @@ class UsersController < ApplicationController
   # GET /users/new
   def new
     @user = User.new 
+    render layout: false if params[:nolayout] == "true"
   end
 
   # GET /users/1/edit
@@ -31,11 +32,14 @@ class UsersController < ApplicationController
        # url = is_admin? ? user_path(@user) : my_path
         sign_in @user if !signed_in?
         UserMailer.welcome(@user).deliver_now
-        format.html { redirect_to current_user == @user ? my_path : @user, notice: "Аккаунт успешно зарегестрирован, на электронный адрес #{@user.email} отправлено проверочное письмо" }
+        @url = current_user == @user ? my_path : user_path(@user)
+        format.html { redirect_to @url, notice: "Аккаунт успешно зарегестрирован, на электронный адрес #{@user.email} отправлено проверочное письмо" }
         format.json { render :show, status: :created, location: @user }
       else
+        format.js { }#fillErrorsInForm(#{@user.errors.messages}, 'user_form');
         format.html { render :new }
         format.json { render json: @user.errors, status: :unprocessable_entity }
+        
       end
     end
   end

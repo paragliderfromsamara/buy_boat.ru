@@ -7,7 +7,7 @@
 
 <p>
   <strong>Series:</strong>
-  <%= @boat_type.series %>
+  <% if @boat_type.boat_series.nil? %>Вне серий<%else%><%= link_to @boat_type.boat_series.name, @boat_type.boat_series %><%end%>
 </p>
 
 <p>

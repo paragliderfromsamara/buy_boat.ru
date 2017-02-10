@@ -1,6 +1,6 @@
 
 
-<%= form_for(user) do |f| %>
+<%= form_for(user, html: {id: "user_form", "data-abide":true, novalidate: true}) do |f| %>
   <% if user.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
@@ -15,29 +15,33 @@
   <% if @show_email %>
   <div class="field">
     <%= f.label :email %>
-    <%= f.text_field :email, placeholder: "example@example.com" %>
+    <%= f.text_field :email, placeholder: "example@example.com", pattern: "email" %>
+    <span class="form-error" id = "email_error"></span>
   </div>
   <%end%>
   
-  <% if @show_control_password %>
+  <% if @show_control_password and signed_in? %>
       <div class="field">
         <%= f.label :control_password, @show_passwords && !@show_secondary ? "Предыдущий пароль" : "Пароль" %>
-        <%= f.password_field :control_password %>
+        <%= f.password_field :control_password, required: true  %>
+        <span class="form-error" id = "control_password_error"></span>
       </div>
   <%end%>
   
   <% if @show_passwords %>
       <div class="field">
         <%= f.label :password, @show_secondary ? "Пароль" :  "Новый пароль" %>
-        <%= f.password_field :password %>
+        <%= f.password_field :password, required: true  %>
+        <span class="form-error" id = "password_error"></span>
       </div>
       <div class="field">
         <%= f.label :password_confirmation, "Подтверждение"  %>
-        <%= f.password_field :password_confirmation %>
+        <%= f.password_field :password_confirmation, required: true  %>
+        <span class="form-error" id = "password_confirmation_error"></span>
       </div>
   <%end%>
   
-  <% if @show_secondary %>
+  <% if @show_secondary and signed_in? %>
   
   <% if is_admin? && @user != current_user && current_user.user_type == "admin" %>
   <div class="field">
@@ -74,10 +78,10 @@
     <%= f.number_field :post_index %>
   </div>
   <%end%>
- 
-
 
   <div class="actions">
-    <%= f.submit %>
+    <button class = "button success" type = "submit"> 
+        Отправить
+    </button>
   </div>
 <% end %>

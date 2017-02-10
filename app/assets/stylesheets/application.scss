@@ -13,3 +13,13 @@
  *= require_tree .
  *= require_self
  */
+@import "foundation-sites";
+@import "motion-ui";
+@import "_settings";
+
+@include foundation-everything;
+
+.entities-menu
+{
+    //выпадающее меню для выбора из базы существующих данных
+}

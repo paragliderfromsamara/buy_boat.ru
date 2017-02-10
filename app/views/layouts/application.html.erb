@@ -10,23 +10,23 @@
 
   <body>
       <div id = "top">
-          <ul>  
-              <% if signed_in? %>
+          <%= react_component 'SessionMenuItems', { data: session_menu_items } %><%# find_in app/assets/javascript/components/sessions.coffee %>
+          <%if is_manager? %>
+              <ul>
                   <li>
-                      <%= link_to "Личный кабинет", my_path %>
+                      <%= link_to "Пользователи", users_path %>
                   </li>
                   <li>
-                      <%= link_to "Выйти", signout_path %>
-                  </li>
-              <%else%>
-                  <li>
-                      <%= link_to "Вход", signin_path %>
+                      <%= link_to "Типы лодок", boat_types_path %>
                   </li>
                   <li>
-                      <%= link_to "Регистрация", signup_path %>
+                      <%= link_to "Серии лодок", boat_series_index_path %>
                   </li>
-              <% end %>
-          </ul>
+                  <li>
+                      <%= link_to "Торговые марки", trademarks_path %>
+                  </li>
+              </ul>
+          <%end%>
       </div>
       <div id = "middle">
           <%if !@header.blank? %>

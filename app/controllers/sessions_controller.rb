@@ -18,24 +18,23 @@ class SessionsController < ApplicationController
 	  @title = @header = 'Вход на сайт'
     @user = User.authenticate(params[:session][:email],
                              params[:session][:password])
-    if @user.nil?
-      flash.now[:alert] = "Неверный email или пароль"
-      @title = @header = 'Вход на сайт'
-	    respond_to do |format|
-	      format.html { render 'new' }
-        #format.js {}
-      end
-    else
-      sign_in @user
-	    respond_to do |format|
-	      format.html { redirect_to my_path }
-        #format.js {}
+    respond_to do |format|
+      if @user.nil?
+        format.html {render :new}
+        format.js {render js: "$('#session_callback').addClass(\"alert\").html(\"Неверный email или пароль\");"}
+      else
+        sign_in @user
+        format.html {redirect_to my_path}
+        format.js {render js: "$('#reveal_form_window').foundation('close');Turbolinks.visit('/cabinet');"}
       end
     end
   end
 
   def destroy
 	  sign_out
-    redirect_to root_path
+    respond_to do |format|
+      format.js {render js: "Turbolinks.visit('#{root_path}');"}
+      format.html {redirect_to root_path}
+    end
   end
 end

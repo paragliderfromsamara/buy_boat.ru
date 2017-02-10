@@ -22,7 +22,19 @@ module SessionsHelper
   	end
   end
 
-  
+  def session_menu_items
+    if signed_in?
+      [
+        {url: signout_path, name: "Выйти"},
+        {url: my_path, name: "Кабинет"}
+      ]
+    else
+      [
+        {url: signin_path, name: "Вход"},
+        {url: signup_path, name: "Регистрация"}
+      ]
+    end
+  end
   private
     
     def user_from_remember_token

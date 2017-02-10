@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
 
+  resources :boat_series#, only: [:show]
+  #get "/boat_series", to: "boat_series#index", as: :series_index
+  resources :trademarks
   root to: 'pages#index'
   
   get "/check_user", to: "users#check", as: :check_user

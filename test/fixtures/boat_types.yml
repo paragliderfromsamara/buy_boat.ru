@@ -2,7 +2,8 @@
 
 one:
   name: MyString
-  series: MyString
+  boat_series_id: 1
+  trademark_id: 1
   body_type: MyString
   description: MyString
   base_cost: 1.5
@@ -17,7 +18,8 @@ one:
 
 two:
   name: MyString
-  series: MyString
+  boat_series_id: 1
+  trademark_id: 1
   body_type: MyString
   description: MyString
   base_cost: 1.5

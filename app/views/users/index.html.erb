@@ -1,37 +1,8 @@
-<p id="notice"><%= notice %></p>
+<%# компонент лежит app/assets/javascript/components/users.coffee %>
 
-<table>
-  <thead>
-    <tr>
-      <th>Имя</th>
-      <th>Фамили</th>
-      <th>Отчество</th>
-      <th>Email</th>
-      <th>Контактный номер</th>
-      <th>Почтовый индекс</th>
-      <th>Тип пользователя</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
 
-  <tbody>
-    <% @users.each do |user| %>
-      <tr>
-        <td><%= user.first_name %></td>
-        <td><%= user.last_name %></td>
-        <td><%= user.third_name %></td>
-        <td><%= user.email %></td>
-        <td><%= user.phone_number %></td>
-        <td><%= user.post_index %></td>
-        <td><%= user.user_type_ru %></td>
-        <td><%= link_to 'Перейти', user if could_see_user?(user)%></td>
-        <td><%= link_to 'Редактировать', edit_user_path(user) if could_modify_user?(user) %></td>
-        <td><%= link_to 'Удалить', user, method: :delete, data: { confirm: 'Are you sure?' } if could_destroy_user?(user)%></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<%= react_component 'Users', { data: @users } %>
 
-<br>
 
 <%= link_to 'Добавить пользователя', new_user_path if could_add_user? %>
+

@@ -1,0 +1,2 @@
+module BoatSeriesHelper
+end

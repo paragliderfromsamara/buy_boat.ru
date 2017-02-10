@@ -1,0 +1,27 @@
+@font-face {
+    font-family: 'clear_sans_regular';
+    src: url('/fonts/ClearSans/TTF/ClearSans-Regular.ttf') format('truetype');
+    font-style: normal;
+}
+@font-face {
+    font-family: 'clear_sans_medium';
+    src: url('/fonts/ClearSans/TTF/ClearSans-Medium.ttf') format('truetype');
+    font-style: normal;
+}
+@font-face {
+    font-family: 'clear_sans_bold';
+    src: url('/fonts/ClearSans/TTF/ClearSans-Bold.ttf') format('truetype');
+    font-style: normal;
+}
+@font-face {
+    font-family: 'clear_sans_italic';
+    src: url('/fonts/ClearSans/TTF/ClearSans-Italic.ttf') format('truetype');
+    font-style: normal;
+}
+@font-face {
+    font-family: 'clear_sans_bold_italic';
+    src: url('/fonts/ClearSans/TTF/ClearSans-BoldItalic.ttf') format('truetype');
+    font-style: normal;
+}
+@import "foundation-sites";
+

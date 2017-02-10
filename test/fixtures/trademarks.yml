@@ -7,7 +7,7 @@ one:
   phone: MyString
   logo: MyString
   creator_id: 1
-  updator_id: 1
+  updater_id: 1
 
 two:
   name: MyString
@@ -16,4 +16,4 @@ two:
   phone: MyString
   logo: MyString
   creator_id: 1
-  updator_id: 1
+  updater_id: 1

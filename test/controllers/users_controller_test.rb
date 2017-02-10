@@ -9,6 +9,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     @users_for_another_destroy = create_users_list(@default_password)
   end
   
+  test "Тест механизма для восстановления пароля" do
+    flunk("Необходимо сделать восстановления пароля пользователем")
+  end
+  
+  #test "" do
+  #  flunk("Необходимо сделать восстановления пароля пользователем")
+  #end
+  
   test "Тест создания пользователей для тестирования" do 
     assert @users_for_self_destroy.values.size == User.user_types.size, "Количество пользователей для удаления себя не соответствует ожиданию"
     assert @users_for_another_destroy.values.size == User.user_types.size, "Количество пользователей для которых будет удалять другой чувак не соответствует ожиданию"

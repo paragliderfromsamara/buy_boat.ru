@@ -1,0 +1,2 @@
+class BoatSeriesController < ApplicationController
+end
