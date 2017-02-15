@@ -3,6 +3,7 @@ class BoatParameterType < ApplicationRecord
   has_many :boat_parameter_values, dependent: :delete_all 
   #before_save :update_numbers
   before_save :set_number, on: :create
+  after_create :create_boat_parameter_values, on: :create
   after_destroy :reordering_numbers
   
   def default_value
@@ -24,18 +25,22 @@ class BoatParameterType < ApplicationRecord
   #end
   
   def self.json_view
-    order("number ASC")
+    order("number ASC").map {|t| {id: t.id, name: t.name, number: t.number, short_name: t.short_name, measure: t.measure, value_type: t.value_type_ru, is_use_on_filter: t.show_in_filter_ru}}
   end
   
   def self.measures
     select(:measure).order("measure ASC").uniq.collect {|m| m.measure}
   end
   def self.accessible_value_types
-    [["строчный", "string"], ["целочисленный", "integer"], ["десятичный", "float"], ["да/нет", "bool"]]
+    [["текст", "string"], ["целый", "integer"], ["десятичный", "float"], ["да/нет", "bool"]]
+  end
+  
+  def value_type_ru 
+    BoatParameterType.accessible_value_types.each {|vt| return vt[0] if vt[1] == value_type}
   end
   
   def show_in_filter_ru
-    is_use_on_filter ? "да" : "нет"
+    is_use_on_filter ? "check" :  "x" #такие значение возвращаются чтобы отрисовать foundation icons через utils.coffee
   end
   
   def update_numbers
@@ -53,6 +58,12 @@ class BoatParameterType < ApplicationRecord
   end
   
   private 
+  
+  def create_boat_parameter_values
+    vals = []
+    BoatType.all.each {|bt| vals[vals.length] = {boat_type_id: bt.id, is_binded: false, set_value: default_value}}
+    boat_parameter_values.create(vals) if !vals.blank?
+  end 
   
   def set_number
     return if !new_record?

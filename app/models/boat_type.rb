@@ -12,8 +12,8 @@ class BoatType < ApplicationRecord
     where(is_deprecated: false, is_active: true)
   end
   
-  def boat_parameters
-   #boat_parameter_values.joins(:boat_parameter_type).order("boat_parameter_types.number ASC").select("boat_parameter_types.name as name AND boat_parameter_types.value_type AS value_type AND boat_parameter_values.integer_value AND boat_parameter_values.string_value AND boat_parameter_values.bool_value AND boat_parameter_values.float_value AND boat_parameter_types.number AS number")
+  def boat_parameters_for_react #для скармливания React.js
+    boat_parameter_values.map {|v| {id: v.id, name: v.name_and_measure, boat_type_id: self.id, short_name: v.name_and_measure(true), value_type: v.get_value_type, number: v.number, value: v.get_value, is_binded: v.is_binded}}
   end
   
   def catalog_name #название типа лодки с наименованием производителя, серией и типом корпуса
@@ -46,7 +46,7 @@ class BoatType < ApplicationRecord
   def make_boat_parameter_values #создаёт таблицу значений параметров лодки 
     vals = []
     BoatParameterType.all.each do |t|
-      vals[vals.length] = {set_value: t.default_value, boat_parameter_type_id: t.id}
+      vals[vals.length] = {set_value: t.default_value, boat_parameter_type_id: t.id, is_binded: true}
     end
     boat_parameter_values.create vals
   end

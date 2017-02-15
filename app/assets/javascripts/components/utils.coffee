@@ -6,6 +6,14 @@
 #</div>
 
 #загружаем удаленную форму в reveal контейнер
+
+@FIcon = React.createClass
+    render: ->
+        React.DOM.i
+            className: "fi-#{@props.fig}",
+            " "
+            
+
 @getRemoteForm = (p)->
     c = $(p.winId).find("#reveal_content")
     if p.winHeader isnt undefined then $(p.winId).find("h3").html p.winHeader

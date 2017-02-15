@@ -50,4 +50,9 @@ module GrantsHelper
   def could_modify_boat_type?
     is_admin?
   end 
+  
+  #boat_parameter_values
+  def could_modify_boat_parameter_values?
+    is_admin?
+  end 
 end

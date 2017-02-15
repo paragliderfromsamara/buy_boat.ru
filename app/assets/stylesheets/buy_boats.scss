@@ -1,3 +1,44 @@
 // Place all the styles related to the BoatSeries controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+@import "foundation-sites";
+@import "realcraft";
+
+.bb-inline-menu
+{
+    @include menu-base;
+
+    li.tabs-title
+    {
+        display: inline-block;
+        padding: 0 15px 0 15px;
+        a
+        {
+            color: smart-scale($rc-primary-dark-blue, 80%);
+            padding: 0;
+            font-size: 1.7rem;
+        }
+        a:hover
+        {
+            color: smart-scale($rc-primary-dark-blue, 50%);
+        }
+    }
+    li.tabs-title.is-active
+    {
+        color: smart-scale($rc-primary-dark-blue, 10%);
+        background-color: none;
+        a
+        {
+            padding: 0;
+            background: none;
+            color: smart-scale($rc-primary-dark-blue, 10%);
+        }
+    }
+    li:first-child
+    {
+        padding: 0 15px 0 0;
+        a{padding: 0;}
+    }
+
+}

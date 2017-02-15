@@ -1,6 +1,7 @@
 #@BoatParameterType = React.createClass
 #    render: ->
 
+
 @BoatParameterTypeRow = React.createClass
     getInitialState: ->
         parent: @props.parent
@@ -60,7 +61,8 @@
             React.DOM.td null, @state.type.short_name
             React.DOM.td null, @state.type.measure
             React.DOM.td null, @state.type.value_type
-            React.DOM.td null, (if @state.type.is_use_on_filter then "Да" else "Нет")
+            React.DOM.td null,
+                React.createElement(FIcon, key: @state.type.id, fig: @state.type.is_use_on_filter)
             React.DOM.td null, 
                 React.DOM.a 
                     onClick: if @state.parent.state.isReorderMode then @moveDown else @editRow
@@ -140,7 +142,12 @@
                         React.DOM.th null,
                             "Мера"
                         React.DOM.th null,
-                            "Тип значения"
+                            React.DOM.span
+                                "data-tooltip": true
+                                "aria-haspopup":true
+                                className: "has-tip top"
+                                title: "В зависимости от выбранного типа параметра, фильтр будет подбирать способы сортировки."
+                                "Тип"
                         React.DOM.th null,
                             React.DOM.span
                                 "data-tooltip": true

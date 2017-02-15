@@ -5,51 +5,43 @@
        
     </div>
 </div>
-<div class = "row">
-  <div class="small-12 columns">
-      <h3>
-          Основные данные
-      </h3>
-  </div>
-</div>
-<%= render 'form', boat_type: @boat_type %>
-<div class = "row">
-  <div class="small-12 columns">
-      <h3>
-          Технические характеристики
-      </h3>
-  </div>
-</div>
-<div class = "row">
-  <div class="small-12 columns">
-      <table>
-          <thead>
-              <tr>
-                  <th>
-                      #
-                  </th>
-                  <th>
-                      Название
-                  </th>
-                  <th>
-                      Значение
-                  </th>
-              </tr>
-          </thead>
-          <% @boat_type.boat_parameter_values.each do |pv| %>
-              <tr>
-                  <td>
-                      <%= pv.number %>
-                  </td>
-                  <td>
-                       <%= pv.name_and_measure %>
-                  </td>
-                  <td>
-                      <%= pv.get_value %>
-                  </td>
-              </tr>
-          <%end%>
-      </table>
 
-  </div>
+<div class = "row tb-pad-s">
+    <div class = "small-12 columns">
+        <ul class = 'bb-inline-menu' data-tabs id="bb-tabs">
+            <li class = 'tabs-title is-active'>
+                <a href="#main">Основные данные</a>
+            </li>
+
+            <li class = 'tabs-title'>
+                <a href="#parameter-values">Технические характеристики</a>
+            </li>
+
+            <li class = 'tabs-title '>
+               <a href="#photos">Фото</a>
+            </li>
+        </ul>
+    </div>
 </div>
+<div class = "tabs-content" data-tabs-content="bb-tabs">
+    <div class = 'tabs-panel is-active' id="main">
+        <%= render 'form', boat_type: @boat_type %>
+    </div>
+    <div class = 'tabs-panel'  id="parameter-values">
+        <div class = "row tb-pad-s">
+          <div class="small-12 columns">
+              <%= react_component 'BoatParameterValuesTable', { data: @boat_type.boat_parameters_for_react, is_edit_action: true } %>
+          </div>
+        </div>
+    </div>
+    <div class = 'tabs-panel'  id="photos">
+        <div class = "row tb-pad-s">
+          <div class="small-12 columns">
+              add_photos
+          </div>
+        </div>
+    </div>
+</div>
+
+
+
