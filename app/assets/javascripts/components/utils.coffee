@@ -12,6 +12,7 @@
     c.load "#{p.url} #{p.loadEl}", ()-> 
             c.find("form").attr("data-remote", "true") 
             $(p.winId).foundation('open')
+            $(p.winId).find("[data-dropdown]").foundation()
 
 @fillErrorsInForm = (errors, formId)->
     f = document.getElementById("formId")
@@ -28,17 +29,19 @@
        header: @props.header
        enableClose: @props.enableClose
        data: @props.data
+       size: @props.size
     getDefaultProps: ->
         id: "default_reveal"
         class: "reveal"
         header: ""
         enableClose: true
         data: ""
+        size: "small"
     render: ->
         React.DOM.div
             "data-reveal":true
             id: @state.id
-            className: @state.class
+            className: "#{@state.class} #{@state.size}"
             if @state.header isnt ""
                 React.DOM.h3 null,
                 "#{@state.header}"

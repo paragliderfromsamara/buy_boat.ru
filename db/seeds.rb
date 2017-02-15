@@ -59,33 +59,78 @@ end
 
 
 
-
 BoatParameterType.create([
-                              {
-                                name: "Минимальная мощность двигателя",
-                                short_name: "Мин. мощн. ПМ",
-                                measure: "л.с.",
-                                value_type: "integer"
-                              },
-                              {
-                                name: "Максимальная мощность двигателя",
-                                short_name: "Макс. мощн. ПМ",
-                                measure: "л.с.",
-                                value_type: "integer"
-                              },
-                              {
-                                name: "Ширина корпуса",
-                                measure: "мм",
-                                value_type: "integer"
-                              },
-                              {
-                                name: "Длина корпуса",
-                                measure: "мм",
-                                value_type: "integer"
-                              },
-                              {
-                                name: "Длина корпуса",
-                                measure: "мм",
-                                value_type: "integer"
-                              }
-                          ])
+                                                {
+                                                  name: "Пассажировместимость",
+                                                  measure: "чел.",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "Максимальная скорость",
+                                                  measure: "км/ч",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "t выхода в режим глиссирования при полной загрузке",
+                                                  measure: "с",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "Длина наибольшая",
+                                                  measure: "мм",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "Ширина наибольшая",
+                                                  measure: "мм",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "Ширина габаритная",
+                                                  measure: "мм",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "Длина габаритная",
+                                                  measure: "мм",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "Высота борта",
+                                                  measure: "мм",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "Килеватость",
+                                                  measure: "град.",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "Масса лодки",
+                                                  measure: "кг",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "Размер транца",
+                                                  measure: "",
+                                                  value_type: "string"
+                                                },
+                                                {
+                                                  name: "Минимальная мощность ПМ",
+                                                  measure: "л.с.",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "Максимальная мощность ПМ",
+                                                  measure: "л.с.",
+                                                  value_type: "integer"
+                                                },
+                                                {
+                                                  name: "Рекомендуемая мощность ПМ",
+                                                  measure: "л.с.",
+                                                  value_type: "integer"
+                                                }
+                                               ]
+                                             )
+
+

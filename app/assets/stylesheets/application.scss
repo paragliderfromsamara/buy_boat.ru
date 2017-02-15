@@ -17,9 +17,125 @@
 @import "motion-ui";
 @import "_settings";
 
-@include foundation-everything;
+@include foundation-visibility-classes;
+@include foundation-float-classes;
+@include foundation-grid;
+@include foundation-typography;
+@include foundation-menu;
+@include foundation-top-bar;
+@include foundation-title-bar;
+@include foundation-tabs;
+@include foundation-menu-icon;
+@include foundation-sticky;
+@include foundation-dropdown;
+@include foundation-dropdown-menu;
+@include foundation-orbit;
+@include foundation-flex-video;
+@include foundation-reveal;
+@include foundation-close-button;
+@include foundation-table;
+@include foundation-tooltip;
+@include foundation-button;
+@include foundation-forms;
 
-.entities-menu
+
+.tb-pad-s
 {
-    //выпадающее меню для выбора из базы существующих данных
+ padding-top: 2rem;   
+  padding-bottom: 2rem;  
+}
+.tb-pad-m
+{
+ padding-top: 4rem;   
+  padding-bottom: 4rem;  
+}
+.tb-pad-l
+{
+ padding-top: 8rem;   
+  padding-bottom: 8rem;  
+}
+
+
+.c-box
+{
+    position: relative;
+    width: 100%;
+    z-index:1;
+}
+//
+
+.degree
+{
+     vertical-align: top; 
+     font-size: 1.3rem;
+}
+.orbit
+{
+    @include breakpoint(small) {height: 150px;}
+    @include breakpoint(medium) {height: 250px;}
+    @include breakpoint(large) {height: 400px;}
+    @include breakpoint(xlarge) {height: 500px;}
+    #rc-boat-slogan
+    {
+        @include breakpoint(small) {font-size: 1.0rem;}
+        @include breakpoint(medium) {font-size: 1.2rem;}
+        @include breakpoint(large) {font-size: 1.5rem;}
+    }
+    .rc-slide
+    {
+        position: relative;
+        width: 100%;
+        background-repeat: no-repeat;
+        background-size: cover;
+        -webkit-background-size:cover;
+        -o-background-size:cover;
+         -moz-background-size:cover;
+         background-position: center;
+         @include breakpoint(small) {height: 150px;}
+         @include breakpoint(medium) {height: 250px;}
+         @include breakpoint(large) {height: 400px;}
+         @include breakpoint(xlarge) {height: 500px;}
+    }
+
+    
+    #slogan
+    {
+        img#slogan-img
+        {
+            @include breakpoint(small) 
+            {
+               height: 5rem;
+             }
+            @include breakpoint(medium) 
+            {
+               height: 9rem;
+             }
+             @include breakpoint(large) 
+             {
+                height: 13rem;
+              }
+              @include breakpoint(xlarge) 
+              {
+                  
+                 height: 14rem;
+               }
+        }
+        position: absolute;
+        //top: 2rem;
+        width: 100%;
+        
+        z-index: 100;
+        p
+        {
+            font-weight: bolder;
+        }
+        p.slogan-small
+        {
+            font-size: 1rem;
+        }
+        p.slogan-big
+        {
+            font-size: 2rem;
+        }
+    }
 }

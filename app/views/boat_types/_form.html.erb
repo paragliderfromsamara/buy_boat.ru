@@ -14,6 +14,7 @@
               </ul>
             </div>
           <% end %>
+          <% if !boat_type.new_record? %>
           <div class = "row">
               <div class="small-2 columns field">
                 <%= f.label :is_deprecated, "Устаревшая модель" %>
@@ -25,6 +26,7 @@
                 <%= f.check_box :is_active %>
               </div>
           </div>
+          <%end%>
           <div class = "row">
               <div class="small-3 columns field">
                 <%= f.label :trademark_id, "Марка лодки" %>
@@ -33,7 +35,7 @@
           
               <div class="small-3 columns field">
                   <%= f.label :boat_series_id, "Серия" %>
-                  <%= f.collection_select :boat_series_id, BoatSeries.all, :id, :name  %> 
+                  <%= f.collection_select :boat_series_id, BoatSeries.all, :id, :name, include_blank:  "Вне серии"  %> 
               </div>
               
               <div class="small-3 columns field">
@@ -53,6 +55,7 @@
                 <%= f.text_field :name %>
               </div>
           </div>
+          <% if !boat_type.new_record? %>
           <div class="field">
             <%= f.label :description, "Текстовое описание" %>
             <%= f.text_field :description %>
@@ -62,47 +65,7 @@
             <%= f.label :base_cost, "Базовая стоимость" %>
             <%= f.text_field :base_cost %>
           </div>
-          <div class = "row">
-              <div class="small-3 columns field">
-                <%= f.label :min_hp, "Минимальная мощность двигателя, л.с." %>
-               
-                <div class = "row">
-                    <div class="small-6 columns field">
-                         <%= f.number_field :min_hp %>
-                    </div>
-                    <div class="small-6 columns field">
-                        <%= my_select_list(BoatType.min_hp, "boat_type_min_hp") %>
-                    </div>
-                </div>
-                
-              </div>
-          
-              <div class="small-3 columns field">
-                <%= f.label :max_hp, "Максимальная мощность двигателя" %>
-                <div class = "row">
-                    <div class="small-6 columns field">
-                         <%= f.number_field :max_hp %>
-                    </div>
-                    <div class="small-6 columns field">
-                        <%= my_select_list(BoatType.max_hp, "boat_type_max_hp") %>
-                    </div>
-                </div>
-              </div>
-              
-              <div class="small-3 columns field">
-                <%= f.label :hull_width, "Ширина корпуса, мм" %>
-                <%= f.text_field :hull_width %>
-              </div>
-              
-              <div class="small-3 columns field">
-                <%= f.label :hull_length, "Длина корпуса, мм" %>
-                <%= f.text_field :hull_length %>
-              </div>
-          </div>
-
-
-
-
+          <%end%>
 
           <div class="actions">
             <button class = "success button" type = "submit">

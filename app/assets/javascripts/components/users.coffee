@@ -18,6 +18,7 @@
        users: @props.data
     getDefaultProps: ->
        users: []
+
     render: ->
       React.DOM.div
         className: "row"

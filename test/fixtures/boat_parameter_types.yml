@@ -11,3 +11,28 @@ two:
   short_name: MyString
   measure: MyString
   value_type: MyString
+
+
+string_type:
+  name: string_type_parameter
+  short_name: MyString
+  measure: MyString
+  value_type: string
+
+integer_type:
+  name: integer_type_parameter
+  short_name: MyString
+  measure: MyString
+  value_type: integer
+  
+boolean_type:
+  name: boolean_type_parameter
+  short_name: MyString
+  measure: MyString
+  value_type: bool
+  
+float_type:
+  name: float_type_parameter
+  short_name: MyString
+  measure: MyString
+  value_type: float

@@ -1,10 +1,16 @@
 class BoatTypesController < ApplicationController
+  before_action :check_grants, only: [:new, :create, :edit, :update, :destroy, :manage_index]
   before_action :set_boat_type, only: [:show, :edit, :update, :destroy]
 
+  def manage_index
+    @boat_types = BoatType.all
+    @title = @header = "Управление типами лодок"
+  end
+  
   # GET /boat_types
   # GET /boat_types.json
   def index
-    @boat_types = BoatType.all
+    @boat_types = BoatType.for_catalog
   end
 
   # GET /boat_types/1
@@ -15,11 +21,13 @@ class BoatTypesController < ApplicationController
 
   # GET /boat_types/new
   def new
+    @title = @header = "Новый тип лодки"
     @boat_type = BoatType.new
   end
 
   # GET /boat_types/1/edit
   def edit
+    @title = @header = "Редактирование типа лодки"
   end
 
   # POST /boat_types
@@ -29,7 +37,7 @@ class BoatTypesController < ApplicationController
 
     respond_to do |format|
       if @boat_type.save
-        format.html { redirect_to @boat_type, notice: 'Boat type was successfully created.' }
+        format.html { redirect_to edit_boat_type_path(@boat_type), notice: 'Новый тип лодки успешно добавлен' }
         format.json { render :show, status: :created, location: @boat_type }
       else
         format.html { render :new }
@@ -63,6 +71,9 @@ class BoatTypesController < ApplicationController
   end
 
   private
+    def check_grants
+      redirect_to "/404" if !could_modify_boat_type?
+    end 
     # Use callbacks to share common setup or constraints between actions.
     def set_boat_type
       @boat_type = BoatType.find(params[:id])
@@ -70,6 +81,6 @@ class BoatTypesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def boat_type_params
-      params.require(:boat_type).permit(:name, :series, :body_type, :description, :base_cost, :min_hp, :max_hp, :hull_width, :hull_length, :is_deprecated, :is_active, :creator_id, :modifier_id, :trademark_id)
+      params.require(:boat_type).permit(:name, :boat_series_id, :body_type, :description, :base_cost, :min_hp, :max_hp, :hull_width, :hull_length, :is_deprecated, :is_active, :creator_id, :modifier_id, :trademark_id)
     end
 end

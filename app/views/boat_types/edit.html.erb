@@ -1,6 +1,55 @@
-<h1>Editing Boat Type</h1>
-
+<div class = "row tb-pad-s">
+    <div class = "small-12 columns">
+        <%= link_to 'К странице лодки', @boat_type %> |
+        <%= link_to 'К списку типов лодок', manage_boat_types_path %>
+       
+    </div>
+</div>
+<div class = "row">
+  <div class="small-12 columns">
+      <h3>
+          Основные данные
+      </h3>
+  </div>
+</div>
 <%= render 'form', boat_type: @boat_type %>
+<div class = "row">
+  <div class="small-12 columns">
+      <h3>
+          Технические характеристики
+      </h3>
+  </div>
+</div>
+<div class = "row">
+  <div class="small-12 columns">
+      <table>
+          <thead>
+              <tr>
+                  <th>
+                      #
+                  </th>
+                  <th>
+                      Название
+                  </th>
+                  <th>
+                      Значение
+                  </th>
+              </tr>
+          </thead>
+          <% @boat_type.boat_parameter_values.each do |pv| %>
+              <tr>
+                  <td>
+                      <%= pv.number %>
+                  </td>
+                  <td>
+                       <%= pv.name_and_measure %>
+                  </td>
+                  <td>
+                      <%= pv.get_value %>
+                  </td>
+              </tr>
+          <%end%>
+      </table>
 
-<%= link_to 'Show', @boat_type %> |
-<%= link_to 'Back', boat_types_path %>
+  </div>
+</div>

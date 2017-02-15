@@ -1,7 +1,6 @@
 Rails.application.routes.draw do
 
-  resources :boat_series#, only: [:show]
-  #get "/boat_series", to: "boat_series#index", as: :series_index
+  resources :boat_series
   resources :trademarks
   root to: 'pages#index'
   
@@ -13,8 +12,12 @@ Rails.application.routes.draw do
   get "/signup", to: "users#new", as: :signup
   resources :sessions, only: [:new, :create, :destroy]
   resources :boat_parameter_values
-  resources :boat_parameter_types
+  resources :boat_parameter_types, only: [:new, :create, :destroy, :edit, :update, :index]
+  post "/reorder_boat_parameter_types", to: "boat_parameter_types#update_numbers"
+  get "/reorder_boat_parameter_types", to: "boat_parameter_types#update_numbers"
+  resources :parameter_groups, only: [:create, :update, :destroy, :new]
   resources :boat_types
+  get "/manage_boat_types", to: "boat_types#manage_index", as: :manage_boat_types
   resources :users
   
   

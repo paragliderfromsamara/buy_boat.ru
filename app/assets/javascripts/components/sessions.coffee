@@ -1,5 +1,5 @@
 
-SessionMenuItem = React.createClass
+@MenuItem = React.createClass
 
     initRegistrationForm: ->
         winParams = {
@@ -20,44 +20,71 @@ SessionMenuItem = React.createClass
         getRemoteForm(winParams)        
     
     render: -> 
-        if @props.session_menu_item.url is "/signin"
+        if @props.menu_item.url is "/signin"
             React.DOM.li null,
                 React.DOM.a
                     onClick: @initSessionForm
-                    @props.session_menu_item.name   
+                    @props.menu_item.name   
             
-        else if @props.session_menu_item.url is "/signout"
+        else if @props.menu_item.url is "/signout"
             React.DOM.li null,
                 React.DOM.a
-                    href: @props.session_menu_item.url
+                    href: @props.menu_item.url
                     "data-remote": true
-                    @props.session_menu_item.name
+                    @props.menu_item.name
                     
-        else if @props.session_menu_item.url is "/signup"
+        else if @props.menu_item.url is "/signup"
             React.DOM.li null,
                 React.DOM.a
                     onClick: @initRegistrationForm
-                    @props.session_menu_item.name                    
+                    @props.menu_item.name                    
         else
             React.DOM.li null,
                 React.DOM.a
-                    href: @props.session_menu_item.url,
-                    @props.session_menu_item.name
+                    href: @props.menu_item.url
+                    React.DOM.span null, 
+                        @props.menu_item.name
+                if @props.menu_item.dropdown isnt undefined 
+                    j = 0
+                    React.DOM.ul 
+                        className: "menu vertical",
+                        React.createElement MenuItem, key: j++, menu_item: sub_item for sub_item in @props.menu_item.dropdown
+                                
+                        
         
                     
-@SessionMenuItems = React.createClass
+@MenuItems = React.createClass
     getInitialState: ->
-        session_menu_items: @props.data
+        session_menu_items: @props.data.right
+        menu_items: @props.data.left
     getDefaultProps: ->
         session_menu_items: []
+        menu_items: []
     render: ->
        needForm = false
-       React.DOM.div null,
-           React.DOM.ul null,
-               for item in @state.session_menu_items
-                   needForm = if not needForm then item.url == "/signin" else needForm 
-                   React.createElement SessionMenuItem, key: item.url, session_menu_item: item    
-           if needForm then React.createElement Reveal, id: "reveal_form_window", header: "Вход на сайт"
+       i = 0
+       React.DOM.div
+           className: "top-bar"
+           React.DOM.div
+               className: "row"
+               React.DOM.div
+                   className: "small-12 columns"
+                   React.DOM.div
+                       className: "top-bar-left"
+                       React.DOM.ul
+                           className: "dropdown menu"
+                           "data-dropdown-menu": ""
+                           for item in @state.menu_items    
+                               React.createElement MenuItem, key: i++, menu_item: item
+                   React.DOM.div
+                       className: "top-bar-right"
+                       React.DOM.ul
+                           className: "dropdown menu"
+                           "data-dropdown-menu": true 
+                           for item in @state.session_menu_items
+                               needForm = if not needForm then item.url == "/signin" else needForm 
+                               React.createElement MenuItem, key: i++, menu_item: item
+                   if needForm then React.createElement Reveal, id: "reveal_form_window", header: "Вход на сайт"
                
         
 

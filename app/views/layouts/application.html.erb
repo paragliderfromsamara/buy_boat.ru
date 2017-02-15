@@ -10,29 +10,17 @@
 
   <body>
       <div id = "top">
-          <%= react_component 'SessionMenuItems', { data: session_menu_items } %><%# find_in app/assets/javascript/components/sessions.coffee %>
-          <%if is_manager? %>
-              <ul>
-                  <li>
-                      <%= link_to "Пользователи", users_path %>
-                  </li>
-                  <li>
-                      <%= link_to "Типы лодок", boat_types_path %>
-                  </li>
-                  <li>
-                      <%= link_to "Серии лодок", boat_series_index_path %>
-                  </li>
-                  <li>
-                      <%= link_to "Торговые марки", trademarks_path %>
-                  </li>
-              </ul>
-          <%end%>
+          <%= react_component 'MenuItems', { data: menu_items } %><%# find_in app/assets/javascript/components/sessions.coffee %>
       </div>
       <div id = "middle">
           <%if !@header.blank? %>
-              <h1>
-                  <%= @header %>
-              </h1>
+              <div class = "row tb-pad-s">
+                  <div class = "small-12 columns">
+                      <h1>
+                          <%= @header %>
+                      </h1>
+                  </div>
+              </div>
           <%end%>
           <div id = "content">
               <%= yield %>

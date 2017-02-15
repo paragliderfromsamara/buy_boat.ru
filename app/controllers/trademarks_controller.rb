@@ -4,6 +4,7 @@ class TrademarksController < ApplicationController
   # GET /trademarks
   # GET /trademarks.json
   def index
+    @title = @header = "Торговые марки"
     @trademarks = Trademark.all
   end
 

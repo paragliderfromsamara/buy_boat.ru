@@ -10,6 +10,10 @@ module GrantsHelper
   def is_banned?
     user_type == "banned" 
   end
+  
+  def is_customer?
+    user_type == "customer" 
+  end
   #users_controller grants
   def could_see_users_list?
     is_manager?
@@ -36,4 +40,14 @@ module GrantsHelper
     #(current_user == user || is_admin?) && user_type != "banned"
   end
   #end
+  
+  #boat_parameter_types
+  def could_edit_boat_parameter_types?
+    is_admin?
+  end 
+  
+  #boat_types
+  def could_modify_boat_type?
+    is_admin?
+  end 
 end
