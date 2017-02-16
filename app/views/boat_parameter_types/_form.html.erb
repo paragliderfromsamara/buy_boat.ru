@@ -10,7 +10,7 @@
       </ul>
     </div>
   <% end %>
-  <div class = "row">
+  <div class = "row tb-pad-s">
       <div class="small-4 columns field">
         <%= f.label :name, "Наименование" %>
         <%= f.text_field :name %>
@@ -43,10 +43,6 @@
             <%= f.select :value_type, BoatParameterType.accessible_value_types %>
           <%end%>
       </div>
-  </div>
-  <div class = "row">
-      
-      
   </div>
   <div class = "row">
       <div class="small-12 columns actions">

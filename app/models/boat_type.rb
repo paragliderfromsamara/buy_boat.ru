@@ -6,14 +6,23 @@ class BoatType < ApplicationRecord
   has_many :boat_parameter_values, dependent: :delete_all
   belongs_to :boat_series, optional: true
   belongs_to :trademark
-
   
-  def self.for_catalog #то что отображается в каталоге
+  
+  
+  def self.active #лодки которые показываются в каталоге
     where(is_deprecated: false, is_active: true)
   end
   
+  def self.not_active  #лодки которые по каким-то причинам не показаны в каталоге, к примеру
+    where(is_deprecated: false, is_active: false)
+  end
+  
+  def self.deprecated  #устаревшие
+    where(is_deprecated: true)
+  end
+  
   def boat_parameters_for_react #для скармливания React.js
-    boat_parameter_values.map {|v| {id: v.id, name: v.name_and_measure, boat_type_id: self.id, short_name: v.name_and_measure(true), value_type: v.get_value_type, number: v.number, value: v.get_value, is_binded: v.is_binded}}
+    boat_parameter_values.for_react.map {|v| {id: v.id, name: v.name_and_measure, boat_type_id: self.id, short_name: v.name_and_measure(true), value_type: v.get_value_type, number: v.number, value: v.get_value, is_binded: v.is_binded}}
   end
   
   def catalog_name #название типа лодки с наименованием производителя, серией и типом корпуса

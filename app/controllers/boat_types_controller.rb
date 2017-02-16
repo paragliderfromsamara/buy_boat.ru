@@ -10,7 +10,7 @@ class BoatTypesController < ApplicationController
   # GET /boat_types
   # GET /boat_types.json
   def index
-    @boat_types = BoatType.for_catalog
+    @boat_types = BoatType.active
   end
 
   # GET /boat_types/1
@@ -51,7 +51,7 @@ class BoatTypesController < ApplicationController
   def update
     respond_to do |format|
       if @boat_type.update(boat_type_params)
-        format.html { redirect_to @boat_type, notice: 'Boat type was successfully updated.' }
+        format.html { redirect_to @boat_type, notice: 'Новый тип лодки успешно добавлен' }
         format.json { render :show, status: :ok, location: @boat_type }
       else
         format.html { render :edit }
@@ -65,7 +65,7 @@ class BoatTypesController < ApplicationController
   def destroy
     @boat_type.destroy
     respond_to do |format|
-      format.html { redirect_to boat_types_url, notice: 'Boat type was successfully destroyed.' }
+      format.html { redirect_to boat_types_url, notice: 'Тип лодки был успешно удалён' }
       format.json { head :no_content }
     end
   end

@@ -5,6 +5,10 @@
 @import "foundation-sites";
 @import "realcraft";
 
+tr.bb-undinded
+{
+    color: $medium-gray;
+}
 .bb-inline-menu
 {
     @include menu-base;

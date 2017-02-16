@@ -2,11 +2,23 @@ class BoatParameterValue < ApplicationRecord
   attr_accessor :set_value
   
   before_validation :select_value_type
-  belongs_to :boat_parameter_type
-  belongs_to :boat_type
+  belongs_to :boat_parameter_type, optional: :true
+  belongs_to :boat_type, optional: :true
   
-  default_scope {joins(:boat_parameter_type).select("boat_parameter_values.id, boat_parameter_values.is_binded, boat_parameter_types.name as name, boat_parameter_types.value_type AS value_type, boat_parameter_values.integer_value, boat_parameter_values.string_value, boat_parameter_values.bool_value, boat_parameter_values.float_value, boat_parameter_types.number AS number, boat_parameter_types.measure AS measure, boat_parameter_types.short_name AS short_name" ).order("boat_parameter_types.number ASC")} 
-
+  def self.for_react
+    joins(:boat_parameter_type).select(
+            "boat_parameter_values.id, 
+             boat_parameter_values.integer_value, 
+             boat_parameter_values.string_value, 
+             boat_parameter_values.bool_value, 
+             boat_parameter_values.float_value, 
+             boat_parameter_values.is_binded, 
+             boat_parameter_types.name as name, 
+             boat_parameter_types.value_type AS value_type, 
+             boat_parameter_types.number AS number, 
+             boat_parameter_types.measure AS measure, 
+             boat_parameter_types.short_name AS short_name").order("boat_parameter_types.number ASC")
+  end 
   def get_value 
     self["#{get_value_type}_value".to_sym]
   end

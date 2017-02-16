@@ -13,9 +13,11 @@
  *= require_tree .
  *= require_self
  */
+
 @import "foundation-sites";
 @import "motion-ui";
 @import "_settings";
+
 
 @include foundation-visibility-classes;
 @include foundation-float-classes;
@@ -37,6 +39,7 @@
 @include foundation-tooltip;
 @include foundation-button;
 @include foundation-forms;
+@include foundation-global-styles;
 
 
 .tb-pad-s

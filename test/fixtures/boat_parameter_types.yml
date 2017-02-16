@@ -5,12 +5,14 @@ one:
   short_name: MyString
   measure: MyString
   value_type: MyString
+  number: 1
 
 two:
   name: MyString
   short_name: MyString
   measure: MyString
   value_type: MyString
+  number: 2
 
 
 string_type:
@@ -18,21 +20,25 @@ string_type:
   short_name: MyString
   measure: MyString
   value_type: string
+  number: 3
 
 integer_type:
   name: integer_type_parameter
   short_name: MyString
   measure: MyString
   value_type: integer
+  number: 4
   
 boolean_type:
   name: boolean_type_parameter
   short_name: MyString
   measure: MyString
   value_type: bool
+  number: 5
   
 float_type:
   name: float_type_parameter
   short_name: MyString
   measure: MyString
   value_type: float
+  number: 6

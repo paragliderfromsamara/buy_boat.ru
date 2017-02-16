@@ -11,11 +11,10 @@ Rails.application.routes.draw do
   get "/signout", to: "sessions#destroy", as: :signout
   get "/signup", to: "users#new", as: :signup
   
-  resources :sessions, only: [:new, :create, :destroy]
+  resources :sessions, only: [:new, :create]
   
-  resources :boat_parameter_values, only: [:create, :update, :destroy]
+  resources :boat_parameter_values, only: [:update]
   get "/boat_parameter_values/:id/:boat_type_id", to: "boat_parameter_values#switch_bind"
-  
   resources :boat_parameter_types, only: [:new, :create, :destroy, :edit, :update, :index]
   post "/reorder_boat_parameter_types", to: "boat_parameter_types#update_numbers"
   get "/reorder_boat_parameter_types", to: "boat_parameter_types#update_numbers"

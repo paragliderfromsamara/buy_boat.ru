@@ -26,6 +26,9 @@
 @import "foundation-sites";
 @import "realcraft";
 
+
+$primary-color: $rc-primary-dark-blue;
+
 $foundation-palette: (
   primary: $rc-primary-dark-blue,
   secondary: $rc-gray,
@@ -38,13 +41,21 @@ $foundation-palette: (
   rc-blue: $rc-blue,
 );
 
+//GLOBAL STYLES
+
+$anchor-color: $rc-primary-blue;
+$anchor-color-hover: scale-color($anchor-color, $lightness: -35%);
+//GLOBAL STYLES END
+
+
+
 $regular-fonts: 'clear_sans_regular','Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;
 $bold-fonts: 'clear_sans_bold','Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;
 $medium-fonts: 'clear_sans_medium','Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;
 
 $body-font-family: "clear_sans_regular",'Helvetica Neue', Helvetica, Roboto, Arial, sans-serif;
 $header-font-family: 'clear_sans_bold','Helvetica Neue', Helvetica, Roboto, Arial, sans-serif ;
-@include foundation-global-styles;
+
  
 
 $light-gray:#f2f5f7;
@@ -222,6 +233,14 @@ th, thead
     font-weight: normal;
     font-family: $bold-fonts;
     text-align: center;
+    a
+    {
+        color: $light-gray;
+        &:hover
+        {
+           color: $medium-gray; 
+        }
+    }
 }
 th#modification
 {
