@@ -25,16 +25,10 @@ class BoatParameterTypesController < ApplicationController
   # POST /boat_parameter_types.json
   def create
     @boat_parameter_type = BoatParameterType.new(boat_parameter_type_params)
-
-    respond_to do |format|
-      if @boat_parameter_type.save
-        format.html { redirect_to @boat_parameter_type, notice: 'Boat parameter type was successfully created.' }
-        format.json { render :show, status: :created, location: @boat_parameter_type }
-        format.js {render js: "Turbolinks.visit(window.location);"}
-      else
-        format.html { render :new }
-        format.json { render json: @boat_parameter_type.errors, status: :unprocessable_entity }
-      end
+    if @boat_parameter_type.save
+      render js: "Turbolinks.visit(window.location);"
+    else
+      render js: "alert('Не удалось сохранить новый тип параметра');"
     end
   end
   
@@ -53,27 +47,18 @@ class BoatParameterTypesController < ApplicationController
   # PATCH/PUT /boat_parameter_types/1
   # PATCH/PUT /boat_parameter_types/1.json
   def update
-    respond_to do |format|
       if @boat_parameter_type.update(boat_parameter_type_params)
-        format.html { redirect_to @boat_parameter_type, notice: 'Boat parameter type was successfully updated.' }
-        format.json { render :show, status: :ok, location: @boat_parameter_type }
-        format.js {render js: "Turbolinks.visit(window.location);"}
+        render js: "Turbolinks.visit(window.location);"
       else
-        format.html { render :edit }
-        format.json { render json: @boat_parameter_type.errors, status: :unprocessable_entity }
-      end
-    end
+        render js: "alert('Не удалось обновить тип параметра');"
+      end  
   end
 
   # DELETE /boat_parameter_types/1
   # DELETE /boat_parameter_types/1.json
   def destroy
     @boat_parameter_type.destroy
-    respond_to do |format|
-      format.html { redirect_to boat_parameter_types_url, notice: 'Boat parameter type was successfully destroyed.' }
-      format.json { head :no_content }
-      format.js {render js: "Turbolinks.visit(window.location);"}
-    end
+    render js: "Turbolinks.visit(window.location);"
   end
 
   private

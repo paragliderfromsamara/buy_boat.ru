@@ -1,26 +1,25 @@
 class BoatParameterValuesController < ApplicationController
   before_action :check_grants
-  before_action :set_boat_parameter_value, only: [:update]
+  before_action :set_boat_parameter_value, only: [:update, :switch_bind]
 
   # POST /boat_parameter_values
   # POST /boat_parameter_values.json
   def switch_bind
     boat = BoatType.find_by(id: params[:boat_type_id])
     redirect_to "/404" and return if boat.nil?
-    value = boat.boat_parameter_values.find_by(id: params[:id])
-    redirect_to "/404" and return if value.nil?
-    value.update_attribute(:is_binded, !value.is_binded)
+    redirect_to "/404" and return if @boat_parameter_value.boat_type_id != boat.id
+    @boat_parameter_value.update_attribute(:is_binded, !@boat_parameter_value.is_binded)
     render json: {status: :ok}
   end
   
   # PATCH/PUT /boat_parameter_values/1
   # PATCH/PUT /boat_parameter_values/1.json
   def update
-    respond_to do |format|
       if @boat_parameter_value.update(boat_parameter_value_params)
-        format.json { render json: {status: :ok, new_value: @boat_parameter_value.reload.get_value}}
+        render json: {status: :ok, new_value: @boat_parameter_value.reload.get_value}
+      else
+        render json: {status: :bad}
       end
-    end
   end
 
 
