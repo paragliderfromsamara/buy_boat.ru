@@ -8,6 +8,19 @@ class UserTest < ActiveSupport::TestCase
     @mail_authority_test_user = User.create(email: %{#{default_string}@fuckyou.com}, password: "123456", password_confirmation: "123456")
     @psw = "123456" #пароль по умолчанию
   end
+  
+  test "Тест на добавление тест юзеров" do
+    password = default_string
+    users = default_users(password)
+    flag = true
+    User.user_types.each do |t|
+      users.each {|u| break if (flag = u.user_type_id == t[:id])}
+      break if !flag
+    end
+    assert_equal User.user_types.size, users.size,  "Добавилось не достаточное количество тест пользователей"
+    assert flag, "Не все типы пользоваетелей добавились"
+  end
+  
   test "Тест сохранения сохранения пароля" do
     user = User.new(email: %{#{default_string}@fuckyou.com}, password: "123456", password_confirmation: "123456")
     assert user.save, "Тест пользователь не сохранился"

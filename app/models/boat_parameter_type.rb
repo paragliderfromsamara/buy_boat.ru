@@ -38,7 +38,7 @@ class BoatParameterType < ApplicationRecord
   end
   
   def self.measures
-    select(:measure).reorder("measure ASC").uniq.collect {|m| m.measure}
+    select(:measure).reorder("measure ASC").distinct.collect {|m| m.measure}
   end
   def self.accessible_value_types
     [["текст", "string"], ["целый", "integer"], ["десятичный", "float"], ["да/нет", "bool"]]

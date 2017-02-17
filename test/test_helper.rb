@@ -6,20 +6,16 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
   
+  def default_users(password="123456")
+    v = User.user_types.map{ |type| {email: rand_email, password: password, password_confirmation: password, user_type_id: type[:id], creator_email: users(:admin).email, creator_salt: users(:admin).salt }}
+    users = User.create v
+    return users
+  end
+  
   def create_users_list(password="123456")
     v = {}
-    User.user_types.each {|t| v[t[:name].to_sym] = User.create(
-                                                                first_name: default_string,
-                                                                last_name: default_string,
-                                                                third_name: default_string,
-                                                                email: rand_email,
-                                                                password: password,
-                                                                password_confirmation: password,
-                                                                creator_salt: users(:admin).salt,
-                                                                creator_email: users(:admin).email,
-                                                                user_type_id: t[:id]
-                                                                
-                          )}
+    u = default_users(password)
+    u.each {|usr| v[usr.user_type.to_sym] = usr }
     return v
   end
   

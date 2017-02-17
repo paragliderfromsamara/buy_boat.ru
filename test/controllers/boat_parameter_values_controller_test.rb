@@ -3,22 +3,12 @@ require 'test_helper'
 class BoatParameterValuesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @password = default_string
-    @boat_parameter_value = boat_parameter_values(:one)
     @white_list_for_modify = ["admin"]
     @white_list_for_unbind = ["admin"]
-    v = User.user_types.map{ |type| {email: rand_email, password: @password, password_confirmation: @password, user_type_id: type[:id], creator_email: users(:admin).email, creator_salt: users(:admin).salt }}
-    @users = User.create v
+    @users = default_users(@password)
   end
   
-  test "Тест на добавление тест юзеров" do
-    flag = true
-    User.user_types.each do |t|
-      @users.each {|u| break if (flag = u.user_type_id == t[:id])}
-      break if !flag
-    end
-    assert_equal User.user_types.size, @users.size,  "Добавилось не достаточное количество тест пользователей"
-    assert flag, "Не все типы пользоваетелей добавились"
-  end
+  
   
   test "Тест на возможность пользования функционалом зарегестрированными пользователями" do
     @users.each do |u|

@@ -4,14 +4,14 @@ one:
   name: MyString
   short_name: MyString
   measure: MyString
-  value_type: MyString
+  value_type: string
   number: 1
 
 two:
   name: MyString
   short_name: MyString
   measure: MyString
-  value_type: MyString
+  value_type: string
   number: 2
 
 

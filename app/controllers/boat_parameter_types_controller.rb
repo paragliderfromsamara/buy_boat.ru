@@ -9,7 +9,6 @@ class BoatParameterTypesController < ApplicationController
     @title = @header = "Таблица типов параметров"
   end
 
-
   # GET /boat_parameter_types/new
   def new
     @boat_parameter_type = BoatParameterType.new
@@ -33,15 +32,12 @@ class BoatParameterTypesController < ApplicationController
   end
   
   def update_numbers
-    ids = upd = ""
     if !params.blank?
       BoatParameterType.all.each do |t|
         next if params["number_#{t.id}".to_sym].nil?
         t.update_attribute(:number, params["number_#{t.id}".to_sym])
-        upd += "#{t.id}; "
       end
-      upd = "no" if upd.blank?
-      render json: {status: "#{upd}; #{ids}"}
+      render json: {status: :ok}
     end
   end
   # PATCH/PUT /boat_parameter_types/1
@@ -63,7 +59,7 @@ class BoatParameterTypesController < ApplicationController
 
   private
     def check_grants
-      redirect_to "/404" if !could_edit_boat_parameter_types? #defined in GrantsHelper
+      redirect_to "/404" and return if !could_edit_boat_parameter_types? #defined in GrantsHelper
     end 
     
     # Use callbacks to share common setup or constraints between actions.

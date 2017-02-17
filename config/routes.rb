@@ -17,7 +17,6 @@ Rails.application.routes.draw do
   get "/boat_parameter_values/:id/:boat_type_id", to: "boat_parameter_values#switch_bind", as: :switch_bind_parameter_value #привязка-отвязка атрибутов от лодки
   resources :boat_parameter_types, only: [:new, :create, :destroy, :edit, :update, :index]
   post "/reorder_boat_parameter_types", to: "boat_parameter_types#update_numbers"
-  get "/reorder_boat_parameter_types", to: "boat_parameter_types#update_numbers"
   
   resources :boat_types
   get "/manage_boat_types", to: "boat_types#manage_index", as: :manage_boat_types
