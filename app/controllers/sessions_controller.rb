@@ -8,7 +8,7 @@ class SessionsController < ApplicationController
   end
   
   def new
-   redirect_to my_path if signed_in? 
+   redirect_to my_path and return if signed_in? 
 	 @title = @header = 'Вход на сайт'
    render layout: false if params[:nolayout] == "true" 
   end

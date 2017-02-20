@@ -35,8 +35,8 @@
                 <td><%= boat_type.creator.email %></td>
                 <td><%= boat_type.modifier.email %></td>
                 <td><%= link_to "<i class = 'fi-arrow-right'></i>".html_safe, boat_type %></td>
-                <td><%= link_to "<i class = 'fi-pencil'></i>".html_safe, edit_boat_type_path(boat_type) %></td>
-                <td><%= link_to "<i class = 'fi-x'></i>".html_safe, boat_type, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+                <td><%= link_to "<i class = 'fi-pencil'></i>".html_safe, edit_boat_type_path(boat_type), "data-turbolinks"=> false %></td>
+                <td><%= link_to "<i class = 'fi-x'></i>".html_safe, boat_type, method: :delete, data: { confirm: 'Вы уверены, что хотите удалить данный тип лодки?' } %></td>
               </tr>
             <% end %>
           </tbody>

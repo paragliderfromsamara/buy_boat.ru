@@ -10,7 +10,81 @@
 
   <body>
       <div id = "top">
-          <%= react_component 'MenuItems', { data: menu_items } %><%# find_in app/assets/javascript/components/sessions.coffee %>
+          <div id="site-menu">
+              <div id="white-menu" class = "top-bar">
+                   <div class = "row">
+                       <div class = "medium-4 columns">
+                           <ul class = 'menu'>
+                               <li class = "logo-field">
+                                   <%= link_to "КупитьЛодку.рф", root_path %>
+                               </li>
+                           </ul>
+                       </div>
+                       <div class = "medium-8 columns">
+                           <ul class = 'menu float-right'>
+                               <li>
+                                   <%= link_to "ВЫБОР ЛОДКИ", boat_types_path %>
+                               </li>
+                               <li>
+                                   <%= link_to "ЛОДКИ В НАЛИЧИИ", boat_types_path %>
+                               </li>
+                               <li>
+                                   <%= link_to "СПЕЦПРЕДЛОЖЕНИЯ", boat_types_path %>
+                               </li>
+                           </ul>
+                       </div>
+                   </div>
+              </div>
+              <div id="dark-menu" class = "top-bar">
+                      <div class = "row">
+                          <% if is_manager?%>
+                            <div class = "medium-7 columns">
+                                  <ul class = 'menu'>
+                                      
+                                          <li>
+                                              <%= link_to "Пользователи", users_path %>
+                                          </li>
+                                          <li>
+                                              <%= link_to "Типы лодок", manage_boat_types_path %>
+                                          </li>
+                                          <li>
+                                              <%= link_to "Торговые марки", trademarks_path %>
+                                          </li>
+                                         <li>
+                                             <%= link_to "Серии лодок", boat_series_index_path %>
+                                         </li>
+                                         <li>
+                                             <%= link_to "Таблица характеристик лодок", boat_parameter_types_path %>
+                                         </li>
+                                      
+                                  </ul>
+                          </div>
+                          <%end%>
+                          <div class = "medium-<%= is_manager? ? 5 : 12 %> columns">
+                              <ul class = 'menu float-right'>
+                                  <% if signed_in?%>
+                                      <li>
+                                          <%= link_to "МОИ ЛОДКИ(0)", "/my_boats" %>
+                                      </li>
+                                      <li>
+                                          <%= link_to "ЛИЧНЫЙ КАБИНЕТ", my_path %>
+                                      </li>
+                                     <li>
+                                         <%= link_to "ВЫХОД", signout_path, remote: true %>
+                                     </li>
+                                  <%else%>
+                                      <li>
+                                          <%= link_to "РЕГИСТРАЦИЯ", signup_path %>
+                                      </li>
+                                      <li>
+                                          <%= link_to "ВОЙТИ", signin_path %>
+                                      </li>
+                                  <%end%>
+                              </ul>
+                          </div>
+                      </div>
+              </div>
+          </div>
       </div>
       <div id = "middle">
           <%if !@header.blank? %>

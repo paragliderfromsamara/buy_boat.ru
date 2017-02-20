@@ -37,9 +37,21 @@
     <div class = 'tabs-panel'  id="photos">
         <div class = "row tb-pad-s">
           <div class="small-12 columns">
-              add_photos
+              <%= form_for(@boat_type, html: {class: "dropzone"}) do |f| %>
+                  <%= f.hidden_field :modifier_id, value: current_user.id %>
+                  <%= f.fields_for :photos_attributes do |ph| %>
+                      <%= ph.hidden_field :uploader_id, value: current_user.id %>
+                  <%end%>
+              <%end%>
           </div>
         </div>
+      <div id = "uploaded-photos-container" class="row small-up-2 medium-up-3 tb-pad-s">
+          <% @boat_type.photos.each do |p| %>
+                <div class="column column-block tb-pad-s">
+                  <%= image_tag p.link.thumb, class: "thumbnail", "data-photo-id" => p.id%>
+                </div>
+           <%end%>
+      </div>
     </div>
 </div>
 

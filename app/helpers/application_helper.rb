@@ -15,28 +15,6 @@ module ApplicationHelper
     return %{<select name = "#{form_name}[#{input_name}]" id = "#{form_name}_#{input_name}">#{def_val_string}#{collection}</select>}
   end
   
-  def menu_items
-    menu = {left: [], right: []}
-    menu[:right] = signed_in? ? [{url: my_path, name: "Моя лодка (0)"},{url: my_path, name: "Кабинет"},{url: signout_path, name: "Выйти"}] : [{url: signin_path, name: "Вход"}, {url: signup_path, name: "Регистрация"}]
-    menu[:left] = [
-                    {url: boat_types_path, name: "Подобрать лодку"},
-                    {url: boat_types_path, name: "Лодки в наличии"}
-                  ] 
-  
-    if is_manager?
-      control_menu = []
-      control_menu[control_menu.length] = {url: users_path, name: "Пользователи"}
-      control_menu[control_menu.length] = {url: trademarks_path, name: "Торговые марки"} 
-      control_menu[control_menu.length] = {url: manage_boat_types_path, name: "Типы лодок"}
-      control_menu[control_menu.length] = {url: boat_series_index_path, name: "Серии лодок"}
-      control_menu[control_menu.length] = {url: boat_parameter_types_path, name: "Таблица характеристик лодок"} 
-      c = [{url: "#", name: "Управление", dropdown: control_menu}]
-      menu[:right] = c + menu[:right]
-    end
-    
-    return menu
-  end
-  
   
   def my_select_list(collection, target_id)
     return "" if collection.blank?

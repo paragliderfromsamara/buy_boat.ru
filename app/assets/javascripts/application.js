@@ -10,21 +10,29 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
+//= require turbolinks
 //= require jquery
 //= require jquery_ujs
+//= require motion-ui
+//= require foundation-sites
 //= require react
 //= require react_ujs
 //= require components
-//= require motion-ui
-//= require foundation-sites
-//= require turbolinks
 //= require_tree .
     
 var rFunc = function()
     {
-        ReactRailsUJS.mountComponents();
         $(document).foundation();
+    }
+var rendFunc = function()
+    {
+        ReactRailsUJS.mountComponents();
+    }
+var befRendFunc = function()
+    {
+        ReactRailsUJS.unmountComponents();
     }
     
 document.addEventListener("turbolinks:load", rFunc);
-    
+document.addEventListener("turbolinks:request-end", rendFunc);    
+document.addEventListener("turbolinks:before-visit", befRendFunc); 

@@ -64,6 +64,37 @@
             React.DOM.div
                 id: "reveal_content"
                 @state.data
-    
+                
+#{text: "КупитьЛодку.рф", href: "/", className: "logo-field"}
+@LiItem = React.createClass
+    render: ->
+        React.DOM.li
+            className: @props.liElement.className,
+            if @props.liElement.href isnt undefined || @props.liElement.urlClickHandle isnt undefined
+                React.DOM.a
+                    onClick: @props.liElement.urlClickHandle
+                    "data-remote": @props.liElement.urlRemote
+                    href: @props.liElement.href
+                    @props.liElement.text
+            else
+                React.DOM.span null, @props.liElement.text
 
-    
+#{text: "КупитьЛодку.рф", href: "/", className: "logo-field"}
+@Menu = React.createClass
+    getInitialState: ->
+       id: @props.ulElement.id
+       _class: @props.ulElement._class
+       liList: @props.ulElement.li_list
+    getDefaultProps: ->
+        id: ""
+        _class: ""
+        liList: []
+    render: ->
+        i = 0
+        React.DOM.ul
+            id: @state.id
+            className: @state._class
+            for li in @state.liList
+                React.createElement LiItem, {key: i++, liElement: li}
+                
+      

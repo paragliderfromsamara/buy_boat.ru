@@ -51,7 +51,7 @@ class BoatTypesController < ApplicationController
   def update
     respond_to do |format|
       if @boat_type.update(boat_type_params)
-        format.html { redirect_to @boat_type, notice: 'Новый тип лодки успешно добавлен' }
+        format.html { redirect_to @boat_type, notice: 'Тип лодки успешно обновлён' }
         format.json { render :show, status: :ok, location: @boat_type }
       else
         format.html { render :edit }
@@ -78,9 +78,9 @@ class BoatTypesController < ApplicationController
     def set_boat_type
       @boat_type = BoatType.find(params[:id])
     end
-
+    
     # Never trust parameters from the scary internet, only allow the white list through.
     def boat_type_params
-      params.require(:boat_type).permit(:name, :boat_series_id, :body_type, :description, :base_cost, :min_hp, :max_hp, :hull_width, :hull_length, :is_deprecated, :is_active, :creator_id, :modifier_id, :trademark_id)
+      params.require(:boat_type).permit(:name, :boat_series_id, :body_type, :description, :base_cost, :is_deprecated, :is_active, :creator_id, :modifier_id, :trademark_id, photos_attributes:[:link, :uploader_id])
     end
 end
