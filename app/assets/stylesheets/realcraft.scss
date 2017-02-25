@@ -18,7 +18,7 @@ $rc-secondary-dark-blue: #464e7e;
 $rc-dark-blue: #28334a;
 $rc-gray: #7c878e;
 $rc-red: #ce0037;
-$rc-blue: #489fdf;
+$rc-blue: #005aff;
 //-----------------------
 
 
@@ -77,9 +77,17 @@ $rc-blue: #489fdf;
        color: $rc-primary-dark-blue;
    }
 }
+.black-bg
+{
+   background-color: #171e2d; 
+}
+.lightest-fog
+{
+    @include my_opacity(0.25);
+}
 .light-fog
 {
-    @include my_opacity(0.3);
+    @include my_opacity(0.35);
 }
 .medium-fog
 {
@@ -88,6 +96,10 @@ $rc-blue: #489fdf;
 .hard-fog
 {
     @include my_opacity(0.75);
+}
+.hardest-fog
+{
+    @include my_opacity(0.90);
 }
 //--------------------------------------
 //

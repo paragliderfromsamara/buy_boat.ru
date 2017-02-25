@@ -68,7 +68,6 @@ $menu-item-color-active: $dark-gray;
 $menu-item-background-active:none;
 $topbar-title-spacing: 0;
 $dropdownmenu-arrow-color: $white;
-$topbar-submenu-background: $rc-primary-dark-blue;;
 //$topbar-padding: 1.3rem; 
 $hr-width: 100%;
 a.locale-link
@@ -94,44 +93,6 @@ a.locale-link
 
 
 
-
-
-#white-menu
-{
-    &.top-bar, li, .menu
-    {
-        background-color: $white;
-    } 
-    &.top-bar
-    {
-        padding: 1.3rem;
-        li a
-        {
-            color: $rc-primary-dark-blue;
-        }
-        .logo-field
-        {
-            font-size: 1.3rem;
-            font-family: $bold-fonts;
-        }
-    }
-}
-#dark-menu
-{
-   &.top-bar, li, .menu
-   {
-       background-color: $rc-primary-dark-blue;
-   } 
-   &.top-bar
-   {
-       padding: 0.1rem;
-       li a
-       {
-           color: $white;
-           font-size: 0.8rem;
-       }
-   }
-}
 
 .row
 {

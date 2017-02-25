@@ -6,12 +6,17 @@ class BoatType < ApplicationRecord
   
   has_many :boat_photos, dependent: :delete_all
   has_many :photos, through: :boat_photos
+  belongs_to :photo
   
   has_many :boat_parameter_values, dependent: :delete_all
   belongs_to :boat_series, optional: true, validate: false
   belongs_to :trademark
   
   accepts_nested_attributes_for :photos
+  
+  def alter_photo
+    photo.nil? ? photos.first : photo 
+  end
   
   def photos_hash_view
     return "" if photos.blank?

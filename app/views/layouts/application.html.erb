@@ -10,33 +10,9 @@
 
   <body>
       <div id = "top">
-          <div id="site-menu">
-              <div id="white-menu" class = "top-bar">
-                   <div class = "row">
-                       <div class = "medium-4 columns">
-                           <ul class = 'menu'>
-                               <li class = "logo-field">
-                                   <%= link_to "КупитьЛодку.рф", root_path %>
-                               </li>
-                           </ul>
-                       </div>
-                       <div class = "medium-8 columns">
-                           <ul class = 'menu float-right'>
-                               <li>
-                                   <%= link_to "ВЫБОР ЛОДКИ", boat_types_path %>
-                               </li>
-                               <li>
-                                   <%= link_to "ЛОДКИ В НАЛИЧИИ", boat_types_path %>
-                               </li>
-                               <li>
-                                   <%= link_to "СПЕЦПРЕДЛОЖЕНИЯ", boat_types_path %>
-                               </li>
-                           </ul>
-                       </div>
-                   </div>
-              </div>
-              <div id="dark-menu" class = "top-bar">
-                      <div class = "row">
+          <div class = "top-bar">
+                <div class = "row">
+                          <!--
                           <% if is_manager?%>
                             <div class = "medium-7 columns">
                                   <ul class = 'menu'>
@@ -60,7 +36,15 @@
                                   </ul>
                           </div>
                           <%end%>
-                          <div class = "medium-<%= is_manager? ? 5 : 12 %> columns">
+                              -->
+                          <div class = "medium-5 columns">
+                              <ul class = 'menu'>
+                                 <li class = "logo-field">
+                                     <%= link_to "КупитьЛодку.рф", root_path %>
+                                 </li>
+                              </ul>
+                          </div>
+                          <div class = "medium-7 columns">
                               <ul class = 'menu float-right'>
                                   <% if signed_in?%>
                                       <li>
@@ -74,17 +58,17 @@
                                      </li>
                                   <%else%>
                                       <li>
-                                          <%= link_to "РЕГИСТРАЦИЯ", signup_path %>
+                                          <%= link_to "<i class = 'fi-anchor'></i>РЕГИСТРАЦИЯ".html_safe, signup_path %>
                                       </li>
                                       <li>
-                                          <%= link_to "ВОЙТИ", signin_path %>
+                                          <%= link_to "<i class = 'fi-key'></i>ВХОД".html_safe, signin_path %>
                                       </li>
                                   <%end%>
                               </ul>
                           </div>
-                      </div>
-              </div>
+                </div>
           </div>
+          <%= render "layouts/top_image" %>
       </div>
       <div id = "middle">
           <%if !@header.blank? %>

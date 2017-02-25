@@ -1,3 +1,4 @@
+
 <%= form_for(trademark) do |f| %>
   <% if trademark.errors.any? %>
     <div id="error_explanation">
@@ -11,42 +12,65 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= f.label :name %>
-    <%= f.text_field :name %>
-  </div>
+    <%= f.hidden_field :creator_id, value: current_user.id if trademark.new_record? %>
+    <%= f.hidden_field :updater_id, value: current_user.id %>
+<div class = "row">
+    <div class = "small-4 columns field">
+        <%= f.label :logo, "Лого цветной, горизонтальный", class: "button"%>
+        <%= f.file_field :logo, class: "show-for-sr" %>
+        <%= f.hidden_field :logo_cache %>
+    </div>
+    <div class = "small-4 columns field">
+        <%= f.label :vertical_logo, "Лого цветной, вертикальный", class: "button"%>
+        <%= f.file_field :vertical_logo, class: "show-for-sr"  %>
+        <%= f.hidden_field :vertical_logo_cache %>
+    </div>
+    <div class = "small-4 columns field">
+        <%= f.label :white_logo, "Лого белый, горизонтальный", class: "button"%>
+        <%= f.file_field :white_logo, class: "show-for-sr"  %>
+        <%= f.hidden_field :white_logo_cache %>
+    </div>
+</div>
+<div class = "row">
+    <div class = "small-4 columns field">
+        <%= image_tag trademark.logo.medium if !trademark.logo.nil? %>
 
-  <div class="field">
-    <%= f.label :www %>
-    <%= f.text_field :www %>
-  </div>
+    </div>
+    <div class = "small-4 columns field">
+        <%= image_tag trademark.vertical_logo.medium if !trademark.vertical_logo.nil? %>
 
-  <div class="field">
-    <%= f.label :email %>
-    <%= f.text_field :email %>
-  </div>
+    </div>
+    <div class = "small-4 columns field" style = "position: relative">
+        <div class = "rc-fog black-bg medium-fog"></div>
+        <div style='position: relative; z-index:100;' class = "tb-pad-s">
+            <%= image_tag trademark.white_logo.medium if !trademark.white_logo.nil? %>
+        </div>
+    </div>
+</div>
+<div class = "row">
+    <div class = "small-6 columns field">
+        <%= f.label :name, "Наименование" %>
+        <%= f.text_field :name %>
+    </div>
+    <div class = "small-6 columns field">
+        <%= f.label :www, "Сайт"  %>
+        <%= f.text_field :www %>
+    </div>
+</div>
+<div class = "row">
+    <div class = "small-6 columns field">
+        <%= f.label :email, "email" %>
+        <%= f.text_field :email %>
+    </div>
+    <div class = "small-6 columns field">
+        <%= f.label :phone, "Контактный номер" %>
+        <%= f.text_field :phone %>
+    </div>
+</div>
+<div class = "row">
+    <div class = "small-12 columns actions">
+          <%= f.submit trademark.new_record? ? "Добавить" : "Обновить", class: "button success" %>
+    </div>
+</div>
 
-  <div class="field">
-    <%= f.label :phone %>
-    <%= f.text_field :phone %>
-  </div>
-
-  <div class="field">
-    <%= f.label :logo %>
-    <%= f.text_field :logo %>
-  </div>
-
-  <div class="field">
-    <%= f.label :creator_id %>
-    <%= f.number_field :creator_id %>
-  </div>
-
-  <div class="field">
-    <%= f.label :updater_id %>
-    <%= f.number_field :updater_id %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit %>
-  </div>
 <% end %>

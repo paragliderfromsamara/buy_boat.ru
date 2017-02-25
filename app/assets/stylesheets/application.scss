@@ -31,7 +31,7 @@
 @include foundation-sticky;
 @include foundation-dropdown;
 @include foundation-dropdown-menu;
-@include foundation-orbit;
+//@include foundation-orbit;
 @include foundation-flex-video;
 @include foundation-reveal;
 @include foundation-close-button;
@@ -41,21 +41,364 @@
 @include foundation-forms;
 @include foundation-global-styles;
 
+@mixin covered-bg
+{
+    background-repeat: no-repeat;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -o-background-size: cover;
+    -moz-background-size: cover; 
+}
+.rubl
+{
+    &:before
+    {
+     content: "₽";
+    }
+    margin-left: 4px;
+    
+}
 
-.tb-pad-s
+@include breakpoint(small)
 {
- padding-top: 2rem;   
-  padding-bottom: 2rem;  
+    .rubl
+    {
+        font-size:1.0rem;
+        vertical-align: 0.5rem;
+    }
+    .tb-pad-xs
+    {
+        padding-top: 0.35rem;   
+        padding-bottom: 0.35rem;
+    }
+    .tb-pad-s
+    {
+     padding-top: 1rem;   
+     padding-bottom: 1rem;  
+    }
+    .tb-pad-m
+    {
+     padding-top: 2rem;   
+      padding-bottom: 2rem;  
+    }
+    .tb-pad-l
+    {
+     padding-top: 4rem;   
+      padding-bottom: 4rem;  
+    } 
+    .bb-wide-block
+    {
+        height: 280px; 
+         h3
+         {
+             font-size: 1.0rem;
+         }
+         p
+         {
+          font-size: 0.8rem;   
+         }
+         .stat
+         {
+            font-size: 1.3rem;   
+         }
+         #cost
+         {
+             font-size: 1.3rem;
+         }
+        .bottom-menu
+        {
+            height: 48px;
+            .black-menu
+            {
+                height: 48px;
+                .menu
+                {
+                    padding-top: 9px;
+                }
+                .menu, .menu li
+                {
+                    height: 30px;
+                }
+                a
+                {
+                    font-size: 0.7rem;
+                }
+            }
+        }
+    }
+    .bb-mini-block
+    {
+        h4
+        {
+            font-size: 1.0rem;
+        }
+    }
 }
-.tb-pad-m
+@include breakpoint(medium)
 {
- padding-top: 4rem;   
-  padding-bottom: 4rem;  
+    .rubl
+    {
+        font-size:1.3rem;
+        vertical-align: 0.8rem;
+    }
+    .tb-pad-xs
+    {
+        padding-top: 0.7rem;   
+        padding-bottom: 0.7rem;
+    }
+    .tb-pad-s
+    {
+     padding-top: 1.5rem;   
+     padding-bottom: 1.5rem;  
+    }
+    .tb-pad-m
+    {
+     padding-top: 3rem;   
+      padding-bottom: 3rem;  
+    }
+    .tb-pad-l
+    {
+     padding-top: 6rem;   
+      padding-bottom: 6rem;  
+    } 
+    .bb-wide-block
+    {
+        height: 360px; 
+        h3
+        {
+            font-size: 1.3rem;
+        }
+        p
+        {
+            font-size: 0.9rem;   
+        }
+        .stat
+        {
+           font-size: 1.3rem;   
+        }
+        #cost
+        {
+            font-size: 2.0rem;
+        }
+        .bottom-menu
+        {
+            height: 60px;
+            .black-menu
+            {
+                height: 60px;
+                .menu
+                {
+                    padding-top: 10px;
+                }
+                .menu, .menu li
+                {
+                    height: 40px;
+                }
+                a
+                {
+                    font-size: 0.9rem;
+                }
+            }
+        }
+    }
+    .bb-mini-block
+    {
+        h4
+        {
+            font-size: 1.2rem;
+        }
+    }
 }
-.tb-pad-l
+@include breakpoint(large)
 {
- padding-top: 8rem;   
-  padding-bottom: 8rem;  
+    .rubl
+    {
+        font-size:1.5rem;
+        vertical-align: 1.0rem;
+    }
+    .tb-pad-xs
+    {
+        padding-top: 1.0rem;   
+        padding-bottom: 1.0rem;
+    }
+    .tb-pad-s
+    {
+     padding-top: 2rem;   
+     padding-bottom: 2rem;  
+    }
+    .tb-pad-m
+    {
+     padding-top: 4rem;   
+      padding-bottom: 4rem;  
+    }
+    .tb-pad-l
+    {
+     padding-top: 8rem;   
+      padding-bottom: 8rem;  
+    } 
+    .bb-wide-block
+    {
+        height: 500px; 
+        h3
+        {
+            font-size: 2.0rem;
+        }
+        p
+        {
+            font-size: 1.0rem;   
+        }
+        .stat
+        {
+           font-size: 2.0rem;   
+        }
+        #cost
+        {
+            font-size: 2.5rem;
+        }
+        .bottom-menu
+        {
+            height: 70px;
+            .black-menu
+            {
+                height: 70px;
+                .menu
+                {
+                    padding-top: 12px;
+                }
+                .menu, .menu li
+                {
+                    height: 46px;
+                }
+                a
+                {
+                    font-size: 1.0rem;
+                }
+            }
+        }
+    }
+    .bb-mini-block
+    {
+        h4
+        {
+            font-size: 1.4rem;
+        }
+    }
+}
+
+#top
+{
+    width: 100%;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid $medium-gray;
+    
+       &, .top-bar.menu, .top-bar, .top-bar li, .top-bar ul 
+       {
+           background-color: #f9f9f9;//scale-color($rc-primary-blue, $lightness: -50%);//$rc-primary-blue;//$rc-primary-dark-blue;
+       } 
+       .top-bar
+       {
+           padding: 1.2rem;
+           li a
+           {
+               color: $rc-gray;
+               font-size: 0.8rem;
+               &:hover
+               {
+                   color: darken($rc-gray, 13%);
+               }
+           }
+           .logo-field a
+           {
+               font-size: 1.0rem;
+               font-family: $bold-fonts;
+           }
+       }
+       .bb-wide-block
+       {
+          margin-bottom: 2.5rem; 
+          .bottom-menu
+          {
+              position: absolute;
+              bottom: 0;
+              width: 100%;
+              .menu-wrapper
+              {
+                  position: relative;
+                  width: 100%;
+                  .black-menu
+                  {
+                      position: relative;
+                      width: 100%;
+                      z-index: 100;
+                      .menu, .menu li
+                      {
+
+                          background-color: none;
+                      }
+                      li
+                      {
+                          border-left: 1px solid $medium-gray;
+                      }
+                      li:first-child
+                      {
+                          border-left: none;
+                      }
+                      li a
+                      {
+                          color: $medium-gray;
+                          z-index: 100;
+                          &:hover
+                          {
+                              color: $light-gray;
+                          }                       
+                      }
+                  }
+                  .rc-fog
+                  {
+                      z-index: 10;
+                  }
+                  
+              }
+          }
+       }   
+}
+
+.bb-wide-block, .bb-mini-block
+{
+    h3, p, span, h4
+    {
+        color: $light-gray;
+    }
+    .row
+    {
+        position: relative;
+        z-index: 100;
+    }
+    @include covered-bg;
+}
+.bb-wide-block
+{
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1400px;
+    width: 100%;
+}
+
+.bb-mini-block
+{
+    position: relative;
+    max-width: 400px;
+    width: 100%;
+    max-height: 300px;
+    .bb-mini-control
+    {
+        position: absolute;
+        bottom: 30px;
+        left: 0px;
+        height: 20px;
+        width: 100%;
+    }
 }
 
 

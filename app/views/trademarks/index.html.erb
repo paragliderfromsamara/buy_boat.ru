@@ -5,11 +5,11 @@
       <table>
         <thead>
           <tr>
+            <th>Логотип</th>
             <th>Наименование</th>
             <th>Веб сайт</th>
             <th>Email</th>
             <th>Телефон</th>
-            <th>Логотип</th>
             <th>Добавил</th>
             <th>Изменил</th>
             <th colspan="3"></th>
@@ -19,11 +19,11 @@
         <tbody>
           <% @trademarks.each do |trademark| %>
             <tr>
+              <td><%= image_tag trademark.logo.small if !trademark.logo.nil? %></td>
               <td><%= trademark.name %></td>
               <td><%= trademark.www %></td>
               <td><%= trademark.email %></td>
               <td><%= trademark.phone %></td>
-              <td><%= trademark.logo %></td>
               <td><%= trademark.creator.email%></td>
               <td><%= trademark.updater.email %></td>
               <td><%= link_to "<i class = 'fi-arrow-right alert'>".html_safe, trademark %></td>

@@ -13,11 +13,9 @@ class Photo < ApplicationRecord
       small: link.small.url,
       medium: link.medium.url,
       large: link.large.url,
-      xlarge: link.xlarge.url,
       wide_small: link.wide_small.url,
       wide_medium: link.wide_medium.url,
-      wide_large: link.wide_large.url,
-      wide_xlarge: link.wide_xlarge.url
+      wide_large: link.wide_large.url
     }
   end
   

@@ -1,0 +1,36 @@
+
+<%boat = top_block[:boat_type]%>
+<div class = 'bb-wide-block' <% if !boat.alter_photo.nil? %> data-interchange = "[<%= boat.alter_photo.link.wide_small.url %>, small], [<%= boat.alter_photo.link.wide_medium.url %>, medium], [<%= boat.alter_photo.link.wide_large.url %>, large]" style = "background-image:url('<%= boat.alter_photo.link.wide_small.url %>');" <% end %> >
+  <div class = "rc-fog light-fog blue-bg"></div>
+  <div class = "bottom-menu">
+      <div class = "row">
+          <div class = "small-12 medium-10 medium-centered columns">
+              <div class = "menu-wrapper">
+                  <div class = "rc-fog hard-fog black-bg"></div>
+                  <div class = 'black-menu'>
+                  <ul class = "menu menu-centered expanded">
+                      <li>
+                          <%= link_to "ВЫБОР ЛОДКИ", boat_types_path %>
+                      </li>
+                      <li>
+                          <%= link_to "ЛОДКИ В НАЛИЧИИ", boat_types_path %>
+                      </li>
+                      <li>
+                          <%= link_to "СПЕЦПРЕДЛОЖЕНИЯ", boat_types_path %>
+                      </li>
+                  </ul>
+                  </div>
+              </div>
+              
+          </div>
+      </div>
+  </div>
+  <div class = "row  tb-pad-m">
+      <div class = "small-6 columns">
+         <h4> <%= boat.catalog_name %></h4> 
+      </div>
+      <div class = "small-6 columns">
+           <%= image_tag boat.trademark.white_logo.small, class: "float-right" %>
+      </div>
+  </div>
+</div>

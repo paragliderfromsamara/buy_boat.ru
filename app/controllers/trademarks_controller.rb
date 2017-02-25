@@ -15,21 +15,23 @@ class TrademarksController < ApplicationController
 
   # GET /trademarks/new
   def new
+    @title = @header = "Новая торговая марка"
     @trademark = Trademark.new
   end
 
   # GET /trademarks/1/edit
   def edit
+    @title = @header = "Изменение торговой марка"
   end
 
   # POST /trademarks
   # POST /trademarks.json
   def create
     @trademark = Trademark.new(trademark_params)
-
+    @title = @header = "Новая торговая марка"
     respond_to do |format|
       if @trademark.save
-        format.html { redirect_to @trademark, notice: 'trademark was successfully created.' }
+        format.html { redirect_to @trademark, notice: 'Торговая марка успешно добавлена' }
         format.json { render :show, status: :created, location: @trademark}
       else
         format.html { render :new }
@@ -41,9 +43,10 @@ class TrademarksController < ApplicationController
   # PATCH/PUT /trademarks/1
   # PATCH/PUT /trademarks/1.json
   def update
+    @title = @header = "Изменение торговой марка"
     respond_to do |format|
       if @trademark.update(trademark_params)
-        format.html { redirect_to @trademark, notice: 'trademark was successfully updated.' }
+        format.html { redirect_to @trademark, notice: 'Торговая марка успешно изменена' }
         format.json { render :show, status: :ok, location: @trademark }
       else
         format.html { render :edit }
@@ -70,6 +73,6 @@ class TrademarksController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def trademark_params
-      params.require(:trademark).permit(:name, :www, :email, :phone, :logo, :creator_id, :updater_id)
+      params.require(:trademark).permit(:name, :www, :email, :phone, :logo, :vertical_logo, :white_logo, :creator_id, :updater_id)
     end
 end
