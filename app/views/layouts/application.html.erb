@@ -6,6 +6,7 @@
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <% if !@additionScript.nil? %><script src="<%= @additionScript %>" type="text/javascript"></script><%end%>
   </head>
 
   <body>
@@ -37,16 +38,22 @@
                           </div>
                           <%end%>
                               -->
-                          <div class = "medium-5 columns">
+                          <div class = "medium-3 columns">
                               <ul class = 'menu'>
                                  <li class = "logo-field">
                                      <%= link_to "КупитьЛодку.рф", root_path %>
                                  </li>
                               </ul>
                           </div>
-                          <div class = "medium-7 columns">
+                          <div class = "medium-9 columns">
                               <ul class = 'menu float-right'>
+
                                   <% if signed_in?%>
+                                      <%if user_type == "admin"%>
+                                      <li>
+                                          <%= link_to "ТИПЫ ЛОДОК", "/manage_boat_types" %>
+                                      </li>
+                                      <%end%>
                                       <li>
                                           <%= link_to "МОИ ЛОДКИ(0)", "/my_boats" %>
                                       </li>
@@ -68,7 +75,7 @@
                           </div>
                 </div>
           </div>
-          <%= render "layouts/top_image" %>
+          <%= render "layouts/top_image" if !top_block[:boat_type].new_record? %>
       </div>
       <div id = "middle">
           <%if !@header.blank? %>

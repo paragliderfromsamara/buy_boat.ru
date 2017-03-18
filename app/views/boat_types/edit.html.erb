@@ -1,3 +1,4 @@
+
 <div class = "row tb-pad-s">
     <div class = "small-12 columns">
         <%= link_to 'К странице лодки', @boat_type %> |
@@ -6,19 +7,20 @@
     </div>
 </div>
 
-<div class = "row tb-pad-s">
+<div class = "row tb-pad-m">
     <div class = "small-12 columns">
-        <ul class = 'bb-inline-menu' data-tabs id="bb-tabs">
+        <ul class = 'bb-inline-menu' data-tabs id="bb-tabs" data-deep-link="false" data-turbolinks="false">
             <li class = 'tabs-title is-active'>
                 <a href="#main">Основные данные</a>
             </li>
-
             <li class = 'tabs-title'>
                 <a href="#parameter-values">Технические характеристики</a>
             </li>
-
             <li class = 'tabs-title '>
                <a href="#photos">Фото</a>
+            </li>
+            <li class = 'tabs-title '>
+               <a href="#option_groups">Наборы опций</a>
             </li>
         </ul>
     </div>
@@ -48,10 +50,102 @@
       <div id = "uploaded-photos-container" class="row small-up-2 medium-up-3 tb-pad-s">
           <% @boat_type.photos.each do |p| %>
                 <div class="column column-block tb-pad-s">
-                  <%= image_tag p.link.thumb, class: "thumbnail", "data-photo-id" => p.id%>
+                    <%= link_to "<i class = 'fi-x'></i>".html_safe, boat_photo_path(id: @boat_type.id, photo_id: p.id), remote: true, method: :DELETE  %><br />
+                    <%= image_tag p.link.thumb, class: "thumbnail", "data-photo-id" => p.id%>
                 </div>
            <%end%>
       </div>
+      
+    </div>
+    <div class = 'tabs-panel' id = "option_groups"> 
+        
+        <div class="row">
+            <div class="small-12 columns">
+                <% if @boat_type.need_update_local_file? %>
+                <script type = 'text/javascript'>
+                    var url = "/boat_types/<%= @boat_type.id %>";
+                    var importEntities = function()
+                {
+                    var entArr = new Array();
+                    var j = 0;
+                    for(i=FirstElement; i<LastElement; i++)
+                    {
+                        var l = lodka[i];
+                        entArr[j] = {
+                                        arr_id: i,
+                                        rec_type: l.RecType,
+                                        rec_level: l.RecLevel,
+                                        hidden: l.Hidden,
+                                        group_hidden: l.GroupHidden,
+                                        rec_fixed_invisibility: l.RecFixedInvisibility,
+                                        param_code: l.ParamCode,
+                                        param_name: l.ParamName,
+                                        comment: l.Comment,
+                                        nom_std_compl: l.NomStdCompl,
+                                        checked: l.Checked,
+                                        level_checked: l.LevelChecked + "",
+                                        enabled: l.Enabled,
+                                        start_enabled: l.StartEnabled,
+                                        std_comp_sostav: l.StdCompSostav + "",
+                                        std_comp_option: l.StdCompOptions + "",
+                                        std_comp_select: l.StdCompSelect + "",
+                                        std_comp_enable: l.StdCompEnable + "",
+                                        std_comp_prefer: l.StdCompPrefer + "",
+                                        sel_if_y: l.SelIfY + "",
+                                        sel_if_n: l.SelIfN + "",
+                                        de_sel_if_y: l.DeSelIfY + "",
+                                        de_sel_if_n: l.DeSelIfN + "",
+                                        en_if_y: l.EnIfY + "",
+                                        en_if_n: l.EnIfN + "",
+                                        dis_if_y: l.DisIfY + "",
+                                        dis_if_n: l.DisIfN + "",
+                                        price: l.Price,
+                                        amount: l.Amount + ""
+                                      };
+                                      j++;
+                    }
+                    if(entArr.length > 0)
+                    {
+                        $.post(
+                                url+"/add_configurator_entity",
+                                {
+                                        boat_type: {configurator_entities_attributes: entArr} 
+                                      },
+                                function(data)
+                                      {
+                                          if (data.status == 'ok')
+                                          {
+                                              Turbolinks.visit(url+'/edit'+window.location.hash);
+                                          }
+                                          
+                                      },
+                                       'json'  
+                              );
+                    }
+                    
+                }
+                    var checkOptions = function()
+                {
+                    if (lodka != null && lodka != undefined)
+                        {
+                            $("#import-but").show();
+                            console.log(window.location + "/add_configurator_entity")
+                        } 
+                }
+                    document.addEventListener("turbolinks:load", checkOptions);
+    
+                </script>
+                    
+                <p>Файл c данными конфигуратора <%= @confFileExists ? "найден" : "не найден" %> по адресу <%= @boat_type.cnf_data_file_url %></p>
+                <div id = 'option-container'>
+                    <a id = 'import-but' class = 'button' style = 'display:none;' onclick = 'importEntities()'>Начать импорт</a>
+                </div>
+                <%else%>
+                    <p>Файл c данными конфигуратора <%= @confFileExists ? "найден" : "не найден" %> по адресу <%= @boat_type.cnf_data_file_url %> </p>
+                <%end%>
+                <%= react_component 'BoatConfigurator', { data: @boat_type.configurator_entities.order("arr_id ASC")} %>
+            </div>
+        </div>
     </div>
 </div>
 

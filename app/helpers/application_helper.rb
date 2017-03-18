@@ -18,9 +18,8 @@ module ApplicationHelper
   def top_block
     return @top_block if !@top_block.nil?
     {
-      boat_type: BoatType.first
-      
-      
+      boat_type: @boat_type.nil? ? BoatType.first : @boat_type
+      #sub_menu_items: [{text: "url name", url: link}, ...]
     }
   end
   
@@ -61,12 +60,47 @@ module ApplicationHelper
     return v
   end
   
-  
+  def parseFile #meteo.paraplan.net изображения прикрепляются в pages.coffee.js 
+    #link = Rails.root.join("public", "boat_option_combination", "option_combination_1.html")
+    #doc = Nokogiri::HTML(open(link), nil, 'utf-8')
+    #v = []
+    #doc.css('table tr').each do |table|
+    #    if !table[:id].blank?
+          #opt = ConfiguratorEntity.find_by(param_code: table[:id])
+          #v[v.length] = {name: opt.param_name, id: table[:id], amount: table.css('td').last.children.to_s.scan(/\d+/).join.to_i}
+    #    end
+    #end
+    #return "#{v.join('<br/>')}".html_safe
+  end
   
   def remake_photos
     Photo.all.each do |ph|
       ph.link.recreate_versions!
     end
   end
+  #fromtest
+  def alphabet(ru = false)
+    "абвгдеёжзийклмнопрстуфхцчшщъыьэюя" if ru
+    "abcdefghijklmnopqrstuvwxyz"
+  end
   
+  def default_numb(n = 6)
+    rand 10**(n-1) .. 10**n
+  end
+  
+  def rand_email
+    %{#{default_string}@#{default_string}.com}
+  end
+  
+  def default_string(n=6, is_ru = false)
+    s = ""
+    al =  alphabet(is_ru)
+    1.upto(n) do 
+      v = rand 2
+      l = al[rand(al.size)] 
+      s += (v>0) ? l : l.mb_chars.upcase.to_s
+    end 
+    return s
+  end
+
 end

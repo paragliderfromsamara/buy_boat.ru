@@ -4,7 +4,7 @@ class BoatParameterType < ApplicationRecord
   
   before_save :set_number, on: :create
   
-  after_create :create_boat_parameter_values, on: :create
+  after_create :create_boat_parameter_values#, on: :create
   
   after_destroy :reordering_numbers
   
@@ -13,7 +13,9 @@ class BoatParameterType < ApplicationRecord
   validates :value_type, inclusion: { in: %w(integer bool float string)}
   
   
-  default_scope { order("number ASC") }
+  def self.default_scope 
+    order("number ASC")
+  end
   
   def default_value
     case value_type

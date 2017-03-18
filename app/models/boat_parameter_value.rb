@@ -7,12 +7,12 @@ class BoatParameterValue < ApplicationRecord
   
   def self.for_react
     joins(:boat_parameter_type).select(
-            "boat_parameter_values.id, 
-             boat_parameter_values.integer_value, 
-             boat_parameter_values.string_value, 
-             boat_parameter_values.bool_value, 
-             boat_parameter_values.float_value, 
-             boat_parameter_values.is_binded, 
+            "boat_parameter_values.id AS id, 
+             boat_parameter_values.integer_value AS integer_value, 
+             boat_parameter_values.string_value AS string_value, 
+             boat_parameter_values.bool_value AS bool_value, 
+             boat_parameter_values.float_value AS float_value, 
+             boat_parameter_values.is_binded AS is_binded, 
              boat_parameter_types.name as name, 
              boat_parameter_types.value_type AS value_type, 
              boat_parameter_types.number AS number, 

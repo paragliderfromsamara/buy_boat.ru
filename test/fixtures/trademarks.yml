@@ -1,19 +1,20 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  www: MyString
-  email: MyString
+  name: MarkOne
+  www: www.ggg.com
+  email: MarkOne
   phone: MyString
-  logo: MyString
-  creator_id: 1
-  updater_id: 1
+  logo: ''
+  creator_id: admin
+  updater_id: admin
 
 two:
-  name: MyString
-  www: MyString
-  email: MyString
-  phone: MyString
-  logo: MyString
-  creator_id: 1
-  updater_id: 1
+  name: MarkTwo
+  www: www.ggg.ru
+  email: MarkTwo@gg.com
+  phone: 4434535
+  logo: ''
+  creator_id: admin
+  updater_id: admin
+

@@ -40,6 +40,7 @@ class BoatParameterTypeTest < ActiveSupport::TestCase
   
   test "При добавлении нового типа параметра, он должен привязаться к каждой лодке с флагом is_binded == false" do 
     boat_type = BoatType.all
+    assert boat_type.size > 0, "Не найдено типов лодки для данного теста"
     bt = BoatParameterType.new(name: default_string, short_name: default_string, measure: default_string, value_type: "string")
     assert_difference('BoatParameterValue.count', boat_type.size) do
       bt.save
@@ -50,6 +51,7 @@ class BoatParameterTypeTest < ActiveSupport::TestCase
   
   test "При добавлении нового атрибута, он должен создаться в каждой лодке с флагом is_binded == false" do 
     boat_type = BoatType.all
+    assert boat_type.size > 0, "Не найдено типов лодки для данного теста"
     bt = BoatParameterType.new(name: default_string, short_name: default_string, measure: default_string, value_type: "string")
     assert_difference('BoatParameterValue.count', boat_type.size) do
       bt.save
@@ -87,6 +89,8 @@ class BoatParameterTypeTest < ActiveSupport::TestCase
     end
     assert flag
   end
+  
+  
   def boat_parameter_type_val_types_test(type, is_good = true)
     bt = BoatParameterType.new(name: default_string, short_name: default_string, measure: default_string, value_type: type)
     assert_equal is_good, bt.save, message: "#{is_good ? "НЕ " : ''}Удалось добавить тип параметра #{type}"

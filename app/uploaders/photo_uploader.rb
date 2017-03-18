@@ -66,9 +66,9 @@ class PhotoUploader < CarrierWave::Uploader::Base
 		process :resize_to_fit => [784, 280]
 	end
 	
- # def filename
-    #"#{model.file_name}.jpg" if original_filename
-#  end
+  def filename
+    "#{model.file_name}.jpg" if original_filename
+  end
   
   # Add a white list of extensions which are allowed to be uploaded.
   # For images you might use something like this:

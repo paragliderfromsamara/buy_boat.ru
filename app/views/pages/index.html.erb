@@ -1,5 +1,19 @@
 
-<%#remake_photos%>
+<% make_configurator_entities.each do |e|%>
+    <% offset = -1 * (e[:rec_level].to_i - 1) %>
+    <% name_tag = "h#{2 - offset}" %>
+    <div class = 'row'>
+        <div class = 'small-<%= 7+offset %> small-offset<%= offset.to_s %> columns'>
+            <<%= name_tag %>>
+            <%= e[:param_name] %>
+            </<%= name_tag %>>
+        </div>
+        <div class = 'small-5 small-offset<%= offset.to_s %> columns'>
+            <%= e[:price] == 0 ? "" : e[:price].to_s %>
+        </div>
+    </div>
+<%end%>
+<% if Photo.count > 0 %>
 <div class = "tb-pad-s">
     <div class = 'bb-wide-block' data-interchange = "[<%= Photo.second.link.wide_small.url %>, small], [<%= Photo.second.link.wide_medium.url %>, medium], [<%= Photo.second.link.wide_large.url %>, large]" style = "background-image:url('<%= Photo.second.link.wide_small.url %>');">
         <div class = "rc-fog medium-fog dark-blue-bg"></div>
@@ -101,3 +115,4 @@
         </div>
     </div>
 </div>
+<%end%>

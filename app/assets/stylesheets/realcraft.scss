@@ -39,7 +39,7 @@ $rc-blue: #005aff;
 .red-bg
 {
     background-color: $rc-red;
-    p, h1, h2, h3, h4 
+    p, h1, h2, h3, h4, h5, h6 
     {
         color: $white;
     }
@@ -47,7 +47,7 @@ $rc-blue: #005aff;
 .light-blue-bg
 {
     background-color: $rc-primary-blue;
-    p, h1, h2, h3, h4 
+    p, h1, h2, h3, h4, h5, h6 
     {
         color: $rc-primary-dark-blue;
     }
@@ -55,7 +55,7 @@ $rc-blue: #005aff;
 .blue-bg
 {
     background-color: $rc-blue;
-    p, h1, h2, h3, h4 
+    p, h1, h2, h3, h4, h5, h6 
     {
         color: $white;
     }
@@ -63,7 +63,7 @@ $rc-blue: #005aff;
 .dark-blue-bg
 {
     background-color: $rc-primary-dark-blue;
-    p, h1, h2, h3, h4 
+    p, h1, h2, h3, h4, h5, h6 
     {
         color: $white;
     }

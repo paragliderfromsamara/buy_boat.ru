@@ -2,24 +2,56 @@
 
 one:
   name: MyString
-  boat_series_id: 1
-  trademark_id: 1
-  body_type: MyString
+  boat_series: one
+  trademark: one
+  body_type: "430"
   description: MyString
-  base_cost: 1.5
-  min_hp: 1
-  max_hp: 1
-  hull_width: 1.5
-  hull_length: 1.5
-  is_deprecated: 
-  is_active: 
-  creator_id: 1
-  modifier_id: 1
+  is_deprecated: false
+  is_active: true
+  creator: admin
+  modifier: admin
 
 two:
-  name: MyString
-  boat_series_id: 1
-  trademark_id: 1
+  name: "480"
+  boat_series: one
+  trademark: one
+  body_type: "480"
+  description: MyString
+  is_deprecated: false
+  is_active: true
+  creator: admin
+  modifier: admin
+
+for_photos:
+  id: 1005500
+  name: "480"
+  boat_series: one
+  trademark: one
+  body_type: "480"
+  description: MyString
+  is_deprecated: 
+  is_active: 
+  creator: admin
+  modifier: admin
+
+<% 100.times do |b| %>
+active_boat_<%= b %>:
+  name: active_boat_<%= b %>
+  boat_series_id: one
+  trademark_id: one
+  body_type: MyString
+  description: MyString
+  is_deprecated: false 
+  is_active: true
+  creator: admin
+  modifier: admin
+<%end%>
+
+<% 100.times do |b| %>
+disabled_boat_<%= b %>:
+  name: disabled_boat_<%= b %>
+  boat_series_id: one
+  trademark_id: one
   body_type: MyString
   description: MyString
   base_cost: 1.5
@@ -27,7 +59,8 @@ two:
   max_hp: 1
   hull_width: 1.5
   hull_length: 1.5
-  is_deprecated: 
-  is_active: 
-  creator_id: 1
-  modifier_id: 1
+  is_deprecated: false 
+  is_active: true
+  creator: admin
+  modifier: admin
+<%end%>

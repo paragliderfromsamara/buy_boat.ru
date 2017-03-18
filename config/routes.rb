@@ -1,4 +1,17 @@
 Rails.application.routes.draw do
+  #boat_for_sales
+  resources :boat_for_sales
+  post "/parse_selected_options_file", to: "boat_for_sales#parse_selected_options_file"
+  get "/parse_selected_options_file", to: "boat_for_sales#parse_selected_options_file"
+  #end
+  resources :boat_option_types
+  get 'cnf_options_lists/show'
+
+  get 'cnf_options_lists/index'
+
+  get 'cnf_options_lists/create'
+
+  get 'cnf_options_lists/destroy'
 
   resources :boat_series
   resources :trademarks
@@ -11,6 +24,8 @@ Rails.application.routes.draw do
   get "/signout", to: "sessions#destroy", as: :signout
   get "/signup", to: "users#new", as: :signup
   
+  get "/boat_types_import", to: "pages#boat_type_import"
+  
   resources :sessions, only: [:new, :create]
   
   resources :boat_parameter_values, only: [:update]
@@ -19,7 +34,11 @@ Rails.application.routes.draw do
   post "/reorder_boat_parameter_types", to: "boat_parameter_types#update_numbers"
   
   resources :boat_types
+  post '/boat_types/:id/add_configurator_entity', to: "boat_types#add_configurator_entity"  
   get "/manage_boat_types", to: "boat_types#manage_index", as: :manage_boat_types
+  get '/boat_types/:id/photos', to: "boat_types#photos", as: :boat_photos
+  get '/boat_types/:id/photos/:photo_id', to: "boat_types#photo", as: :boat_photo
+  delete '/boat_types/:id/photos/:photo_id', to: "boat_types#delete_photo"
   resources :users
   
   

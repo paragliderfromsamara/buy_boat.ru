@@ -57,6 +57,11 @@
           </div>
           <% if !boat_type.new_record? %>
           <div class="field">
+            <%= f.label :cnf_data_file_url, "Ссылка на файл конфигуратора" %>
+            <%= f.text_field :cnf_data_file_url %>
+          </div>
+          
+          <div class="field">
             <%= f.label :description, "Текстовое описание" %>
             <%= f.text_field :description %>
           </div>

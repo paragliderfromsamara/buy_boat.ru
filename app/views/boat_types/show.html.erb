@@ -1,10 +1,40 @@
 
+<%= react_component 'BoatTypeShow', { data: @boat_type.hash_view } %>
 
-<div class = "row">
+<!--
+
+
+<div class = "row tb-pad-m">
     <div class = "small-12 columns">
-        <%= react_component 'BoatParameterValuesTableShow', { data: @boat_type.boat_parameters_for_react } %>
+        <ul class = 'bb-inline-menu' data-match-height = "true" data-tabs id="bb-tabs" data-deep-link="false" data-turbolinks="false">
+            <li class = 'tabs-title is-active'>
+                <a href="#technical" >Технические характеристики</a>
+            </li>
+
+            <li class = 'tabs-title '>
+               <a href="#photos" onclick = "getPhotos(<%= @boat_type.id %>);">Фото</a>
+            </li>
+        </ul>
     </div>
 </div>
 
+<div class = "tabs-content"  data-tabs-content="bb-tabs">
+    <div class = 'tabs-panel is-active' id="main">
+        
+    </div>
+    <div class = 'tabs-panel'  id="technical">
+       <div class = "row">
+           <div class = "small-12 columns">
+               <%# react_component 'BoatParameterValuesTableShow', { data: @boat_type.boat_parameters_for_react } %>
+           </div>
+       </div>
+    </div>
+    <div class = 'tabs-panel'  id="photos">
+
+    </div>
+</div>
+
+
 <%= link_to 'Edit', edit_boat_type_path(@boat_type) %> |
 <%= link_to 'Back', boat_types_path %>
+-->

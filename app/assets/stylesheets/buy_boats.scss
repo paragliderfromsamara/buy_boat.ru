@@ -11,12 +11,19 @@ tr.bb-unbinded
 {
     color: $medium-gray;
 }
+.bb-inline-underline
+{
+    position: absolute;
+    border-bottom: 3px solid  smart-scale($rc-primary-dark-blue, 10%);
+    z-index: 50;
+}
 .bb-inline-menu
 {
     @include menu-base;
-
+    
     li.tabs-title
     {
+        z-index: 100;
         display: inline-block;
         padding: 0 15px 0 15px;
         a
@@ -24,6 +31,7 @@ tr.bb-unbinded
             color: smart-scale($rc-primary-dark-blue, 80%);
             padding: 0;
             font-size: 1.7rem;
+            z-index: 100;
         }
         a:hover
         {

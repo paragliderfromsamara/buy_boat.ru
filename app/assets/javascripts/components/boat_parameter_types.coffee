@@ -89,10 +89,7 @@
                        id: "delete_parameter_type",
                            React.DOM.i
                                className: "fi-x"
-                    
 
-        
-        
 @BoatParameterTypesTable = React.createClass
     getInitialState: ->
        types: @props.data
@@ -125,9 +122,6 @@
                  console.log data.status
                error: ->
                    alert "Не удалось обновить таблицу" 
-                   
-        
-        
     render: ->
         React.DOM.div null,
             React.DOM.table null,
