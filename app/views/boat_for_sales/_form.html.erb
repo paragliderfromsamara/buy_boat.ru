@@ -1,0 +1,16 @@
+<%= form_for(:boat_option_list, url: "/parse_selected_options_file") do |f| %>
+    <div class = "row">
+        <div class = "small-3 columns">
+            <div class = 'button-group'>
+                <%= f.collection_select :boat_type_id, BoatType.active.order("body_type ASC"), :id, :catalog_name  %>
+            </div>
+        </div>
+        <div class = "small-6 end columns">
+            <div class = 'button-group'>
+                <%= f.label :option_list_file, "html файл с опциями", class: 'button' %>
+                <%= f.file_field :option_list_file, class: "show-for-sr", required: true %>
+                <%= f.submit "Импортировать", class: "success button" %>
+            </div>
+        </div>
+    </div>
+<%end%>

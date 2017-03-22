@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  boat_for_sale_id: 1
+  boat_option_type_id: 1
+  arr_id: 1
+  rec_type: MyString
+  amount: 1
+
+two:
+  boat_for_sale_id: 1
+  boat_option_type_id: 1
+  arr_id: 1
+  rec_type: MyString
+  amount: 1

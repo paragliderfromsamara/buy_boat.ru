@@ -1,0 +1,2 @@
+class BoatSelectedOption < ApplicationRecord
+end

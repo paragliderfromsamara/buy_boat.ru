@@ -1,0 +1,55 @@
+<%= render 'form' if is_manager? %>
+<div class = 'row'>
+    <div class = 'small-12 columns'>
+        <div class = 'tb-pad-s'>
+        <% if @boat_for_sales.blank? %>
+            <p>Нет ни одной скомпанованной лодки</p>
+        <%else%>
+            <table>
+                <thead>
+                <tr>
+                    <th>
+                        КОД
+                    </th>
+                    <th>
+                        Тип лодки
+                    </th>
+                    <th>
+                        Стандарт
+                    </th>
+                    <th>
+                        Стоимость с учётом опций
+                    </th>
+                    <th colspan='2'>
+                        
+                    </th>
+                </tr>
+            </thead>
+                <% @boat_for_sales.each do |bfs| %>
+                    <tr>
+                        <td>
+                            <%= bfs.id_as_code %>
+                        </td>
+                        <td>
+                            <%= link_to bfs.boat_type.catalog_name, bfs.boat_type %>
+                        </td>
+                        <td>
+                            <%=  bfs.standart.nil? ? "<i class = 'fi-minus'></i>".html_safe : bfs.standart.boat_option_type.name %>
+                        </td>
+                        <td>
+                            <%= bfs.amount %>
+                        </td>
+                        <td>
+                            <%= link_to "Перейти", bfs %>
+                        </td>
+                        <td>
+                            <%= link_to "Удалить", bfs, confirm: "Вы уверены?", method: :delete,  remote: true %>
+                        </td>
+                    </tr>
+                <%end%>
+            </table>
+
+        <%end%>
+        </div>
+    </div>
+</div>

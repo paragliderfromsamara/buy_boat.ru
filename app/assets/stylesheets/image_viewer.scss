@@ -1,0 +1,111 @@
+// Place all the styles related to the Pages controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+@import "realcraft";
+//контейнер в котором содержатся фотографии в модальной форме
+
+div#photo-viewer
+{
+    padding: 0;
+    @include breakpoint(small)
+    {
+        width: 100%;
+        height: auto; 
+    }
+    @include breakpoint(medium)
+    {
+        width: 75%;
+        height: auto; 
+    }
+    @include breakpoint(large)
+    {
+        width: 90%;
+        height: auto; 
+    }
+    #viewer-info
+    {
+        position: absolute;
+        z-index: 9999;
+        color: $black;
+        left: 10px;
+        top: 10px;
+        font-size: 0.85rem;
+        @include my_opacity(0.8);
+        #rc-box-title
+        {
+            padding-left: 20px;
+        }
+    }
+    #ph-container
+    {
+        position: relative;
+        width: 100%;
+        //margin-top: 2rem;
+        max-width: 100%;
+        margin-right: auto;
+        margin-left: auto;
+        img
+        {
+           // position: relative;
+        }
+
+        //стрелки
+        #close_reveral
+        {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            right: 20%;
+            top:0;
+        }
+        .arrows
+        {
+            position: absolute;
+            width: 25%;
+            height: 100%;
+            //background-color: white;
+            cursor: pointer;
+            @include my_opacity(0.3);
+            
+            span
+            {
+                @include breakpoint(small)
+                {
+                    font-size: 1.5rem;
+                }
+                @include breakpoint(medium)
+                {
+                    font-size: 2.3rem;
+                }
+                @include breakpoint(large)
+                {
+                    font-size: 4.0rem;
+                }
+                color: $medium-gray;
+                position: relative;
+                top: 45%;
+                
+            }
+        }
+        #prev_ph
+        {
+            left: 0px;
+            text-align: left;
+        }
+    
+        #next_ph
+        {
+            right: 0px;
+            text-align: right;
+        }
+    }
+    #ph-container:hover
+    {
+        .arrows
+        {
+            @include my_opacity(0.9);
+        }
+    } 
+}
+

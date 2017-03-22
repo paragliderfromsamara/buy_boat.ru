@@ -1,0 +1,2 @@
+module BoatOptionTypesHelper
+end

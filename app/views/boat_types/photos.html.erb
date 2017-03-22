@@ -1,0 +1,10 @@
+<div class = "row small-up-2 medium-up-3 large-up-4 tb-pad-s">
+    <% @photos.each do |ph| %>
+        <div class = "column tb-pad-xs">
+            <%= image_tag ph.link.small, "data-interchange" => "[#{ph.link.small.url}, small], [#{ph.link.medium.url}, medium],[#{ph.link.large.url}, large]" %>
+        </div>
+    <%end%>
+</div>
+
+
+

@@ -1,0 +1,26 @@
+<script type = 'text/javascript'>
+    var importEntities = function()
+{
+    for(i=FirstElement; i<LastElement; i++)
+    {
+        var l = lodka[i];
+        console.log("el_"+i);
+
+    }
+}
+    var checkOptions = function()
+{
+    if (lodka != null)
+        {
+            $("#import-but").show();
+
+        } 
+}
+    document.addEventListener("turbolinks:load", checkOptions);
+    
+</script>
+<div class = 'row'>
+    <div class = 'small-12 columns' id = "option-container">
+        <a id = 'import-but' class = 'button' style = 'display:none;' onclick = 'importEntities()'>Начать импорт</a>
+    </div>
+</div>

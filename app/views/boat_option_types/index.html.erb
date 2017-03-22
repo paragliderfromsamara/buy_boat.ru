@@ -1,0 +1,47 @@
+        <div class = 'row'>
+            <div class = 'small-12 columns'>
+        <% if !@boat_option_types.blank? %>
+
+            <p>Список типов опций пуст</p>
+
+        <%else%>
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            id
+                        </th>
+                         <th>
+                             Код опции
+                         </th>   
+                         <th>
+                             Название
+                         </th>
+                         <th>
+                             Описание
+                         </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @boat_option_types.each do |ot| %>
+                        <tr>
+                            <td>
+                                <%= ot.id %>
+                            </td>
+                            <td>
+                                <%= ot.param_code %>
+                            </td>
+                            <td>
+                                <%= ot.name %>
+                            </td>
+                            <td>
+                                <%= ot.description.html_safe %>
+                            </td>
+                        </tr>
+                    <%end%>
+                </tbody>
+            </table>
+        <% end %>
+        <table>
+            </div>
+        </div>
