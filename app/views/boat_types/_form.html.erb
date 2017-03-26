@@ -65,13 +65,21 @@
             <%= f.label :description, "Текстовое описание" %>
             <%= f.text_field :description %>
           </div>
-
+          <!--
           <div class="field">
             <%= f.label :base_cost, "Базовая стоимость" %>
             <%= f.text_field :base_cost %>
           </div>
+              -->
+          <%else%>
+              <div class = 'row'>      
+                  <div class="small-4 columns field tb-pad-s">
+                    <%= f.label :copy_params_table_from_id, "Копировать таблицу параметров из: " %>
+                    <%= f.collection_select :copy_params_table_from_id, BoatType.all, :id, :catalog_name, include_blank:  "У этого типа свои параметры"  %> 
+                  </div>
+              </div>
           <%end%>
-
+          
           <div class="actions">
             <button class = "success button" type = "submit">
                 <% if boat_type.new_record? %>

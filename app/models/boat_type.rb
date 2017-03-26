@@ -1,4 +1,5 @@
 class BoatType < ApplicationRecord
+  attr_accessor :copy_params_table_from_id
   after_create :make_boat_parameter_values
   belongs_to :creator, class_name: "User" #кто создал
   belongs_to :modifier, class_name: "User" #кто изменил
@@ -135,6 +136,24 @@ class BoatType < ApplicationRecord
   private
   
   def make_boat_parameter_values #создаёт таблицу значений параметров лодки 
+    if !copy_params_table_from_id.blank?
+      bt = BoatType.find_by(id: copy_params_table_from_id)
+      make_clear_parameter_values if bt.nil?
+      clone_parameter_values(bt.boat_parameter_values) if !bt.nil?
+    else
+      make_clear_parameter_values
+    end
+  end
+  
+  def clone_parameter_values(input_vals)
+    vals = []
+    input_vals.each do |v|
+      vals[vals.length] = {set_value: v.get_value, boat_parameter_type_id: v.boat_parameter_type_id, is_binded: v.is_binded}
+    end
+    make_clear_parameter_values if vals.blank?          #если список не сформировался - хуярим пустой список
+    boat_parameter_values.create(vals) if !vals.blank?  #если список сформировался - создаем
+  end
+  def make_clear_parameter_values #создает новую таблицу параметров
     vals = []
     BoatParameterType.all.each do |t|
       vals[vals.length] = {set_value: t.default_value, boat_parameter_type_id: t.id, is_binded: true}
