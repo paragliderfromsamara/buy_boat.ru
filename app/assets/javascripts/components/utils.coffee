@@ -51,8 +51,11 @@
             id: @state.id
             className: "#{@state.class} #{@state.size}"
             if @state.header isnt ""
-                React.DOM.h3 null,
-                "#{@state.header}"
+                React.DOM.div
+                    className: 'row'
+                    React.DOM.div
+                        className: "small-12 columns"
+                        React.DOM.h3 null, "#{@state.header}"
             if @state.enableClose 
                 React.DOM.button
                     className: "close-button"

@@ -51,7 +51,7 @@
                                   <% if signed_in?%>
                                       <%if user_type == "admin"%>
                                       <li>
-                                          <%= link_to "ТИПЫ ЛОДОК", "/manage_boat_types" %>
+                                          <%= link_to "УПРАВЛЕНИЕ", "#", onclick: "$('#manage_menu').toggle();", "data-turbolinks" => false%>
                                       </li>
                                       <%end%>
                                       <li>
@@ -75,7 +75,24 @@
                           </div>
                 </div>
           </div>
-          <%= render "layouts/top_image" if !top_block[:boat_type].new_record? %>
+          <% if is_manager? %>
+          <div style = 'display: none;' id = "manage_menu" class = 'row' data-turbolinks-permanent>
+              <div class = 'small-12 columns'>
+                  <div class="button-group tb-pad-s">
+                      <% if is_admin?%>
+                          <%= link_to "Пользователи", users_path, class: 'button' %>
+                      <%end%>
+                      <%= link_to "Типы лодок", manage_boat_types_path, class: 'button' %>
+                      <%= link_to "Типы характеристик", boat_parameter_types_path, class: 'button' %>
+                      <%= link_to "Серии лодок", boat_series_index_path, class: 'button' %>
+                      <%= link_to "Торговые марки", trademarks_path, class: 'button' %>
+                      <%= link_to "Скомпанованные лодки", manage_boat_for_sales_path, class: 'button' %>
+                      <%= link_to "Типы опций", boat_option_types_path, class: "button" %>
+                  </div>
+              </div>
+          </div>
+          <%end%>
+          <%= render "layouts/top_image" if show_top_image? %>
       </div>
       <div id = "middle">
           <%if !@header.blank? %>

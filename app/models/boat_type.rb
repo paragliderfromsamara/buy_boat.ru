@@ -12,6 +12,10 @@ class BoatType < ApplicationRecord
   belongs_to :boat_series, optional: true, validate: false
   belongs_to :trademark
   
+  
+  has_many :boat_for_sales, dependent: :destroy
+  
+  
   accepts_nested_attributes_for :photos
   
   has_many :configurator_entities, dependent: :destroy
@@ -58,6 +62,7 @@ class BoatType < ApplicationRecord
   def configurator_entities_attributes=(attrs)
     if !attrs.blank?
       self.configurator_entities.delete_all
+      self.reload
       attrs.values.each do |a|
         if !a[:param_code].blank?
           option_type = BoatOptionType.find_by(param_code: a[:param_code])
@@ -109,7 +114,8 @@ class BoatType < ApplicationRecord
     {
       type: self,
       parameters: self.boat_parameters_for_react,
-      photos: self.photos_hash_view
+      photos: self.photos_hash_view,
+      boat_for_sales: self.boat_for_sales#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
     }
   end
   

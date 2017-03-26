@@ -10,7 +10,10 @@ class BoatTypesController < ApplicationController
   # GET /boat_types
   # GET /boat_types.json
   def index
-    @boat_types = BoatType.active
+    @boat_types = params[:ids].blank? ? BoatType.active : BoatType.where(id: params[:ids])
+    parameter_filter_data = BoatParameterType.filter_data
+    option_filter_data = BoatOptionType.filter_data 
+    @filter_data = parameter_filter_data.merge(option_filter_data) 
   end
 
   # GET /boat_types/1
@@ -88,7 +91,7 @@ class BoatTypesController < ApplicationController
   def update
     respond_to do |format|
       if @boat_type.update(boat_type_params)
-        format.html { redirect_to @boat_type, notice: 'Тип лодки успешно обновлён' }
+        format.html { redirect_to edit_boat_type_path(@boat_type), notice: 'Тип лодки успешно обновлён' }
         format.json { render :show, status: :ok, location: @boat_type }
       else
         format.html { render :edit }

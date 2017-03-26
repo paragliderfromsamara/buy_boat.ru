@@ -5,6 +5,7 @@ class BoatParameterTypesController < ApplicationController
   # GET /boat_parameter_types
   # GET /boat_parameter_types.json
   def index
+    @hide_slider = true
     @boat_parameter_types = BoatParameterType.json_view
     @title = @header = "Таблица типов параметров"
   end
@@ -23,6 +24,7 @@ class BoatParameterTypesController < ApplicationController
   # POST /boat_parameter_types
   # POST /boat_parameter_types.json
   def create
+    @hide_slider = true
     @boat_parameter_type = BoatParameterType.new(boat_parameter_type_params)
     if @boat_parameter_type.save
       render js: "Turbolinks.visit(window.location);"
@@ -69,6 +71,6 @@ class BoatParameterTypesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def boat_parameter_type_params
-      params.require(:boat_parameter_type).permit(:name, :short_name, :measure, :value_type, :is_use_on_filter)
+      params.require(:boat_parameter_type).permit(:name, :short_name, :measure, :value_type, :is_use_on_filter, :tag)
     end
 end

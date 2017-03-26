@@ -3,7 +3,8 @@ class PagesController < ApplicationController
     
   end
   
-  def boat_type_import
-    @additionScript = "http://salut-boats.ru/config_scripts/data_salut480mpro.js"
+  def test_page
+    
   end
+  
 end

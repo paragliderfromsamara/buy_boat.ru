@@ -3,19 +3,16 @@ Rails.application.routes.draw do
   resources :boat_for_sales
   post "/parse_selected_options_file", to: "boat_for_sales#parse_selected_options_file"
   get "/parse_selected_options_file", to: "boat_for_sales#parse_selected_options_file"
+  get "/manage_boat_for_sale", to: "boat_for_sales#manage_index", as: :manage_boat_for_sales
   #end
-  resources :boat_option_types
-  get 'cnf_options_lists/show'
+  resources :boat_option_types, only: [:index, :show, :update]
 
-  get 'cnf_options_lists/index'
-
-  get 'cnf_options_lists/create'
-
-  get 'cnf_options_lists/destroy'
-
+  get "/test_page", to: "pages#test_page"
+  
   resources :boat_series
   resources :trademarks
   root to: 'pages#index'
+  
   
   get "/check_user", to: "users#check", as: :check_user
   get "/cabinet", to: "sessions#current_user_page", as: :my
@@ -24,7 +21,8 @@ Rails.application.routes.draw do
   get "/signout", to: "sessions#destroy", as: :signout
   get "/signup", to: "users#new", as: :signup
   
-  get "/boat_types_import", to: "pages#boat_type_import"
+  #get "/boat_types_import", to: "pages#boat_type_import"
+  
   
   resources :sessions, only: [:new, :create]
   

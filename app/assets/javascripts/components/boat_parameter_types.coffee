@@ -63,6 +63,7 @@
             React.DOM.td null, @state.type.value_type
             React.DOM.td null,
                 React.createElement(FIcon, key: @state.type.id, fig: @state.type.is_use_on_filter)
+            React.DOM.td null, @state.type.tag
             React.DOM.td null, 
                 React.DOM.a 
                     onClick: if @state.parent.state.isReorderMode then @moveDown else @editRow
@@ -149,6 +150,13 @@
                                 className: "has-tip top"
                                 title: "Если выбрано ДА, то на странице выбора лодки будет возможным фильтровать по его значению"
                                 "Вкл. в фильтр"
+                        React.DOM.th null,
+                            React.DOM.span
+                                "data-tooltip": true
+                                "aria-haspopup":true
+                                className: "has-tip top"
+                                title: "Тэг необходим для служебного назначения"
+                                "Тэг"
                         React.DOM.th
                             colSpan: 2,
                             React.DOM.a
@@ -168,8 +176,7 @@
                             className: "fi-plus"
                             " "
                         React.DOM.span null, "Добавить новый тип параметра"
-            React.createElement Reveal, id: "parameter_type_reveal", header: "Изменить тип параметра", size: "full"
-            $("[data-dropdown]").foundation()               
+            React.createElement Reveal, id: "parameter_type_reveal", header: "Изменить тип параметра", size: "full"            
                        
                    
                    

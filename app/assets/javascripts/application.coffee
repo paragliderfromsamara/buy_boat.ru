@@ -54,6 +54,7 @@ rFunc = ->
     $(document).foundation()
     bbMiniAutosize()
     initTabs()
+    initFilter()
     $(window).resize ()-> bbMiniAutosize()
     #InitViewer() #find in photo_wiewer.coffee
 

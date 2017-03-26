@@ -12,6 +12,16 @@ class BoatParameterType < ApplicationRecord
   
   validates :value_type, inclusion: { in: %w(integer bool float string)}
   
+  def self.filter_data
+    filterItems = {}
+    where(tag: ["max_hp", "min_hp", "max_length", "min_length"]).includes(:boat_parameter_values).each{|t| filterItems[t.tag.to_sym] = {
+                                                                                    name: t.name, 
+                                                                                    s_name: t.short_name,
+                                                                                    values: t.boat_parameter_values.to_a.map{|v| {b_id: v.boat_type_id, value: v.get_value, is_binded: v.is_binded}}
+                                                                                }} 
+                                                                                    #}
+                                                                                    return filterItems
+  end
   
   def self.default_scope 
     order("number ASC")
@@ -36,7 +46,7 @@ class BoatParameterType < ApplicationRecord
   #end
   
   def self.json_view
-    all.map {|t| {id: t.id, name: t.name, number: t.number, short_name: t.short_name, measure: t.measure, value_type: t.value_type_ru, is_use_on_filter: t.show_in_filter_ru}}
+    all.map {|t| {id: t.id, name: t.name, number: t.number, short_name: t.short_name, measure: t.measure, value_type: t.value_type_ru, is_use_on_filter: t.show_in_filter_ru, tag: t.tag}}
   end
   
   def self.measures

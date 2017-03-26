@@ -241,6 +241,91 @@
                         id: "boat-for-sales"
                         "data-animate":"fade-in fade-out"
                         React.createElement BoatForSales, key: "bfs-list", bfsList: @state.bfsList
-                        
-                        
-                                      
+
+#boat_filter
+maxFilterVal = (vals)->
+    v = -1
+    for val in vals
+        if val.is_binded then v = (if v is -1 then val.value else (if v < val.value then val.value else v))
+    return v
+    
+minFilterVal = (vals)->
+    v = -1
+    for val in vals
+        if val.is_binded then v = (if v is -1 then val.value else (if v > val.value then val.value else v))
+    return v
+    
+splitData = (dt)->
+    t = {}
+    ut = []
+    for d in dt
+        if $.trim(d.tag) isnt "" then t[d.tag]= d else ut[ut.length] = d
+    return {tagged: t, untagged: ut} 
+
+@HpFilter = React.createClass
+    handleChange: (e)->
+        console.log "goot"
+    render: ->
+       min = minFilterVal(@props.min_hp.values)
+       max = maxFilterVal(@props.max_hp.values)
+       console.log "#{minFilterVal(@props.min_hp.values)}--#{maxFilterVal(@props.max_hp.values)}"
+       React.DOM.div
+            className: @props.elClassName
+            React.DOM.p null, "Мощность подвесного мотора, л.c."
+            React.DOM.div
+                className: "slider"
+                id: "hp-filter"
+                "data-slider": ""
+                "data-initial-start": min
+                "data-initial-end": max
+                "data-end": max
+                React.DOM.span
+                    className: "slider-handle"
+                    "data-slider-handle": ""
+                    "aria-controls": "min-hp-filter"
+                    role: "slider"
+                    tabIndex: "1"
+                    ""
+                React.DOM.span
+                    className: "slider-fill"
+                    "data-slider-fill": ""
+                    ""
+                React.DOM.span
+                    className: "slider-handle"
+                    "data-slider-handle": ""
+                    "aria-controls": "max-hp-filter"
+                    role: "slider"
+                    tabIndex: "1"
+                    ""
+            React.DOM.div
+                className: "row"
+                React.DOM.div
+                    className: "small-3 columns"
+                    React.DOM.input
+                        id: "min-hp-filter"
+                        type: 'number'
+                React.DOM.div
+                    className: "small-3 small-offset-6 columns text-right"
+                    React.DOM.input
+                        id: "max-hp-filter"
+                        type: 'number'
+                        onChange: @handleChange
+                
+            
+                
+
+@BoatFilter = React.createClass
+    getInitialState: ->
+        fD: splitData(@props.data)
+    setDefaultState: ->
+        fD: []
+    render: ->
+        filter = 555
+        React.DOM.div
+            className: "row tb-pad-s"
+            if @state.fD.tagged.min_hp isnt undefined && "#{@state.fD.tagged.min_hp}" isnt undefined
+                React.createElement HpFilter, key: "hp-filter", min_hp: @state.fD.tagged.min_hp, max_hp: @state.fD.tagged.max_hp, elClassName: "small-6 medium-4 columns end"
+            else console.error "Невозможно отобразить HpFilter"
+            ""
+            
+        

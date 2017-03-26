@@ -1,4 +1,24 @@
 module ApplicationHelper
+  
+  def show_top_image?
+    flag = true
+    disable_on_pages = {
+                          "users" => [],
+                          "trademarks" => [],
+                          "boat_parameter_types" => [],
+                          "boat_series" => ["new", "edit", "update", "create"],
+                          "boat_types" => ["manage_index", "create", "update", "new", "edit"],
+                          "boat_for_sales" => ["manage_index"],
+                          "boat_option_types" => []
+                          
+                       }                     
+    v = disable_on_pages[controller.controller_name]
+    if !v.nil?
+      flag = !(!v.index(controller.action_name).nil? || v.blank?)
+    end
+    return flag
+  end
+  
   def my_collection_select_from_hash(hash_array, form_name, input_name, prompt = "", key = :id, value = :value, default_key = nil)
     collection = ""
     if !hash_array.blank?
@@ -103,4 +123,5 @@ module ApplicationHelper
     return s
   end
 
+  
 end

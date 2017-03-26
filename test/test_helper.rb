@@ -48,17 +48,19 @@ class ActiveSupport::TestCase
     rand(2) == 0
   end
   
-  def make_random_good_entities
+  def make_random_good_entities(with_standart = true, start_arr_id = 1) 
     entities = []
-    arr_id = 1
+    arr_id = start_arr_id
     stds = default_numb(1)+1
     steps = rand(10) + 5
-    #добавляем группу для стандарта
-    entities.push(make_group(1, arr_id))
-    #добавляем стандарты
-    stds.times do |std|
-      arr_id+=1
-      entities.push(make_standart(2, arr_id))
+    if with_standart
+      #добавляем группу для стандарта
+      entities.push(make_group(1, arr_id))
+      #добавляем стандарты
+      stds.times do |std|
+        arr_id+=1
+        entities.push(make_standart(2, arr_id))
+      end
     end
     #формируем группы первого уровня
     steps.times do |s|
@@ -109,6 +111,7 @@ class ActiveSupport::TestCase
     v[:rec_type] = Configurator.rec_type_option
     v[:param_code] = default_string(10)
     v[:price] = rand(300000) 
+    v[:arr_id] = arr_id 
     return v
   end
   
@@ -119,6 +122,7 @@ class ActiveSupport::TestCase
     v[:param_code] = default_string(10)
     v[:price] = rand(300000)
     v[:rec_level] = rec_lvl
+    v[:arr_id] = arr_id 
     return v
   end
   

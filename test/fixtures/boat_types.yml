@@ -37,8 +37,8 @@ for_photos:
 <% 100.times do |b| %>
 active_boat_<%= b %>:
   name: active_boat_<%= b %>
-  boat_series_id: one
-  trademark_id: one
+  boat_series: one
+  trademark: one
   body_type: MyString
   description: MyString
   is_deprecated: false 
@@ -50,8 +50,8 @@ active_boat_<%= b %>:
 <% 100.times do |b| %>
 disabled_boat_<%= b %>:
   name: disabled_boat_<%= b %>
-  boat_series_id: one
-  trademark_id: one
+  boat_series: one
+  trademark: one
   body_type: MyString
   description: MyString
   base_cost: 1.5

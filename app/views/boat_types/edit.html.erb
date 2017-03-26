@@ -1,9 +1,7 @@
-
-<div class = "row tb-pad-s">
+<div class = "row">
     <div class = "small-12 columns">
         <%= link_to 'К странице лодки', @boat_type %> |
         <%= link_to 'К списку типов лодок', manage_boat_types_path %>
-       
     </div>
 </div>
 
@@ -143,7 +141,48 @@
                 <%else%>
                     <p>Файл c данными конфигуратора <%= @confFileExists ? "найден" : "не найден" %> по адресу <%= @boat_type.cnf_data_file_url %> </p>
                 <%end%>
-                <%= react_component 'BoatConfigurator', { data: @boat_type.configurator_entities.order("arr_id ASC")} %>
+                <%# react_component 'BoatConfigurator', { data: @boat_type.configurator_entities.order("arr_id ASC")} %>
+                <%
+                    entities = @boat_type.configurator_entities.order("arr_id ASC")
+                %>
+                <% if entities.size == 0 %>
+                    <p>Список опций для <%= @boat_type.catalog_name %> пуст</p>
+                <%else%>
+                    <% entities.length.times do |i| %>
+                        <% if entities[i].rec_type == 'Группа' and entities[i].rec_level == "1" %>
+                            
+                            <div class = 'row'>
+                                <div class = 'small-12 medium-10 medium-centered columns'>
+                                    <h4>
+                                        <%= entities[i].param_name %>
+                                    </h4>
+                                    <table>
+                                        <%j=i+1%>
+                                        <% begin %>
+                                            
+                                            <% break if entities[j].rec_level == "1" %>
+                                            <% 
+                                                if entities[j].param_code.blank? 
+                                                    j+=1
+                                                    next
+                                                end
+                                            %>
+                                            <tr>
+                                                <td>
+                                                    <%= entities[j].param_name %>
+                                                </td>
+                                                <td align='right'>
+                                                    <%= entities[j].price > 0 ? entities[j].price.to_s + ' ₽' : '' %>
+                                                </td>
+                                            </tr>
+                                            <%j+=1%>
+                                        <% end while(j<entities.length) %>
+                                    </table>
+                                </div>
+                            </div>
+                        <%end%>
+                    <%end%>
+                <%end%>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
         <div class = 'row'>
             <div class = 'small-12 columns'>
-        <% if !@boat_option_types.blank? %>
+        <% if @boat_option_types.blank? %>
 
             <p>Список типов опций пуст</p>
 
@@ -18,13 +18,16 @@
                              Название
                          </th>
                          <th>
-                             Описание
+                             Где используется
+                         </th>
+                         <th>
+                             Тэг
                          </th>
                     </tr>
                 </thead>
                 <tbody>
                     <% @boat_option_types.each do |ot| %>
-                        <tr>
+                        <tr style = 'cursor:pointer;' onclick="Turbolinks.visit('<%= boat_option_type_path(ot) %>');">
                             <td>
                                 <%= ot.id %>
                             </td>
@@ -35,13 +38,24 @@
                                 <%= ot.name %>
                             </td>
                             <td>
-                                <%= ot.description.html_safe %>
+                                <% b_types = ot.boat_types_where_it_uses %>
+                                <% if b_types.size > 0 %>
+                                   <% b_types.each do |bt| %>
+                                       <p>
+                                           <%= bt.catalog_name %>
+                                       </p>
+                                   <%end%>
+                                <%else%>
+                                   -
+                                <%end%>
+                            </td>
+                            <td>
+                                <%= ot.tag %>
                             </td>
                         </tr>
                     <%end%>
                 </tbody>
             </table>
         <% end %>
-        <table>
             </div>
         </div>

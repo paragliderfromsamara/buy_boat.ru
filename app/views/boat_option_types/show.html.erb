@@ -1,0 +1,99 @@
+<script>
+    var isForm = false
+    var toggleForm = function(e)
+{
+    isForm = !isForm;
+    $(e).text(isForm ? "Режим просмотра" : "Редактировать");
+    if (isForm) {$("#reset-but").click();}
+    $(".show-field").toggle();
+}
+</script>
+<div class = 'row'>
+    <div class = 'small-12 columns'>
+        <div class = 'tb-pad-s'>
+            <p>
+                <%= link_to "К списку всех типов опций", boat_option_types_path %> | <a onclick = "toggleForm(this)">Редактировать</a>
+            </p>
+        </div>
+    </div>
+</div>
+<div class = 'show-field' style = "display: none;">
+    <%= form_for(@boat_option_type) do |f| %>
+        <div class = 'row'>
+            <div class = 'small-6 medium-3 columns'>
+                <%= f.label :param_code, "КОД" %>
+                <%= f.text_field :param_code, required: true %>
+            </div>
+            <div class = 'small-6 medium-3 end columns'>
+                <%= f.label :tag, "Служебный тэг" %>
+                <%= f.text_field :tag %>
+            </div>
+        </div>
+        <div class = 'row'>
+            <div class = 'small-12 medium-6 end columns'>
+                <%= f.label :name, "Название" %>
+                <%= f.text_field :name, required: true %>
+            </div>
+        </div> 
+        <div class = 'row'>
+            <div class = 'small-12 medium-6 end columns'>
+                <%= f.label :description, "Описание" %>
+                <%= f.text_area :description %>
+            </div>
+        </div>
+        <div class = 'row'>
+            <div class = 'small-12 medium-6 end columns'>
+                <div class = 'button-group tb-pad-s'>
+                    <button type='submit' class = 'button success'>
+                        Сохранить
+                    </button>
+                    <button type='reset' class = 'button secondary' id='reset-but'>
+                        Сбросить
+                    </button>
+                </div>
+            </div>
+        </div>
+     <%end%>
+</div>
+<div class = 'show-field'>
+    <div class = 'row'>
+        <div class = 'small-6 medium-3 columns'>
+            <h5>КОД</h5>
+            <p><%= @boat_option_type.param_code %></p>    
+        </div>
+        <div class = 'small-6 medium-3 end columns'>
+            <h5>Служебный тэг</h5>
+            <p><%= @boat_option_type.tag.blank? ? "-" : @boat_option_type.tag %></p>    
+        </div>
+    </div>
+    <div class = 'row'>
+        <div class = 'small-12 medium-6 end columns'>
+            <h5>Название</h5>
+            <p><%= @boat_option_type.name %></p>
+        </div>
+    </div> 
+    <div class = 'row'>
+        <div class = 'small-12 medium-6 end columns'>
+            <h5>Описание</h5>
+            <p><%= @boat_option_type.description %></p>
+        </div>
+    </div>
+</div>
+<div class = 'row'>
+    <div class = 'small-12 columns'>
+        <h4>
+            Типы лодок на которых используется
+        </h4>
+    </div>
+</div>
+<div class = 'row'>
+    <div class = 'small-12 columns'>
+        <% @boat_option_type.boat_types_where_it_uses.each do |bt| %>
+            <p>
+                <%= bt.catalog_name %>
+            </p>
+        <%end%>
+    </div>
+</div>
+ 
+
