@@ -9,11 +9,17 @@ class BoatTypesController < ApplicationController
   
   # GET /boat_types
   # GET /boat_types.json
+  
   def index
     @boat_types = params[:ids].blank? ? BoatType.active : BoatType.where(id: params[:ids])
-    parameter_filter_data = BoatParameterType.filter_data
-    option_filter_data = BoatOptionType.filter_data 
-    @filter_data = parameter_filter_data.merge(option_filter_data) 
+    if params[:ids].blank? 
+      @boat_types = BoatType.active
+      parameter_filter_data = BoatParameterType.filter_data
+      option_filter_data = BoatOptionType.filter_data 
+      @filter_data = parameter_filter_data.merge(option_filter_data) 
+    else
+       @boat_types = BoatType.with_bfs.where(id: params[:ids])
+    end
   end
 
   # GET /boat_types/1

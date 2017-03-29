@@ -1,6 +1,11 @@
 class BoatForSalesController < ApplicationController
   before_action :set_boat_for_sale, only: [:show, :update, :destroy]
   def index
+    if params[:ids].nil?
+      @boat_for_sales = BoatForSale.all.joins(:boat_type)
+    else
+      @boat_for_sales = BoatForSale.where(id: params[:ids]).joins(:boat_type)
+    end
   end
   
   def show
@@ -41,7 +46,7 @@ class BoatForSalesController < ApplicationController
   end
 
   private
-
+  
   def set_boat_for_sale
     @boat_for_sale = BoatForSale.find(params[:id])
   end

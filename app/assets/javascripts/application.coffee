@@ -20,6 +20,18 @@
 #= require components
 #= require_tree .
 
+#ищем номер элемента в массиве
+@IndexOf = (arr, el)->
+    for i in [0..arr.length]
+        if arr[i] is el then return i
+    -1
+#ищем последний номер элемента el в массиве arr    
+@LastIndexOf = (arr, el)->
+    idx = -1
+    for i in [0..arr.length]
+        if arr[i] is el then idx = i
+    idx
+        
 initTabs = ->
     requestHash = window.location.hash
     tabEl = document.getElementById "bb-tabs"

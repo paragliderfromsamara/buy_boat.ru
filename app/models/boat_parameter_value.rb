@@ -5,22 +5,42 @@ class BoatParameterValue < ApplicationRecord
   belongs_to :boat_parameter_type, optional: :true
   belongs_to :boat_type, optional: :true
   
+  def self.active
+    where(boat_type_id: BoatType.active.ids)
+  end
+  
   def self.for_react
     joins(:boat_parameter_type).select(
             "boat_parameter_values.id AS id, 
+             boat_parameter_values.boat_type_id AS boat_type_id, 
              boat_parameter_values.integer_value AS integer_value, 
              boat_parameter_values.string_value AS string_value, 
              boat_parameter_values.bool_value AS bool_value, 
              boat_parameter_values.float_value AS float_value, 
              boat_parameter_values.is_binded AS is_binded, 
              boat_parameter_types.name as name, 
+             boat_parameter_types.tag as tag,
              boat_parameter_types.value_type AS value_type, 
              boat_parameter_types.number AS number, 
              boat_parameter_types.measure AS measure, 
              boat_parameter_types.short_name AS short_name").order("boat_parameter_types.number ASC")
   end 
+  
   def get_value 
-    self["#{get_value_type}_value".to_sym]
+    return self["#{get_value_type}_value".to_sym] if get_value_type != "option"
+    return "-" if tag.blank?
+    ce = boat_type.configurator_entities.where(boat_option_type_id: BoatOptionType.select(:id).where(tag: get_tag))
+    if ce.blank?
+      v = "-"
+    else
+      v = ce.to_a.map{|c| c.boat_option_type.s_name }.join(", ")
+    end
+    return v
+  end
+  
+  def get_tag
+    return boat_parameter_type.tag if !has_attribute?(:tag)
+    return tag
   end
   
   def get_value_type

@@ -23,7 +23,7 @@ class BoatOptionTypesController < ApplicationController
   private
   
   def boat_option_type_params
-     params.require(:boat_option_type).permit(:name, :param_code, :description, :tag)
+     params.require(:boat_option_type).permit(:name, :param_code, :description, :tag, :short_name)
   end
   
   def set_boat_option_type

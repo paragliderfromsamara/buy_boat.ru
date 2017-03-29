@@ -10,14 +10,14 @@ class BoatParameterType < ApplicationRecord
   
   before_validation :set_value_type_as_was #не даёт изменить тип параметра
   
-  validates :value_type, inclusion: { in: %w(integer bool float string)}
+  validates :value_type, inclusion: { in: %w(integer bool float string option)}
   
   def self.filter_data
     filterItems = {}
     where(tag: ["max_hp", "min_hp", "max_length", "min_length"]).includes(:boat_parameter_values).each{|t| filterItems[t.tag.to_sym] = {
                                                                                     name: t.name, 
                                                                                     s_name: t.short_name,
-                                                                                    values: t.boat_parameter_values.to_a.map{|v| {b_id: v.boat_type_id, value: v.get_value, is_binded: v.is_binded}}
+                                                                                    values: t.boat_parameter_values.active.to_a.map{|v| {b_id: v.boat_type_id, value: v.get_value, is_binded: v.is_binded}}
                                                                                 }} 
                                                                                     #}
                                                                                     return filterItems
@@ -53,7 +53,13 @@ class BoatParameterType < ApplicationRecord
     select(:measure).reorder("measure ASC").distinct.collect {|m| m.measure}
   end
   def self.accessible_value_types
-    [["текст", "string"], ["целый", "integer"], ["десятичный", "float"], ["да/нет", "bool"]]
+    [
+      ["текст", "string"], 
+      ["целый", "integer"], 
+      ["десятичный", "float"], 
+      ["да/нет", "bool"], 
+      ["опция", "option"]
+    ]
   end
   
   def value_type_ru 

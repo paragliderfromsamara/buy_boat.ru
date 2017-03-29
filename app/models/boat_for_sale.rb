@@ -123,6 +123,10 @@ class BoatForSale < Configurator
     self.selected_options.where(rec_type: Configurator.rec_type_standart).first
   end
   
+  def catalog_name
+    self.boat_type.catalog_name
+  end 
+  
   private
   
   def check_build_code

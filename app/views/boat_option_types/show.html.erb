@@ -30,9 +30,13 @@
             </div>
         </div>
         <div class = 'row'>
-            <div class = 'small-12 medium-6 end columns'>
+            <div class = 'small-6 medium-3 columns'>
                 <%= f.label :name, "Название" %>
                 <%= f.text_field :name, required: true %>
+            </div>
+            <div class = 'small-6 medium-3 end columns'>
+                <%= f.label :short_name, "Короткое название" %>
+                <%= f.text_field :short_name %>
             </div>
         </div> 
         <div class = 'row'>
@@ -67,9 +71,13 @@
         </div>
     </div>
     <div class = 'row'>
-        <div class = 'small-12 medium-6 end columns'>
+        <div class = 'small-6 medium-3 columns'>
             <h5>Название</h5>
             <p><%= @boat_option_type.name %></p>
+        </div>
+        <div class = 'small-6 medium-3 end columns'>
+            <h5>Короткое название</h5>
+            <p><%= @boat_option_type.short_name %></p>
         </div>
     </div> 
     <div class = 'row'>

@@ -37,6 +37,10 @@ class BoatType < ApplicationRecord
     joins(:trademark).includes(:photos)#.active
   end 
   
+  def self.with_bfs
+    active.includes(:boat_for_sales)
+  end
+  
   def self.admin
     all
   end
