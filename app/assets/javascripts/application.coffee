@@ -20,6 +20,7 @@
 #= require components
 #= require_tree .
 
+
 #ищем номер элемента в массиве
 @IndexOf = (arr, el)->
     for i in [0..arr.length]
@@ -31,7 +32,20 @@
     for i in [0..arr.length]
         if arr[i] is el then idx = i
     idx
+#формирует строку для data-interchange из хэша фотографии
+@MakeInterchangeData = (ph)->
+    if ph is null or ph is undefined then return ""
+    "[#{ph.small}, small], [#{ph.medium}, medium], [#{ph.large}, large]"
+
+@AddWhiteSpaceToNumb = (n)->
+    n = n.toString()
+   #if n / 3 > 0
+    v = n.split("").reverse()
+    v = v.map (item, idx)-> 
+        if (idx+1) % 3 is 0 then " #{item}" else "#{item}"
+    $.trim v.reverse().join("")
         
+
 initTabs = ->
     requestHash = window.location.hash
     tabEl = document.getElementById "bb-tabs"
@@ -62,6 +76,7 @@ bbMiniAutosize = ()->
 
 
 rFunc = ->
+    #ReactOnRails.reactOnRailsPageLoaded();
     InitViewer()
     $(document).foundation()
     bbMiniAutosize()
@@ -70,12 +85,16 @@ rFunc = ->
     $(window).resize ()-> bbMiniAutosize()
     #InitViewer() #find in photo_wiewer.coffee
 
+#$(document).ready rFunc
 rendFunc = -> 
-    ReactRailsUJS.mountComponents() 
+    #if $("[data-react-class]").length > 0
+    #ReactRailsUJS.unmountComponents()
+    #else
+    #    ReactRailsUJS.unmountComponents()
     
 befRendFunc = -> 
     ReactRailsUJS.unmountComponents() 
     
 document.addEventListener "turbolinks:load", rFunc
-document.addEventListener "turbolinks:request-end", rendFunc    
+document.addEventListener "Turbolinks.pagesCached", rendFunc    
 document.addEventListener "turbolinks:before-visit", befRendFunc 

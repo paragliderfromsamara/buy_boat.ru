@@ -3,6 +3,11 @@ class BoatOptionType < Configurator
   has_many :selected_options, dependent: :delete_all
   has_many :boat_types, through: :configurator_entities
   has_many :boat_for_sales, through: :selected_options
+  
+  def self.transoms #транцы
+    where(tag: "transom")
+  end
+  
   def self.filter_data
     filterItems = {}
     where(tag: ["transom"]).includes(:boat_for_sales).each do |t| 

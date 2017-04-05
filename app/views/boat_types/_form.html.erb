@@ -63,7 +63,7 @@
           
           <div class="field">
             <%= f.label :description, "Текстовое описание" %>
-            <%= f.text_field :description %>
+            <%= f.text_area :description, rows: 10 %>
           </div>
           <!--
           <div class="field">
@@ -80,13 +80,16 @@
               </div>
           <%end%>
           
-          <div class="actions">
+          <div class="actions button-group tb-pad-s">
             <button class = "success button" type = "submit">
                 <% if boat_type.new_record? %>
                     Создать
                 <%else%>
                     Сохранить изменения
                 <%end%>
+            </button>
+            <button class = "secondary button" type = "reset">
+                Отменить изменения
             </button>
           </div>
         <% end %>

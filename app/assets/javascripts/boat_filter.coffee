@@ -17,13 +17,19 @@ maxVal = (vals)->
     max              
 
 BoatForSaleCard = (bfs)->
-    "<div class=\"column\">
-    <div class=\"card\">
-        <div class=\"card-section\">
-            <p>#{bfs.catalog_name}</p>
-            <p>Стоимость #{bfs.amount}</p>
+    "
+    <div class = \"column\"
+        <div class=\"row\">
+            <div class=\"small-12 columns\">
+                    <p>#{bfs.catalog_name}</p>
+                    <p>Стоимость #{bfs.amount}</p>
+                    <div class = \"expanded button-group\">
+                        <a class = \"button\" href = \"#{bfs.url}\">Перейти</a>
+                        <a class = \"button success\" href = \"#\">Купить</a>
+                    </div>
+            </div>
         </div>
-    </div></div>"
+    </div>"
 
 class @myFilter
     constructor: (
@@ -32,167 +38,107 @@ class @myFilter
                     @frBlock = "kra-filter-result"    #блок результата фильтрации
                     @cnt = null
                     @fr = null
-                    @data = {}
-                    @bTypes = []
-                    @bForSales = []
-                    @BTfilters = new Array()    #массив содержащий фильтры типов лодок
-                    @BFSfilters = new Array()   #массив содержащий фильтры лодок на продажу
+                    @data = []
+                    @Filters = new Array()   #массив содержащий фильтров
+                    @isFilterChanged = true #флаг изменения фильтра
                   )-> 
                       @procData()   #обрабатываем входящие данные
                       @makeNodes()  #создаем основные контейнеры
                       @makeFilterList() #создаётся список фильтров
                       @makeControls() #добавляются кнопки
+                      @getDefaultBoats()
+    getDefaultBoats: ->
+        if @data.length > 0
+            @isFilterChanged = true
+            @draw(@data)
     filtering: ->
-        tmp = @BTfilters[0].values
-        bfs_tmp = null
-        if @BTfilters.length > 0
-            for f in [1..@BTfilters.length]
+        tmp = null
+        if @Filters.length > 0
+            for f in @Filters
                 if !f.isEnable then continue
-                if f.values.length is 0 || tmp.length is 0 #если какой-либо из массивов пуст - выводим сообщение что поиск не дал результатов
-                    @emptyResultMsg()
+                if tmp is null 
+                    tmp = f.values
                 else
-                    _tmp = []
-                    for v in tmp 
-                        if IndexOf(f.values, v) > -1 then _tmp.push(v) else continue
-                    tmp = _tmp
-        if @BFSfilters.length > 0 
-            for bfs in @BFSfilters    
-                _tmp = []
-                for bt in tmp
-                    if bfs.values["bt_#{bt}"] is undefined then continue
-                    for i in bfs.values["bt_#{bt}"]
-                        _tmp[_tmp.length] = i
-                if bfs_tmp is null
-                    if _tmp.length > 0 then bfs_tmp = _tmp
-                else
-                    tm = []
-                    for v in bfs_tmp 
-                        tm.push(v)#if IndexOf(_tmp, v) > -1 then tm.push(v) else continue
-                    bfs_tmp = tm
-                #if bfs_tmp is null then break
-                #if bfs_tmp.length is 0 then break
-        bfs_tmp = if bfs_tmp is null then [] else bfs_tmp
-        @getBoatForSale(bfs_tmp)
-    getBoatForSale: (bfsIds)->
-        if bfsIds is undefined 
-            return 
+                    if f.values.length isnt 0 and tmp.length isnt 0 #если какой-либо из массивов пуст - выводим сообщение что поиск не дал результатов
+                        _tmp = []
+                        for v in tmp 
+                            if IndexOf(f.values, v) > -1 then _tmp.push(v) else continue
+                        tmp = _tmp
+        tmp = if tmp is null then [] else tmp
+        tmp = @makeScopedIdsList(tmp)
+        @draw(tmp)
+    #формируем список id        
+    makeScopedIdsList: (Ids)->
+        if Ids is undefined 
+            return []
         else 
-            if bfsIds.length is 0
-                @emptyResultMsg()
-                return 
-        unknownList = []
-        for id in bfsIds
-            f = false
-            for bfs in @bForSales
-                if (f = (bfs.id is id)) then break
-            if !f then unknownList.push(id)
-        if unknownList.length > 0 
-            $.ajax(
-                    url: "/boat_for_sales"
-                    type: "GET"
-                    dataType: "json"
-                    data: {ids: unknownList}
-                    success: (data)=>
-                        for bfs in data 
-                            if IndexOf(@bForSales, bfs) is -1 then @bForSales.push(bfs) 
-                        @getBoatForSale(bfsIds)
-                        # console.log data
-                  )
-        else
-            v = ''
-            for bfs in @bForSales
-                if IndexOf(bfsIds, bfs.id) > -1 then v += BoatForSaleCard(bfs) 
-            @fr.html v
-            #console.log "draw"
-    getBoatTypes: (bTypesIds)->
-        if bTypesIds is undefined 
-            return 
-        else 
-            if bTypesIds.length is 0
-                @emptyResultMsg()
-                return 
-        unknownList = []
-        for id in bTypesIds
-            f = false
-            for bt in @bTypes
-                if (f = (bt.id is id)) then break
-            if !f then unknownList.push(id)
-        if unknownList.length > 0 
-            $.ajax(
-                    url: "/boat_types"
-                    type: "GET"
-                    dataType: "json"
-                    data: {ids: bTypesIds}
-                    success: (data)=>
-                        for bt in data 
-                            if IndexOf(@bTypes, bt) is -1 then @bTypes.push(bt) 
-                        @getBoatTypes(bTypesIds)
-                        # console.log data
-                  )
-        else
-            v = ''
-            for bt in @bTypes
-                if IndexOf(bTypesIds, bt.id) > -1 and bt.boat_for_sales.length > 0 then v += "<p>#{bt.catalog_name}</p>" 
-            @fr.html v
-            console.log "draw"
-    emptyResultMsg: ->
-        @fr.html "<div class = \"row\"><div class = \"small-12 columns\"><p>Поиск не дал результатов, попробуйте поменять критерии</p></div></div>"
+            if Ids.length is 0
+                return []
+        arr = []
+        for b in @data
+            #str = JSON.stringify(bfs)
+            if IndexOf(Ids, b.id) > -1 then arr.push(b)    
+        return arr 
+    draw: (boats)->
+        if not @isFilterChanged then return
+        ReactRailsUJS.unmountComponents()   
+        data = JSON.stringify({"data": boats})
+            #React.createElement(BoatTypeMiniBlock, @fr[0])
+        v = "<div data-react-class = \"BFSFilteringResult\" data-react-props ='#{data}'></div>"
+        @fr.html v
+        ReactRailsUJS.mountComponents()
+        @isFilterChanged = false
     makeFilterList: ->
-        if @hasItem("min_hp") and @hasItem("max_hp") then @initHpFilter()   #инициализируем фильтр по мощности мотора
-        if @hasItem("transom") then @initTransomFilter()   #инициализируем фильтр размеров транцев
+        @initHpFilter() #if @hasItem("min_hp") and @hasItem("max_hp") then @initHpFilter()   #инициализируем фильтр по мощности мотора
+        @initTransomFilter() #if @hasItem("transom") then @initTransomFilter()   #инициализируем фильтр размеров транцев
     procData: ->
         if @fEl.attr("data-filter") is undefined
             console.error "Отсутствует атрибут \"data-filter\" с данными для инициализации фильтра"
         else
-            @data = ($.parseJSON @fEl.attr("data-filter")).data
-    hasItem: (n)-> #проверка есть ли в начальных данных элемент фильтра
-        if !(f = @data["#{n}"] isnt undefined) then console.error "Отсутствуют данные для фильтра с тэгом: \"#{n}\""
-        f
-    addFItem: (n, type)-> 
-        if type is "bfs"
-            @BFSfilters.push(
-                        {
-                            name: n
-                            values: {}
-                            isEnable: true #флаг доступности фильтра
-                        }
-                    ) #добавляем в список фильтров и значений объект фильтра при инициализации
-        else
-            @BTfilters.push(
-                        {
-                            name: n
-                            values: []
-                            isEnable: true #флаг доступности фильтра
-                        }
-                    ) #добавляем в список фильтров и значений объект фильтра при инициализации
+            p = $.parseJSON @fEl.attr("data-filter")
+            @data = p.data
+            #@defaultBoats = p.default_boats
+            @fEl.removeAttr("data-filter") #удаляем атрибут с данными фильтра после того как их достаем
+    addFItem: (n)-> 
+        @Filters.push(
+                    {
+                        name: n
+                        values: []
+                        isEnable: true #флаг доступности фильтра
+                    }
+                ) #добавляем в список фильтров и значений объект фильтра при инициализации
     makeNodes: ->
         @fEl.html "
-                    <div id = \"#{@cntBlock}\" class = \"row small-up-1 medium-up-3 tb-pad-s\"></div>
-                    <div id = \"#{@frBlock}\" class = \"row small-up-1 medium-up-3 tb-pad-s\"></div>
+                    <div id = \"#{@cntBlock}\" class = \"row small-up-1 medium-up-2 large-up-3 tb-pad-s\"></div>
+                    <div id = \"#{@frBlock}\"></div>
                   "
         @cnt = $("##{@cntBlock}")
         @fr = $("##{@frBlock}")
     initListeners: ->
-         @fr.html @data.toString()
+        @fr.html @data.toString()
     makeControls: ->
         @cnt.append(
                     "<div class = \"column\">
                          <div class = \"button-group tb-pad-s\">
                              <button id = \"filter-search\" class = \"button success\">Показать</button>
+                             <button id = \"filter-reset\" class = \"button secondary\">Сбросить</button>
                          </div>
                      </div>"
                    )  
-        @cnt.find("#filter-res").click ()=> @reset() 
+        @cnt.find("#filter-reset").click ()=> @getDefaultBoats()#@reset() 
         @cnt.find("#filter-search").click ()=> @filtering()
     updFilterData: (fName, arr)-> #обновляем массив висящий на фильтре
-        @BTfilters = @BTfilters.map (v)->
+        @Filters = @Filters.map (v)->
             if v.name is fName then v.values = arr
             return v
+        @isFilterChanged = true
     initHpFilter: ->
         fName = "hp-filter"
         @addFItem(fName)
-        min = minVal(@data.min_hp.values)
-        max = maxVal(@data.max_hp.values)
+        min = max = 0
+        for b in @data
+            min = if min is 0 then b.min_hp else (if min > b.min_hp then b.min_hp else min)
+            max = if max is 0 then b.max_hp else (if max < b.min_hp then b.max_hp else max)
         @cnt.append(
                     "<div class = \"column\">
                          <p>Мощность подвесного мотора, л.с.</p>
@@ -207,7 +153,6 @@ class @myFilter
                                  <input id = \"hp-val\" type=\"number\">
                              </div>
                          </div>
-                         
                      </div>"
                    )
         $("#hp-filter").foundation()
@@ -215,21 +160,17 @@ class @myFilter
                             "changed.zf.slider", ()=>
                                                  arr = []
                                                  v = parseInt @cnt.find("#hp-val").val()
-                                                 for minV in @data.min_hp.values
-                                                     if v >= minV.value
-                                                         for maxV in @data.max_hp.values
-                                                             if (v <= maxV.value) and (minV.b_id is maxV.b_id) 
-                                                                 arr[arr.length] = maxV.b_id
-                                                                 break
+                                                 for b in @data
+                                                     if v >= b.min_hp && v <= b.max_hp then arr[arr.length] = b.id
                                                  @updFilterData(fName, arr)
                                                  #v = 
                            )
-    updBFSFilterValue: (n, el)->
-        idxAttr = "data-#{n}-idx"
+    updFilterValue: (n, el)->
         s = "selected"
         _this = @
+        items = "data-filter-item"
         filter = $("[data-filter-name=#{n}]")
-        vals = {} #сюда будут записываться ключи типа bt_1 где 1 это boat_type_id
+        ids = [] #сюда будут записываться ключи типа bt_1 где 1 это boat_type_id
         #при нажатии на item проверяем 
         if el.hasClass(s)
             if filter.find(".#{s}").length is 1 
@@ -238,37 +179,36 @@ class @myFilter
             else el.removeClass(s) 
         else 
             el.addClass(s)
-        $("[#{idxAttr}]").each ()->
+        selected = []
+        filter.find("[#{items}]").each ()->
             e = $(this)
             e.find("i").attr("class", if e.hasClass(s) then "fi-check" else "fi-x")
-            if e.hasClass(s)
-                idx = parseFloat(e.attr(idxAttr))
-                if _this.data[n][idx].values.length > 0
-                    for v in _this.data[n][idx].values
-                        vn = "bt_#{v.b_id}"
-                        if vals[vn] is undefined || vals[vn] is null
-                            vals[vn] = [v.bfs_id]
-                        else
-                            vals[vn].push(v.bfs_id)
-        
-        @BFSfilters = @BFSfilters.map (v)->
-            if v.name is n then v.values = vals
-            return v
+            if e.hasClass(s) then selected.push(e.find("[filter-item-value]").text())
+        for b in @data
+            for s in selected 
+                if s is b[n] 
+                    ids.push(b.id)
+                    break
+        @updFilterData(n, ids)
     initTransomFilter: ->
         fName = "transom"
-        @addFItem(fName, "bfs")
+        @addFItem(fName)
         nameList = ""
-        for i in [0..@data.transom.length-1]
-            nameList += "<p><a data-#{fName}-idx = \"#{i}\"><i class = \"fi-x\"></i> #{@data.transom[i].name}</a></p>"
+        transomList = []
+        for b in @data
+            if IndexOf(transomList, b.transom) is -1 
+                transomList.push(b.transom)
+                nameList += "<li><a data-filter-item><i class = \"fi-x\"></i> <span filter-item-value>#{b.transom}</span></a></li>"
         @cnt.append(
-                    "<div data-filter-name = \"#{fName}\" class = \"column\">
+                    "<div data-filter-name = \"#{fName}\" class = \"column string-vals-filter\">
                          <p id = \"filter-title\"><span>Размер транца</span></p>
-                         #{nameList}
+                         <ul>#{nameList}</ul>
                      </div>"
                    )
         _this = @
-        $("[data-#{fName}-idx]").click ()->
-            _this.updBFSFilterValue(fName, $(this))
-        $("[data-#{fName}-idx]").click()
+        f = $("[data-filter-name = #{fName}]")
+        f.find("[data-filter-item]").click ()->
+            _this.updFilterValue(fName, $(this))
+        f.find("[data-filter-item]").click()
                 
                 

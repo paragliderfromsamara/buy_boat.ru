@@ -3,18 +3,4 @@
           <%= link_to "Удалить сборку", @boat_for_sale, method: :delete, confirmation: "Нажав 'Да', Вы удалите данную сборку", class: "button alert"  %>
         </div>
     </div>
-<% @boat_for_sale.selected_options.each do |o| %>
-    <% offset = -1 * (o.rec_level.to_i - 1) %>
-    <% name_tag = "h#{2 - offset}" %>
-    <div class = 'row'>
-        <div class = 'small-<%= 7+offset %> small-offset<%= offset.to_s %> columns'>
-            <<%= name_tag %>>
-            <%= o.name %>
-            </<%= name_tag %>>
-        </div>
-        <div class = 'small-5 small-offset<%= offset.to_s %> columns'>
-            <%= o.amount == 0 ? "" : o.amount.to_s %>
-        </div>
-    </div>
-<%end%>
-<%= react_component 'BoatTypeShow', { data: @boat_type.hash_view } %>
+<%= react_component 'BoatTypeShow', { data: @boat_type.hash_view }, html: {"data-turbolinks"=>false} %>

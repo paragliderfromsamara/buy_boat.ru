@@ -1,9 +1,12 @@
 class User < ApplicationRecord
   attr_accessor :password,  :control_password, :current_password, :creator_salt, :creator_email, :update_type
   
+  has_many :shops, foreign_key: "manager_id", dependent: :destroy
+  
   before_save :encrypt_password, :set_default_user_type#, :check_email_update
   before_validation :check_email_update
   before_validation :check_password_on_create, on: :create
+  
   
   
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
@@ -20,6 +23,10 @@ class User < ApplicationRecord
   
   
   validate :check_control_password, on: :update, if: :is_pwd_or_email_update?
+  
+  def self.managers
+    where(user_type_id: [255200, 131313, 200500]).order("last_name ASC")
+  end
   
   def check_control_password 
     err_txt = password.nil? ? "Не правильно введён пароль" : "Не правильно введён прежний пароль"
@@ -41,7 +48,8 @@ class User < ApplicationRecord
     [
       {id: 500100, name: "customer", ru_name: 'Клиент'}, 
       {id: 131313, name: "admin", ru_name: 'Администратор'},
-      {id: 100500, name: "manager", ru_name: 'Менеджер'},
+      {id: 255200, name: "producer", ru_name: "Производитель"},     #производитель лодок, может добавлять типы лодок, изменять характеристики, создавать менеджеров магазинов
+      {id: 200500, name: "manager", ru_name: 'Менеджер магазина'}, #менеджер магазина может добавлять магазины, о которых приложение информирует администратора и производителя
       {id: 600600, name: "banned", ru_name: 'Заблокирован'}
     ]
   end
@@ -81,6 +89,9 @@ class User < ApplicationRecord
     encrypt %{#{self.email}--#{self.created_at}}
   end
 
+  def full_name
+    %{#{last_name} #{first_name} #{third_name}}
+  end
   private
   
   def editor_is_admin?

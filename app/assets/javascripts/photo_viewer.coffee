@@ -73,7 +73,7 @@ showPhotoByIdx = (idx)->
                                                     viewer.find("##{titleAttrName}").text("")
                                                     )
             viewer.find(curColTrueSelector).fadeIn(300, ()-> showFunc(this))
-            console.log "#{idx} -- #{l}"
+            #console.log "#{idx} -- #{l}"
     
 getCurIdx = ()->
     parseInt(viewer.find("img[#{curImgAttrName}=true]").attr("#{imgIdxAttrName}"))
@@ -116,7 +116,7 @@ initBoxPhotos = (phs)->
                                             title: if p.hasAttribute(titleAttrName) then $(p).attr(titleAttrName) else ""
                                         }
         #box_phs += "<img #{titleAttrName} = \"#{if p.hasAttribute(titleAttrName) then $(p).attr(titleAttrName) else ""}\" #{collAttrName} = \"#{colName}\" #{imgIdxAttrName} = \"#{idx}\" data-interchange = \"#{if p.hasAttribute(imgListAttrName) then $(p).attr(imgListAttrName) else "[#{$(p).attr("src")}, small]"}\">"
-    console.log urlsCollection
+    #console.log urlsCollection
 
 @InitViewer = ()-> 
     bPhotos = document.getElementsByClassName("kra-ph-box")

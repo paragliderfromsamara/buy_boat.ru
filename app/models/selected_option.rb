@@ -6,7 +6,7 @@ class SelectedOption < ApplicationRecord
     order("arr_id ASC")
   end
   
-
+  
   
   def name
     self.boat_option_type.nil? ?  self.param_name : boat_option_type.name

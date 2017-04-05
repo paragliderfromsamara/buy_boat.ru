@@ -49,7 +49,7 @@
                               <ul class = 'menu float-right'>
 
                                   <% if signed_in?%>
-                                      <%if user_type == "admin"%>
+                                      <%if is_producer?%>
                                       <li>
                                           <%= link_to "УПРАВЛЕНИЕ", "#", onclick: "$('#manage_menu').toggle();", "data-turbolinks" => false%>
                                       </li>
@@ -75,17 +75,16 @@
                           </div>
                 </div>
           </div>
-          <% if is_manager? %>
+          <% if is_producer? %>
           <div style = 'display: none;' id = "manage_menu" class = 'row' data-turbolinks-permanent>
               <div class = 'small-12 columns'>
                   <div class="button-group tb-pad-s">
-                      <% if is_admin?%>
-                          <%= link_to "Пользователи", users_path, class: 'button' %>
-                      <%end%>
-                      <%= link_to "Типы лодок", manage_boat_types_path, class: 'button' %>
-                      <%= link_to "Типы характеристик", boat_parameter_types_path, class: 'button' %>
-                      <%= link_to "Серии лодок", boat_series_index_path, class: 'button' %>
-                      <%= link_to "Торговые марки", trademarks_path, class: 'button' %>
+                      <%= link_to "Пользователи", users_path, class: 'button' if could_see_users_list? %>
+                      <%= link_to "Магазины", manage_shops_path, class: "button" if could_manage_all_shops? %>
+                      <%= link_to "Типы лодок", manage_boat_types_path, class: 'button' if could_manage_boat_types? %>
+                      <%= link_to "Типы характеристик", boat_parameter_types_path, class: 'button' if could_manage_boat_parameter_types? %>
+                      <%= link_to "Серии лодок", boat_series_index_path, class: 'button' if could_manage_boat_series? %>
+                      <%= link_to "Торговые марки", trademarks_path, class: 'button' if could_manage_trademarks? %>
                       <%= link_to "Скомпанованные лодки", manage_boat_for_sales_path, class: 'button' %>
                       <%= link_to "Типы опций", boat_option_types_path, class: "button" %>
                   </div>

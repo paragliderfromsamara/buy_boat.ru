@@ -1,4 +1,13 @@
 Rails.application.routes.draw do
+  #shops
+  resources :shops
+  get "/manage_shops", to: "shops#manage_index", as: :manage_shops #управление магазинами
+  get "/change_shop_status/:id", to: "shops#change_status", as: :change_shop_status #изменение статуса
+  #end
+  #locations
+  get "/locations/regions/:country_id", to: "locations#regions"
+  get "/locations/cities/:region_id", to: "locations#cities"
+  #end
   #boat_for_sales
   resources :boat_for_sales
   post "/parse_selected_options_file", to: "boat_for_sales#parse_selected_options_file"

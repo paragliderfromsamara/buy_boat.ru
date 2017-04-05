@@ -22,7 +22,16 @@ class BoatType < ApplicationRecord
   has_many :configurator_entities, dependent: :destroy
   accepts_nested_attributes_for :configurator_entities
   
-  
+  def horse_power_range
+    bpts = BoatParameterType.includes(:boat_parameter_values).where(tag: ["min_hp", "max_hp"])
+    min = 0
+    max = 0
+    bpts.each do |bpt|
+      min = bpt.boat_parameter_values.find_by(boat_type_id: self.id).get_value if bpt.tag == "min_hp"
+      max = bpt.boat_parameter_values.find_by(boat_type_id: self.id).get_value if bpt.tag == "max_hp"  
+    end 
+    return {max: max, min: min}
+  end
   
   def alter_photo
     photos.first

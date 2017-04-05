@@ -3,8 +3,12 @@ module GrantsHelper
     user_type == "admin"
   end
   
+  def is_producer?
+    user_type == "producer" || is_admin?
+  end
+  
   def is_manager?
-    user_type == "manager" || is_admin?
+    user_type == "manager" || is_producer?
   end
   
   def is_banned?
@@ -16,11 +20,11 @@ module GrantsHelper
   end
   #users_controller grants
   def could_see_users_list?
-    is_manager?
+     is_producer?
   end
   
   def could_see_user?(user = @user)
-    is_manager? || current_user == user 
+    is_producer? || current_user == user 
   end
   
   def could_add_user?
@@ -42,17 +46,45 @@ module GrantsHelper
   #end
   
   #boat_parameter_types
-  def could_edit_boat_parameter_types?
-    is_admin?
+  def could_manage_boat_parameter_types?
+    is_producer?
   end 
   
   #boat_types
-  def could_modify_boat_type?
-    is_admin?
+  def could_manage_boat_types?
+    is_producer?
+  end 
+  
+  #boat_series
+  def could_manage_boat_series? 
+    is_producer?
+  end
+  
+  #trade_marks
+  def could_manage_trademarks?
+    is_producer?
   end 
   
   #boat_parameter_values
   def could_modify_boat_parameter_values?
     is_admin?
   end 
+  
+  #shops
+  def could_manage_all_shops?
+    is_producer?
+  end
+  
+  def could_modify_shop?(shop=@shop) #может менять статус магазина на открытый/закрытый
+    return false if shop.nil?
+    return (is_manager? && shop.manager == current_user) || is_producer?
+  end
+  
+  def could_enable_or_disable_shop?  #может активировать и блокировать магазин
+    is_producer? 
+  end
+  
+  def could_destroy_shop?(shop=@shop) #может удалять магазин
+    (is_producer? and shop.is_recent?) || is_admin?
+  end
 end

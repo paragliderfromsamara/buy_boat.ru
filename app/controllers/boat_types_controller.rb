@@ -14,11 +14,12 @@ class BoatTypesController < ApplicationController
     @boat_types = params[:ids].blank? ? BoatType.active : BoatType.where(id: params[:ids])
     if params[:ids].blank? 
       @boat_types = BoatType.active
-      parameter_filter_data = BoatParameterType.filter_data
-      option_filter_data = BoatOptionType.filter_data 
-      @filter_data = parameter_filter_data.merge(option_filter_data) 
+      #parameter_filter_data = BoatParameterType.filter_data
+      #option_filter_data = BoatOptionType.filter_data 
+     # @filter_data = parameter_filter_data.merge(option_filter_data)
+     # @default_boats = BoatForSale.active.ids 
     else
-       @boat_types = BoatType.with_bfs.where(id: params[:ids])
+      @boat_types = BoatType.with_bfs.where(id: params[:ids])
     end
   end
 
@@ -118,7 +119,7 @@ class BoatTypesController < ApplicationController
 
   private
     def check_grants
-      redirect_to "/404" if !could_modify_boat_type?
+      redirect_to "/404" if !could_manage_boat_types?
     end 
     # Use callbacks to share common setup or constraints between actions.
     def set_boat_type

@@ -9,7 +9,8 @@ module ApplicationHelper
                           "boat_series" => ["new", "edit", "update", "create"],
                           "boat_types" => ["manage_index", "create", "update", "new", "edit"],
                           "boat_for_sales" => ["manage_index"],
-                          "boat_option_types" => []
+                          "boat_option_types" => [],
+                          "shops" => []
                           
                        }                     
     v = disable_on_pages[controller.controller_name]
@@ -80,17 +81,36 @@ module ApplicationHelper
     return v
   end
   
-  def parseFile #meteo.paraplan.net изображения прикрепляются в pages.coffee.js 
-    #link = Rails.root.join("public", "boat_option_combination", "option_combination_1.html")
-    #doc = Nokogiri::HTML(open(link), nil, 'utf-8')
-    #v = []
-    #doc.css('table tr').each do |table|
-    #    if !table[:id].blank?
-          #opt = ConfiguratorEntity.find_by(param_code: table[:id])
-          #v[v.length] = {name: opt.param_name, id: table[:id], amount: table.css('td').last.children.to_s.scan(/\d+/).join.to_i}
-    #    end
-    #end
-    #return "#{v.join('<br/>')}".html_safe
+  def migrateCountry(name) #meteo.paraplan.net изображения прикрепляются в pages.coffee.js 
+    Country.destroy_all
+    link = Rails.root.join("public", "world_countries_regions_cities_utf.xml")
+    doc = Nokogiri::XML(File.open(link), nil, 'utf-8')
+    v = []
+    countries = doc.xpath("//country")
+    countries.each do |country|
+      country_name = country.xpath("name")[0].content
+      v.push(country_name)
+      next if country_name != name
+      country_id = country.xpath("country_id")[0].content
+      c = Country.create(name: country_name)
+      c.reload
+      regions = doc.xpath("//region")
+      regions.each do |region|
+        next if region.xpath("country_id")[0].content != country_id
+        region_id = region.xpath("region_id")[0].content
+        r = c.regions.create(name: region.xpath("name")[0].content)
+        r.reload
+        cities_xml = doc.xpath("//city")
+        cities = []
+        cities_xml.each do |city|
+          next if city.xpath("region_id")[0].content != region_id || city.xpath("country_id")[0].content != country_id
+          cities.push({name: city.xpath("name")[0].content})
+        end
+        r.cities.create(cities)
+      end
+      break 
+    end
+    return "#{v.join('<br/>')}".html_safe
   end
   
   def remake_photos

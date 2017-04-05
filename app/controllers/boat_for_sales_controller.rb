@@ -2,7 +2,12 @@ class BoatForSalesController < ApplicationController
   before_action :set_boat_for_sale, only: [:show, :update, :destroy]
   def index
     if params[:ids].nil?
-      @boat_for_sales = BoatForSale.all.joins(:boat_type)
+      #@boat_types = BoatType.active
+     # parameter_filter_data = BoatParameterType.filter_data
+      #option_filter_data = BoatOptionType.filter_data 
+      #@filter_data = parameter_filter_data.merge(option_filter_data)
+      #@default_boats = BoatForSale.active.ids 
+      @boat_for_sales = BoatForSale.filter_collection(BoatForSale.active.ids)
     else
       @boat_for_sales = BoatForSale.where(id: params[:ids]).joins(:boat_type)
     end
@@ -22,7 +27,6 @@ class BoatForSalesController < ApplicationController
     respond_to do |format|
       format.html {redirect_to manage_boat_for_sales_path}
     end
-    
   end
   
   def parse_selected_options_file

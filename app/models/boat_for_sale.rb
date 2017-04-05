@@ -13,6 +13,23 @@ class BoatForSale < Configurator
     self.selected_options.create(attrs.values)
     calculate_amount #пересчёт полной стоимости
   end
+
+  def self.filter_collection(ids)
+    bfss = where(id: ids).includes(:boat_type, :selected_options)
+    bfss.map do |bfs|
+      hp_range = bfs.boat_type.horse_power_range
+      {id: bfs.id, min_hp: hp_range[:min], max_hp: hp_range[:max], url: "/boat_for_sales/#{bfs.id}", name: bfs.boat_type.catalog_name, transom: bfs.transom_name, amount: bfs.amount, photo: bfs.alter_photo_hash}
+    end
+  end
+  
+  def transom_name 
+    t = selected_options.where(boat_option_type_id: BoatOptionType.transoms.ids).first
+    (t.nil? ? "Без транца" : t.boat_option_type.s_name)
+  end
+  
+  def self.active
+    all
+  end
   
   def selected_options_for_show
       selected_options.includes(:boat_option_type).map {|opt| {arr_id: opt.arr_id, name: opt.boat_option_type.nil? ? opt.param_name : opt.boat_option_type.name, name: opt.boat_option_type.nil? ? opt.param_name : opt.boat_option_type.name, amount: opt.amount, rec_type: opt.rec_type, rec_level: opt.rec_level}}
@@ -126,6 +143,15 @@ class BoatForSale < Configurator
   def catalog_name
     self.boat_type.catalog_name
   end 
+  
+  def alter_photo
+    self.boat_type.alter_photo #if self.photos.blank?
+  end
+  
+  def alter_photo_hash
+    return self.alter_photo.hash_view if !self.alter_photo.blank?
+    return nil
+  end
   
   private
   

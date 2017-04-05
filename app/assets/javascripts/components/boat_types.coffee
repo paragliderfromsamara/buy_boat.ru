@@ -2,6 +2,14 @@
 #    render: ->
 
 #Используется для отображения цены в таблице с выбранными опциями
+
+getCurBfsById = (bfss, id)->
+    if bfss.length is 0 then return null
+    if id is undefined or id is null then id = bfss[0].id
+    for bfs in bfss
+        if id is bfs.id then return bfs     
+    return null
+
 @SelOptAmount = (n)->
     if n is undefined then return ''
     if n is 0 then '' else "#{n} ₽"
@@ -19,6 +27,10 @@
     toggleGroup: (e)->
         @props.group.isOpen = !@props.group.isOpen
         @props.toggleHandle(@props.group)
+    componentDidMount: ->
+        
+    componentWillMount: ->
+    
     render: ->
         React.DOM.div null,
             React.DOM.hr null, null
@@ -69,7 +81,7 @@
 
 @BoatForSales = React.createClass
     getInitialState: ->
-        curBfs: null 
+        curBfs: null
         bfsList: @props.bfsList
         bfsData: @props.bfsData
         groups: @props.groups
@@ -90,10 +102,7 @@
             return e
             
     findBfsInData: (id)->
-        if @state.bfsData.length == 0 then return null
-        for bfs in @state.bfsData
-            if id is bfs.id then return bfs     
-        return null
+        getCurBfsById(@state.bfsList, id)
     
     getStepIdx: (name)->
         if @state.groups.length is 0 then return -1
@@ -147,23 +156,23 @@
                     ,
                     "json"
                  )
-    render: ->
+    componentDidMount: ->
         if @state.curBfs is null
             @setBfs(@state.bfsList[0].id)
             React.DOM.div null, ''
-        else
+    render: ->
+        React.DOM.div
+            className: "row tb-pad-m"
             React.DOM.div
-                className: "row tb-pad-m"
-                React.DOM.div
-                    className: "small-4 columns"
-                    React.DOM.ul
-                        className: "menu vertical"
-                        for i in @state.bfsList
-                            React.createElement BoatForSalesItem, key: "bfs-item-#{i.id}", item: i, curBfsId: @state.curBfs.id, setBfsHandle: @setBfs 
-                React.DOM.div
-                    className: "small-8 columns"
-                    React.createElement BoatForSaleShow, key: "bfs-#{@state.curBfs.id}", bfs: @state.curBfs, bfsList: @state.bfsList, updBfsListFunc: @updBfsList, groups: @state.groups
-    
+                className: "small-4 columns"
+                React.DOM.ul
+                    className: "menu vertical"
+                    for i in @state.bfsList
+                        React.createElement BoatForSalesItem, key: "bfs-item-#{i.id}", item: i, curBfsId: @state.curBfs.id, setBfsHandle: @setBfs 
+            React.DOM.div
+                className: "small-8 columns"
+                React.createElement BoatForSaleShow, key: "bfs-#{@state.curBfs.id}", bfs: @state.curBfs, bfsList: @state.bfsList, updBfsListFunc: @updBfsList, groups: @state.groups
+
 @BoatPhoto = React.createClass
     render: ->
         React.DOM.div
@@ -187,6 +196,10 @@
        parameters: []
        photos: []
        bfsList: []
+    componentDidMount: ->
+        #console.log "componentDidMount()"
+    componentWillUnmount: ->
+        #console.log "componentWillUnmount()"
     render: ->
         React.DOM.div null,
             React.DOM.div
@@ -203,8 +216,8 @@
                             React.DOM.li
                                 className: "tabs-title is-active"
                                 React.DOM.a
-                                    href: "#boat-for-sales"
-                                    "Скомплектованные лодки"
+                                    href: "#options-collection"
+                                    "Комплектация"
                         React.DOM.li
                             className: "tabs-title#{if @state.bfsList.length > 0 then "" else " is-active"}"
                             React.DOM.a
@@ -238,94 +251,87 @@
                 if @state.bfsList.length > 0
                     React.DOM.div
                         className: "tabs-panel is-active"
-                        id: "boat-for-sales"
+                        id: "options-collection"
                         "data-animate":"fade-in fade-out"
-                        React.createElement BoatForSales, key: "bfs-list", bfsList: @state.bfsList
+                        React.DOM.p null, "Здесь должно быть описание готовой лодки"
+                        #React.createElement BoatForSales, key: "bfs-list", bfsList: @state.bfsList, curBfs: @state.bfsList
 
-#boat_filter
-maxFilterVal = (vals)->
-    v = -1
-    for val in vals
-        if val.is_binded then v = (if v is -1 then val.value else (if v < val.value then val.value else v))
-    return v
-    
-minFilterVal = (vals)->
-    v = -1
-    for val in vals
-        if val.is_binded then v = (if v is -1 then val.value else (if v > val.value then val.value else v))
-    return v
-    
-splitData = (dt)->
-    t = {}
-    ut = []
-    for d in dt
-        if $.trim(d.tag) isnt "" then t[d.tag]= d else ut[ut.length] = d
-    return {tagged: t, untagged: ut} 
 
-@HpFilter = React.createClass
-    handleChange: (e)->
-        console.log "goot"
+@BoatTypeMiniBlock = React.createClass
     render: ->
-       min = minFilterVal(@props.min_hp.values)
-       max = maxFilterVal(@props.max_hp.values)
-       console.log "#{minFilterVal(@props.min_hp.values)}--#{maxFilterVal(@props.max_hp.values)}"
-       React.DOM.div
-            className: @props.elClassName
-            React.DOM.p null, "Мощность подвесного мотора, л.c."
+        React.DOM.div
+            className: "column tb-pad-xs"
             React.DOM.div
-                className: "slider"
-                id: "hp-filter"
-                "data-slider": ""
-                "data-initial-start": min
-                "data-initial-end": max
-                "data-end": max
-                React.DOM.span
-                    className: "slider-handle"
-                    "data-slider-handle": ""
-                    "aria-controls": "min-hp-filter"
-                    role: "slider"
-                    tabIndex: "1"
-                    ""
-                React.DOM.span
-                    className: "slider-fill"
-                    "data-slider-fill": ""
-                    ""
-                React.DOM.span
-                    className: "slider-handle"
-                    "data-slider-handle": ""
-                    "aria-controls": "max-hp-filter"
-                    role: "slider"
-                    tabIndex: "1"
-                    ""
+                className: "bb-mini-block"
+                style: {backgroundImage: "url('#{@props.bfs.photo.small}')", display: "none"}
+                React.DOM.div
+                    className: "rc-fog hard-fog dark-blue-bg",
+                    null
+                React.DOM.div 
+                    className: "row"
+                    React.DOM.div
+                        className: "small-12 columns text-center tb-pad-xs"
+                        React.DOM.h4 null, @props.bfs.name
+                React.DOM.div
+                    className: "row"
+                    React.DOM.div
+                        className: "small-4 columns end"
+                        React.DOM.div
+                            className: "stat text-center rc-param-val-b"
+                            React.DOM.span null, "#{@props.bfs.min_hp}-#{@props.bfs.max_hp}"
+                        React.DOM.p
+                            className: "rc-param-name-b text-center"
+                            "мотор, л.с."
+                    React.DOM.div
+                        className: "small-4 columns end"
+                        React.DOM.div
+                            className: "stat text-center rc-param-val-b"
+                            React.DOM.span null, "#{@props.bfs.transom}"
+                        React.DOM.p
+                            className: "rc-param-name-b text-center"
+                            "размер транца"
+                React.DOM.div 
+                    className: "row tb-pad-xs"
+                    React.DOM.div
+                        className: "small-12 small-centered columns"
+                        React.DOM.div
+                            className: "stat text-center rc-param-val-b"
+                            id: "cost"
+                            React.DOM.span null, AddWhiteSpaceToNumb(@props.bfs.amount)
+                            React.DOM.span
+                                className: "rubl"
+                                ""
+                React.DOM.div
+                    className: "row"
+                    React.DOM.div
+                        className: "small-12 columns button-group expanded"
+                        React.DOM.a
+                            className: "button"
+                            href: @props.bfs.url
+                            "ПОДРОБНЕЕ"
+                        React.DOM.a
+                            className: "button success"
+                            href: "#"
+                            "КУПИТЬ"
+
+@BFSFilteringResult = React.createClass
+    getInitialState: ->
+        bfss: @props.data
+    setDefaultState: ->
+        bfss: []
+    componentDidMount: ->
+        $(".bb-mini-block").fadeIn(500)
+    componentWillUnmount: ->
+        $(".bb-mini-block").fadeOut(500)
+    render: ->
+        if @state.bfss.length is 0
             React.DOM.div
                 className: "row"
                 React.DOM.div
-                    className: "small-3 columns"
-                    React.DOM.input
-                        id: "min-hp-filter"
-                        type: 'number'
-                React.DOM.div
-                    className: "small-3 small-offset-6 columns text-right"
-                    React.DOM.input
-                        id: "max-hp-filter"
-                        type: 'number'
-                        onChange: @handleChange
-                
-            
-                
-
-@BoatFilter = React.createClass
-    getInitialState: ->
-        fD: splitData(@props.data)
-    setDefaultState: ->
-        fD: []
-    render: ->
-        filter = 555
-        React.DOM.div
-            className: "row tb-pad-s"
-            if @state.fD.tagged.min_hp isnt undefined && "#{@state.fD.tagged.min_hp}" isnt undefined
-                React.createElement HpFilter, key: "hp-filter", min_hp: @state.fD.tagged.min_hp, max_hp: @state.fD.tagged.max_hp, elClassName: "small-6 medium-4 columns end"
-            else console.error "Невозможно отобразить HpFilter"
-            ""
-            
-        
+                    className: "small-12 columns"
+                    React.DOM.p null, "Поиск не дал результатов, попробуйте поменять критерии"
+        else
+            React.DOM.div
+                className: "row small-up-1 medium-up-2 large-up-3"
+                for bfs in @state.bfss
+                    React.createElement BoatTypeMiniBlock, key: "#{bfs.id}", bfs: bfs

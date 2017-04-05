@@ -1,6 +1,6 @@
 class TrademarksController < ApplicationController
   before_action :set_trademark, only: [:show, :edit, :update, :destroy]
-
+  before_action :check_grants
   # GET /trademarks
   # GET /trademarks.json
   def index
@@ -66,6 +66,10 @@ class TrademarksController < ApplicationController
   end
 
   private
+    def check_grants
+      redirect_to "/404" if !could_manage_trademarks?
+    end 
+    
     # Use callbacks to share common setup or constraints between actions.
     def set_trademark
       @trademark = Trademark.find(params[:id])

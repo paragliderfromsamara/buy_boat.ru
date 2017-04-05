@@ -61,7 +61,7 @@ class BoatParameterTypesController < ApplicationController
 
   private
     def check_grants
-      redirect_to "/404" and return if !could_edit_boat_parameter_types? #defined in GrantsHelper
+      redirect_to "/404" and return if !could_manage_boat_parameter_types? #defined in GrantsHelper
     end 
     
     # Use callbacks to share common setup or constraints between actions.
