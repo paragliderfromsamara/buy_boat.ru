@@ -1,0 +1,62 @@
+<%= form_for(shop, html: {remote: shop.new_record?}) do |f| %>
+    <div class = "row">
+        <div class = "small-12 medium-4 end columns tb-pad-xs">
+            <% if is_producer? %>
+                <%= f.label :manager_id, "Управляющий"%>
+                <%= f.collection_select :manager_id, User.managers, :id, :full_name %>
+            <% else %>   
+                <%= f.hidden_field :manager_id, value: shop.new_record? ? current_user.id : shop.user_id  %>
+            <% end %>
+        </div>
+    </div>
+    <div class = "row">
+        <div class = "small-12 medium-4 end columns tb-pad-xs">
+            <%= f.label :name, "Название" %>
+            <%= f.text_field :name, required: "", placeholder: "Название магазина" %>
+        </div>
+    </div>
+    <div class = "row">
+        <div class = "small-12 medium-4 end columns tb-pad-xs">
+            <%= f.label :phone_number_1, "Контактный номер" %>
+            <%= f.text_field :phone_number_1, placeholder: "+7(999)-999-99-99"  %>
+        </div>
+    </div>
+    <div class = "row">
+        <div class = "small-12 medium-4 end columns tb-pad-xs">
+            <%= f.label :phone_number_2, "Дополнительный номер (не обязательно)" %>
+            <%= f.text_field :phone_number_2, placeholder: "+7(999)-999-99-99"  %>
+        </div>
+    </div>
+    <div id = "location-field">
+        <div class = "row">
+            <div class = "small-12 medium-4 end columns tb-pad-xs">
+                <%= label :locations, :country, "Страна" %>
+                <%= collection_select :locations, :country, Country.all, :id, :name, {}, {id: "countries"} %>
+            </div>
+        </div>
+        <div class = "row">
+            <div class = "small-12  medium-4 end columns tb-pad-xs">
+                <label for = "regions">Регион</label>
+                <select id = "regions">
+                </select>
+            </div>
+        </div>
+        <div class = "row">
+            <div class = "small-12  medium-4 end columns tb-pad-xs">
+                <%= f.label :city_id, "Населённый пункт" %>
+                <%= f.collection_select :city_id, [], nil, nil, {}, {id: "cities"} %>
+            </div>
+        </div>
+        <div class = "row">
+            <div class = "small-12 medium-4 end columns tb-pad-xs">
+                <%= f.label :street, "Адрес" %>
+                <%= f.text_field :street, placeholder: "Улица, дом"  %>
+            </div>
+        </div>
+    </div>
+    <div class = "row">
+        <div class = "small-12 medium-4 end columns">
+            <%= f.submit "Добавить", class: "button success" %>
+        </div>
+    </div>
+<%end%>

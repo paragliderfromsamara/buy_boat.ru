@@ -1,0 +1,61 @@
+<div class = "row" data-toggle style = 'display: none;'>
+    <div class = 'small-12 columns'>
+        <a class = 'button' onclick = "$('[data-toggle]').toggle(200);">
+            Скрыть форму
+        </a>
+    </div>
+    <%= render "form", shop: Shop.new %>
+</div>
+<div data-toggle >
+    <div class = 'row'>
+        <div class = 'small-12 columns'>
+            <a class = 'button' onclick = "$('[data-toggle]').toggle(200);">
+                Добавить магазин
+            </a>
+        </div>
+    </div>
+    <% if !@new_shops.blank? %>
+        <div class = 'row'>
+            <div class = 'small-12 columns'>
+                <h3>Недавно добавленные <span data-tooltip aria-haspopup="true" class="has-tip top subheader" data-disable-hover="false" tabindex="2" title="Магазины, которые ожидают подтверждения администратора">?</span></h3>
+                <%= render "shops_table", shops: @new_shops %>
+            </div>
+        </div>
+    <% end %>
+        <div class = 'row'>
+            <div class = 'small-12 columns'>
+               <h3>Открытые магазины <span data-tooltip aria-haspopup="true" class="has-tip top subheader" data-disable-hover="false" tabindex="2" title="Магазины, которые могут полноценно использовать сайт, продаваемые ими лодки отображаются в разделах сайта">?</span></h3>
+                <% if @opened_shops.blank? %>
+                    <p class = "tb-pad-s">
+                        Нет ни одного открытого магазина
+                    </p>
+                <% else %>
+                    <%= render "shops_table", shops: @opened_shops %>
+                <% end %>
+            </div>
+        </div>
+        <div class = 'row'>
+            <div class = 'small-12 columns'>
+               <h3>Закрытые магазины <span data-tooltip aria-haspopup="true" class="has-tip top subheader" data-disable-hover="false" tabindex="2" title="Магазины, которые заблокированы своими владельцами, либо по их просьбе, продаваемые ими лодки не отображаются в разделах сайта. Могут быть открыты самим владельцем">?</span></h3>
+                <% if @closed_shops.blank? %>
+                    <p class = "tb-pad-s">
+                        Нет ни одного закрытого магазина
+                    </p>
+                <% else %>
+                    <%= render "shops_table", shops: @closed_shops %>
+                <% end %>
+            </div>
+        </div>
+        <div class = 'row'>
+            <div class = 'small-12 columns'>
+               <h3>Заблокированные магазины <span data-tooltip aria-haspopup="true" class="has-tip top subheader" data-disable-hover="false" tabindex="2" title="Магазины, которые заблокированы администратором, без возможности возобновления активности менеджером, продаваемые ими лодки не отображаются в разделах сайта. Могут быть открыты только администратором">?</span></h3>
+                <% if @disabled_shops.blank? %>
+                    <p class = "tb-pad-s">
+                        Нет ни одного заблокированного магазина
+                    </p>
+                <% else %>
+                    <%= render "shops_table", shops: @disabled_shops%>
+                <% end %>
+            </div>
+        </div>
+</div>

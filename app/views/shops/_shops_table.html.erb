@@ -1,0 +1,35 @@
+<table>
+  <thead>
+    <tr>
+      <th>Название</th>
+      <th>Администратор</th>
+      <th>Контактный номер</th>
+      <th>Местоположение</th>
+      <th colspan="5"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% shops.each do |shop| %>
+      <tr>
+        <td><%= shop.name %></td>
+        <td><%= shop.manager.full_name %></td>
+        <td><%= shop.phone_number_1 %></td>
+        <td><span data-tooltip aria-haspopup="true" class="has-tip top" data-disable-hover="false" tabindex="2" title="<%= shop.full_location %>"><%= shop.city.name %></span></td>
+        <td><%= link_to "<i class = 'fi-arrow-right'></i>".html_safe, shop %></td>
+        <td><%= link_to "<i class = 'fi-pencil'></i>".html_safe, edit_shop_path(shop) %></td>
+        <td> 
+            <%= link_to "<i class = 'fi-check'></i>".html_safe, change_shop_status_path(id: shop, to_status: "to_enable"), remote: true, "data-turbolinks" => false, title: "Активировать" if shop.is_recent? || shop.is_disabled?  %>
+            <%= link_to "<i class = 'fi-prohibited'></i>".html_safe, change_shop_status_path(id: shop, to_status: "to_close"), remote: true, "data-turbolinks" => false, title: "Закрыть"  if shop.is_opened? %>
+            <%= link_to "<i class = 'fi-check'></i>".html_safe, change_shop_status_path(id: shop, to_status: "to_open"), remote: true, "data-turbolinks" => false, title: "Открыть" if shop.is_closed? %>
+        </td>
+        <td>
+            <%= link_to "<i class = 'fi-x'></i>".html_safe, change_shop_status_path(id: shop, to_status: "to_disable"), remote: true, "data-turbolinks" => false, title: "Заблокировать"   if shop.is_opened? || shop.is_closed? %>
+        </td>
+        <td>
+                        <%= link_to "<i class = 'fi-trash'></i>".html_safe, change_shop_status_path(id: shop, to_status: "to_remove"), remote: true, "data-turbolinks" => false, "data-confirm" => "Вы уверены что хотите удалить данный магазин навсегда?", title: "Удалить с сайта" if could_destroy_shop?(shop) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
