@@ -1,0 +1,2 @@
+<%= render 'boat_for_sales/form' if is_manager? && @shop.is_opened? %>
+<%= react_component 'BFSFilteringResult', { data: @boat_for_sales} %>

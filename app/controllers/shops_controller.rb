@@ -1,5 +1,5 @@
 class ShopsController < ApplicationController
-  before_action :set_shop, only: [:change_status]
+  before_action :set_shop, only: [:change_status, :manage_show]
   before_action :check_grants
   
   def change_status #возможные статусы #to_open to_close to_disable
@@ -37,6 +37,11 @@ class ShopsController < ApplicationController
   end
   
   def index
+  end
+  
+  def manage_show
+    @title = @header = @shop.name
+    @boat_for_sales =  BoatForSale.filter_collection(@shop.boat_for_sales.ids)
   end
   
   def create
