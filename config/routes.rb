@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
   #shops
   resources :shops
-  get "/manage_shops", to: "shops#manage_index", as: :manage_shops #управление магазинами
+  get "/manage_shops/:id", to: "shops#manage_show", as: :manage_shop                #страница управления магазином
+  get "/manage_shops", to: "shops#manage_index", as: :manage_shops                  #управление магазинами
   get "/change_shop_status/:id", to: "shops#change_status", as: :change_shop_status #изменение статуса
   #end
   #locations

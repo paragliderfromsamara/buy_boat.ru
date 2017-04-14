@@ -258,12 +258,17 @@ getCurBfsById = (bfss, id)->
 
 
 @BoatTypeMiniBlock = React.createClass
+    componentDidMount: ->
+        $("[data-bfs-id=#{@props.bfs.id}]").fadeIn(500)
+    componentWillUnmount: ->
+        $("[data-bfs-id=#{@props.bfs.id}]").fadeOut(500)
     render: ->
         React.DOM.div
             className: "column tb-pad-xs"
             React.DOM.div
                 className: "bb-mini-block"
                 style: {backgroundImage: "url('#{@props.bfs.photo.small}')", display: "none"}
+                "data-bfs-id": @props.bfs.id
                 React.DOM.div
                     className: "rc-fog hard-fog dark-blue-bg",
                     null
@@ -297,7 +302,8 @@ getCurBfsById = (bfss, id)->
                         React.DOM.div
                             className: "stat text-center rc-param-val-b"
                             id: "cost"
-                            React.DOM.span null, AddWhiteSpaceToNumb(@props.bfs.amount)
+                            if @props.bfs.amount isnt undefined
+                                React.DOM.span null, if parseInt(@props.bfs.amount) is NaN then @props.bfs.amount else AddWhiteSpaceToNumb(@props.bfs.amount)
                             React.DOM.span
                                 className: "rubl"
                                 ""
@@ -307,31 +313,48 @@ getCurBfsById = (bfss, id)->
                         className: "small-12 columns button-group expanded"
                         React.DOM.a
                             className: "button"
-                            href: @props.bfs.url
+                            href: "/boat_for_sales/#{@props.bfs.id}"
                             "ПОДРОБНЕЕ"
                         React.DOM.a
                             className: "button success"
                             href: "#"
                             "КУПИТЬ"
+GroupByLocation = (bfss)->
+    locations = []
+    for bfs in bfss
+        if IndexOf(locations, bfs.region) is -1 then locations.push(bfs.region)
+    locations.sort()
 
-@BFSFilteringResult = React.createClass
-    getInitialState: ->
-        bfss: @props.data
-    setDefaultState: ->
-        bfss: []
-    componentDidMount: ->
-        $(".bb-mini-block").fadeIn(500)
-    componentWillUnmount: ->
-        $(".bb-mini-block").fadeOut(500)
+@LocaleListBlock = React.createClass
     render: ->
-        if @state.bfss.length is 0
+        React.DOM.div 
+            className: "tb-pad-s",
+            React.DOM.div
+                className: "row"
+                React.DOM.div
+                    className: "small-12 columns"
+                    React.DOM.h4 null, @props.location
+            React.DOM.div
+                className: "row small-up-1 medium-up-2 large-up-3"
+                for bfs in @props.bfss
+                    if bfs.region is @props.location then React.createElement BoatTypeMiniBlock, key: "#{bfs.id}", bfs: bfs
+    
+@BFSFilteringResult = React.createClass
+    render: ->
+        @locations = GroupByLocation(@props.data)
+        if @props.data.length is 0
             React.DOM.div
                 className: "row"
                 React.DOM.div
                     className: "small-12 columns"
                     React.DOM.p null, "Поиск не дал результатов, попробуйте поменять критерии"
         else
-            React.DOM.div
-                className: "row small-up-1 medium-up-2 large-up-3"
-                for bfs in @state.bfss
-                    React.createElement BoatTypeMiniBlock, key: "#{bfs.id}", bfs: bfs
+            if @locations.length > 0
+                React.DOM.div null,
+                    for l in @locations
+                        React.createElement LocaleListBlock, key: "#{l}", location: l, bfss: @props.data
+            else
+                React.DOM.div
+                    className: "row small-up-1 medium-up-2 large-up-3"
+                    for bfs in @props.data
+                        React.createElement BoatTypeMiniBlock, key: "#{bfs.id}", bfs: bfs

@@ -1,1 +1,1 @@
-<div id = 'boat-filter' data-filter = "<%= { data: @boat_for_sales, default_boats: @default_boats }.to_json %>"></div>
+<%= react_component 'BFSFilter', { data: @filters_data, boatForSales: @boat_for_sales} %>

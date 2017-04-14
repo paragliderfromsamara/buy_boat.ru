@@ -1,4 +1,4 @@
-<%= render 'form' if is_manager? %>
+<%# render 'form' if is_manager? %>
 <div class = 'row'>
     <div class = 'small-12 columns'>
         <div class = 'tb-pad-s'>
@@ -20,6 +20,9 @@
                     <th>
                         Стоимость с учётом опций
                     </th>
+                    <th>
+                        Магазин (нас.пункт)
+                    </th>
                     <th colspan='2'>
                         
                     </th>
@@ -40,6 +43,9 @@
                             <%= bfs.amount %>
                         </td>
                         <td>
+                            <%=  bfs.shop.nil? ? %{Не указан} : link_to(%{#{bfs.shop.name_with_location}}, manage_shop_path(bfs.shop)) %>
+                        </td>
+                        <td>
                             <%= link_to "Перейти", bfs %>
                         </td>
                         <td>
@@ -48,7 +54,6 @@
                     </tr>
                 <%end%>
             </table>
-
         <%end%>
         </div>
     </div>

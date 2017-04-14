@@ -1,16 +1,17 @@
 class BoatForSalesController < ApplicationController
   before_action :set_boat_for_sale, only: [:show, :update, :destroy]
   def index
-    if params[:ids].nil?
-      #@boat_types = BoatType.active
-     # parameter_filter_data = BoatParameterType.filter_data
-      #option_filter_data = BoatOptionType.filter_data 
-      #@filter_data = parameter_filter_data.merge(option_filter_data)
-      #@default_boats = BoatForSale.active.ids 
-      @boat_for_sales = BoatForSale.filter_collection(BoatForSale.active.ids)
-    else
-      @boat_for_sales = BoatForSale.where(id: params[:ids]).joins(:boat_type)
-    end
+      if request.format == "html"
+        @filters_data = BoatForSale.filters 
+        ids = params[:ids].blank? ? [] : params[:ids].split(%r{,\s*}) 
+      else
+        ids = params[:ids].blank? ? [] : params[:ids]
+      end
+      @boat_for_sales = BoatForSale.filtered_collection(ids)
+      respond_to do |format|
+        format.html 
+        format.json {render json: @boat_for_sales}
+      end
   end
   
   def show
@@ -34,13 +35,13 @@ class BoatForSalesController < ApplicationController
     if @parsed_data[:status] < 6 #если что-то пошло не так
       render json: @parsed_data
     else
-      b = BoatForSale.create(boat_type_id: @parsed_data[:boat_type_id])
+      b = BoatForSale.create(boat_type_id: @parsed_data[:boat_type_id], shop_id: parser_options[:shop_id])
       b.reload
       b.update_attributes(selected_options_attributes: @parsed_data[:found].to_ass_hash)#если всё хорошо
       
       #b.selected_options.create(@parsed_data[:found])
       
-      redirect_to manage_boat_for_sales_path
+      redirect_to manage_shop_path(parser_options[:shop_id])
     end
   end
 
@@ -48,7 +49,7 @@ class BoatForSalesController < ApplicationController
     @title = @header = "Управление укомплектованными лодками"
     @boat_for_sales = BoatForSale.all
   end
-
+    
   private
   
   def set_boat_for_sale
@@ -57,6 +58,6 @@ class BoatForSalesController < ApplicationController
 
   def parser_options
     return nil if params[:boat_option_list].blank?
-    params.require(:boat_option_list).permit(:option_list_file, :boat_type_id) 
+    params.require(:boat_option_list).permit(:option_list_file, :boat_type_id, :shop_id) 
   end
 end

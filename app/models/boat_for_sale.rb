@@ -2,6 +2,9 @@ class BoatForSale < Configurator
   attr_accessor :option_list_file
 
   belongs_to :boat_type
+  belongs_to :shop
+  has_one :city, through: :shop
+  
   has_many :selected_options, dependent: :delete_all
   
   after_save :check_build_code
@@ -14,11 +17,24 @@ class BoatForSale < Configurator
     calculate_amount #пересчёт полной стоимости
   end
 
-  def self.filter_collection(ids)
-    bfss = where(id: ids).includes(:boat_type, :selected_options)
+  def self.filters
+    bfss = active.includes(:boat_type, :selected_options, :city)
     bfss.map do |bfs|
       hp_range = bfs.boat_type.horse_power_range
-      {id: bfs.id, min_hp: hp_range[:min], max_hp: hp_range[:max], url: "/boat_for_sales/#{bfs.id}", name: bfs.boat_type.catalog_name, transom: bfs.transom_name, amount: bfs.amount, photo: bfs.alter_photo_hash}
+      {id: bfs.id, min_hp: hp_range[:min], max_hp: hp_range[:max], region: bfs.city.region.name, transom: bfs.transom_name}
+    end
+    #active_bfs = BoatForSale.active.ids
+    #min_hp = BoatParameterValue.where(boat_parameter_type_id: BoatParameterType.min_hp_id, is_binded: true).minimum(:integer_value)
+    #max_hp = BoatParameterValue.where(boat_parameter_type_id: BoatParameterType.max_hp_id, is_binded: true).maximum(:integer_value)
+    #transom = BoatOptionType.transom_filter_data(active_bfs)
+    #return [{name: "hp", min: min_hp, max: max_hp, min_parameter_type_id: BoatParameterType.min_hp_id, min_parameter_type_id: BoatParameterType.max_hp_id, title: "Мощность двигателя, л.с."}, {name: "transom", values: transom, title: "Размер транца"}]
+  end
+  
+  def self.filtered_collection(ids=[])
+    bfss = ids.blank? ? active.includes(:boat_type, :selected_options, :city) : active.where(id: ids).includes(:boat_type, :selected_options, :city)
+    bfss.map do |bfs|
+      hp_range = bfs.boat_type.horse_power_range
+      {id: bfs.id, region: bfs.city.region.name, amount: bfs.amount, min_hp: hp_range[:min], max_hp: hp_range[:max], transom: bfs.transom_name, photo: bfs.alter_photo_hash, name: bfs.boat_type.catalog_name}
     end
   end
   

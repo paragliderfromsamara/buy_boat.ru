@@ -1,11 +1,20 @@
 <%= form_for(:boat_option_list, url: "/parse_selected_options_file") do |f| %>
     <div class = "row">
-        <div class = "small-3 columns">
+        <div class = "small-12 medium-3 columns tb-pad-xs">
             <div class = 'button-group'>
                 <%= f.collection_select :boat_type_id, BoatType.active.order("body_type ASC"), :id, :catalog_name  %>
             </div>
         </div>
-        <div class = "small-6 end columns">
+        <% if !@shop.nil?%>
+            <%= f.hidden_field :shop_id, value: @shop.id %>
+        <% else %>
+            <div class = "small-12 medium-3 columns tb-pad-xs">
+                <div class = 'button-group'>
+                    <%= f.collection_select :shop_id, Shop.opened.order("name ASC"), :id, :name_with_location  %>
+                </div>
+            </div>
+        <% end %>
+        <div class = "small-12 medium-6 end columns tb-pad-xs">
             <div class = 'button-group'>
                 <%= f.label :option_list_file, "html файл с опциями", class: 'button' %>
                 <%= f.file_field :option_list_file, class: "show-for-sr", required: true %>

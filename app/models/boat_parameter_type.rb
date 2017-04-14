@@ -27,6 +27,24 @@ class BoatParameterType < ApplicationRecord
     order("number ASC")
   end
   
+  def self.min_hp_id
+    min = BoatParameterType.min_hp
+    return min.nil? ? 0 : min.id
+  end
+  
+  def self.max_hp_id 
+    max =  BoatParameterType.max_hp
+    return max.nil? ? 0 : max.id
+  end
+  
+  def self.max_hp #ищет параметер с тегом обозначающим max_hp
+    find_by(tag: "max_hp")
+  end
+  
+  def self.min_hp #ищет параметер с тегом обозначающим min_hp
+    find_by(tag: "min_hp")
+  end
+  
   def default_value
     case value_type
     when "integer"
