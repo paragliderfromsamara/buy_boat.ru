@@ -256,13 +256,28 @@ getCurBfsById = (bfss, id)->
                         React.DOM.p null, "Здесь должно быть описание готовой лодки"
                         #React.createElement BoatForSales, key: "bfs-list", bfsList: @state.bfsList, curBfs: @state.bfsList
 
-
+MiniBlockParameterRow = React.createClass
+    render: ->
+        React.DOM.div
+            className: "row parameters"
+            React.DOM.div
+                className: "small-6 columns"
+                React.DOM.p
+                    className: "rc-param-name-b text-center"
+                    @props.p.name
+            React.DOM.div
+                className: "small-6 columns"
+                React.DOM.div
+                    className: "stat text-center rc-param-val-b"
+                    React.DOM.span null, @props.p.value
+                    
 @BoatTypeMiniBlock = React.createClass
     componentDidMount: ->
         $("[data-bfs-id=#{@props.bfs.id}]").fadeIn(500)
     componentWillUnmount: ->
         $("[data-bfs-id=#{@props.bfs.id}]").fadeOut(500)
     render: ->
+        i = 0
         React.DOM.div
             className: "column tb-pad-xs"
             React.DOM.div
@@ -272,29 +287,27 @@ getCurBfsById = (bfss, id)->
                 React.DOM.div
                     className: "rc-fog hard-fog dark-blue-bg",
                     null
+                React.DOM.div
+                    className: "bb-mini-control"
+                    React.DOM.div
+                        className: "row"
+                        React.DOM.div
+                            className: "small-12 columns button-group expanded"
+                            React.DOM.a
+                                className: "button small"
+                                href: "/boat_for_sales/#{@props.bfs.id}"
+                                "ПОДРОБНЕЕ"
+                            React.DOM.a
+                                className: "button success small"
+                                href: "#"
+                                "КУПИТЬ"
                 React.DOM.div 
                     className: "row"
                     React.DOM.div
-                        className: "small-12 columns text-center tb-pad-xs"
+                        className: "small-12 columns text-center"
                         React.DOM.h4 null, @props.bfs.name
-                React.DOM.div
-                    className: "row"
-                    React.DOM.div
-                        className: "small-4 columns end"
-                        React.DOM.div
-                            className: "stat text-center rc-param-val-b"
-                            React.DOM.span null, "#{@props.bfs.min_hp}-#{@props.bfs.max_hp}"
-                        React.DOM.p
-                            className: "rc-param-name-b text-center"
-                            "мотор, л.с."
-                    React.DOM.div
-                        className: "small-4 columns end"
-                        React.DOM.div
-                            className: "stat text-center rc-param-val-b"
-                            React.DOM.span null, "#{@props.bfs.transom}"
-                        React.DOM.p
-                            className: "rc-param-name-b text-center"
-                            "размер транца"
+                for p in @props.bfs.parameters
+                    React.createElement MiniBlockParameterRow, key: "parameter-#{i++}", p: p                            
                 React.DOM.div 
                     className: "row tb-pad-xs"
                     React.DOM.div
@@ -307,18 +320,7 @@ getCurBfsById = (bfss, id)->
                             React.DOM.span
                                 className: "rubl"
                                 ""
-                React.DOM.div
-                    className: "row"
-                    React.DOM.div
-                        className: "small-12 columns button-group expanded"
-                        React.DOM.a
-                            className: "button"
-                            href: "/boat_for_sales/#{@props.bfs.id}"
-                            "ПОДРОБНЕЕ"
-                        React.DOM.a
-                            className: "button success"
-                            href: "#"
-                            "КУПИТЬ"
+
 GroupByLocation = (bfss)->
     locations = []
     for bfs in bfss
@@ -335,7 +337,7 @@ GroupByLocation = (bfss)->
                     className: "small-12 columns"
                     React.DOM.h4 null, @props.location
             React.DOM.div
-                className: "row small-up-1 medium-up-2 large-up-3"
+                className: "row small-up-1 medium-up-2"
                 for bfs in @props.bfss
                     if bfs.region is @props.location then React.createElement BoatTypeMiniBlock, key: "#{bfs.id}", bfs: bfs
     

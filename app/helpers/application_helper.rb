@@ -1,23 +1,23 @@
 module ApplicationHelper
   
   def show_top_image?
-    flag = true
-    disable_on_pages = {
-                          "users" => [],
-                          "trademarks" => [],
-                          "boat_parameter_types" => [],
-                          "boat_series" => ["new", "edit", "update", "create"],
-                          "boat_types" => ["manage_index", "create", "update", "new", "edit"],
-                          "boat_for_sales" => ["manage_index"],
-                          "boat_option_types" => [],
-                          "shops" => []
-                          
-                       }                     
-    v = disable_on_pages[controller.controller_name]
-    if !v.nil?
-      flag = !(!v.index(controller.action_name).nil? || v.blank?)
-    end
-    return flag
+    #flag = true
+    #disable_on_pages = {
+    #                      "users" => [],
+    #                      "trademarks" => [],
+    #                      "boat_parameter_types" => [],
+    #                      "boat_series" => ["new", "edit", "update", "create"],
+    #                      "boat_types" => ["manage_index", "create", "update", "new", "edit"],
+    #                      "boat_for_sales" => ["manage_index"],
+    #                      "boat_option_types" => [],
+    #                      "shops" => []
+    #                      
+    #                   }                     
+    #v = disable_on_pages[controller.controller_name]
+    #if !v.nil?
+    #  flag = !(!v.index(controller.action_name).nil? || v.blank?)
+    #end
+    return controller.controller_name == "pages" && controller.action_name == "index"
   end
   
   def my_collection_select_from_hash(hash_array, form_name, input_name, prompt = "", key = :id, value = :value, default_key = nil)

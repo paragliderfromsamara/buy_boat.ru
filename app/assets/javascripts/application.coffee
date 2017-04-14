@@ -100,7 +100,7 @@ rFunc = ->
     $(document).foundation()
     #bbMiniAutosize()
     initTabs()
-    $(window).resize ()-> bbMiniAutosize()
+    #$(window).resize ()-> bbMiniAutosize()
     #InitViewer() #find in photo_wiewer.coffee
 
 #$(document).ready rFunc

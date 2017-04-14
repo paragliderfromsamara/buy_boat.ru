@@ -34,7 +34,17 @@ class BoatForSale < Configurator
     bfss = ids.blank? ? active.includes(:boat_type, :selected_options, :city) : active.where(id: ids).includes(:boat_type, :selected_options, :city)
     bfss.map do |bfs|
       hp_range = bfs.boat_type.horse_power_range
-      {id: bfs.id, region: bfs.city.region.name, amount: bfs.amount, min_hp: hp_range[:min], max_hp: hp_range[:max], transom: bfs.transom_name, photo: bfs.alter_photo_hash, name: bfs.boat_type.catalog_name}
+      {
+        id: bfs.id, 
+        region: bfs.city.region.name,
+        amount: bfs.amount, 
+        photo: bfs.alter_photo_hash, 
+        name: bfs.boat_type.catalog_name, 
+        parameters: [
+                      {name: "длина", value: %{#{bfs.boat_type.length/1000.0}, м}}, 
+                      {name: "мотор", value: %{#{hp_range[:min]}-#{hp_range[:max]}, л.с.}}, 
+                      {name: "выс. транца", value: bfs.transom_name}]
+      }
     end
   end
   

@@ -47,7 +47,9 @@
                           </div>
                           <div class = "medium-9 columns">
                               <ul class = 'menu float-right'>
-
+                                  <li>
+                                      <%= link_to "ЛОДКИ В НАЛИЧИИ", boat_for_sales_path %>
+                                  </li>
                                   <% if signed_in?%>
                                       <%if is_producer?%>
                                       <li>

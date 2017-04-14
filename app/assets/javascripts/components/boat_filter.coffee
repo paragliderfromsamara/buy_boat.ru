@@ -16,7 +16,7 @@ transomFilterData = (d)->
     l = []
     for b in d
         if IndexOf(l, b.transom) is -1 then l.push(b.transom)
-    {name: "transom", values: l.sort(), title: "Размер транца"}
+    {name: "transom", values: l.sort(), title: "Высота транца"}
 
 regionFilterData = (d)->
     l = []
@@ -90,7 +90,7 @@ getFilters = (d)->
         #sel = f.find()
     render: ->
         React.DOM.div
-            className: "column string-vals-filter"
+            className: "tb-pad-xs string-vals-filter"
             "data-filter-name": @props.f.name
             React.DOM.p 
                 id: 'filter-title',
@@ -113,13 +113,13 @@ getFilters = (d)->
 @SliderFilter = React.createClass
     render: ->
         React.DOM.div
-            className: "column"
+            className: "tb-pad-xs"
             "data-filter-name": @props.f.name
             React.DOM.p null, @props.f.title
             React.DOM.div
                 className: "row"
                 React.DOM.div
-                    className: "small-9 columns"
+                    className: "small-8 columns"
                     React.DOM.div
                         id: "#{@props.f.name}-filter"
                         className: "slider"
@@ -139,7 +139,7 @@ getFilters = (d)->
                             className: "slider-fill"
                             "data-slider-fill": ""
                 React.DOM.div
-                    className: "small-3 columns"
+                    className: "small-4 columns"
                     React.DOM.input
                         type: "number"
                         id: "hp-val"
@@ -173,21 +173,30 @@ getFilters = (d)->
     #componentWillUnmount: ->
     #    console.log "BFSFilter WillUnmount"
     render: ->
-        React.DOM.div null,
+        React.DOM.div
+            className: "row tb-pad-m",
             React.DOM.div
-                className: "row small-up-12 medium-up-2 large-up-3 tb-pad-s"
+                id: "filters"
+                className: "small-12 medium-4 large-3 columns"
+                React.DOM.h5 
+                    className: "tb-pad-xs",
+                    React.DOM.i
+                        className: "fi-filter"
+                        " "
+                    React.DOM.span null, "Фильтр"
                 for f in @state.filters
                     if f.min isnt undefined and f.max isnt undefined
                         React.createElement SliderFilter, key: f.name, f: f
                     else if f.values isnt undefined
                         if f.values.length > 0 then React.createElement ListFilter, key: f.name, f: f
-                React.DOM.div
-                    className: "column"
+                React.DOM.div null, 
                     React.DOM.div
-                        className: "button-group tb-pad-s"
+                        className: "button-group tb-pad-xs"
                         React.DOM.a
                             className: "button success"
                             onClick: @filteringHandle
                             "Поиск"
-            React.createElement BFSFilteringResult, key: "f-result", data: @state.boatForSales
+            React.DOM.div 
+                className: "small-12 medium-8 large-9 columns"
+                React.createElement BFSFilteringResult, key: "f-result", data: @state.boatForSales
             

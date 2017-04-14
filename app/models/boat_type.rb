@@ -22,6 +22,12 @@ class BoatType < ApplicationRecord
   has_many :configurator_entities, dependent: :destroy
   accepts_nested_attributes_for :configurator_entities
   
+  def length
+    bpt = BoatParameterType.includes(:boat_parameter_values).where(tag: "max_length").first
+    return 0 if bpt.nil?
+    return bpt.boat_parameter_values.find_by(boat_type_id: self.id).get_value
+  end
+  
   def horse_power_range
     bpts = BoatParameterType.includes(:boat_parameter_values).where(tag: ["min_hp", "max_hp"])
     min = 0
