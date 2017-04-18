@@ -89,6 +89,7 @@
                       <%= link_to "Торговые марки", trademarks_path, class: 'button' if could_manage_trademarks? %>
                       <%= link_to "Скомпанованные лодки", manage_boat_for_sales_path, class: 'button' %>
                       <%= link_to "Типы опций", boat_option_types_path, class: "button" %>
+                      <%= link_to "Страны", "/add_country", class: "button" if is_admin? %>
                   </div>
               </div>
           </div>

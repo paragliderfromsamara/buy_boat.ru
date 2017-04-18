@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   #locations
   get "/locations/regions/:country_id", to: "locations#regions"
   get "/locations/cities/:region_id", to: "locations#cities"
+  get "/add_country", to: "locations#add_country"
+  post "/add_country", to: "locations#add_country"
   #end
   #boat_for_sales
   resources :boat_for_sales
