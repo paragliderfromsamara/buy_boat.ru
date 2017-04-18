@@ -16,7 +16,7 @@ class BoatForSalesController < ApplicationController
   
   def show
     @boat_type = @boat_for_sale.boat_type
-    @header = @boat_type.catalog_name
+    @title = @boat_type.catalog_name
   end
   
   def update

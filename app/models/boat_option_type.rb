@@ -3,6 +3,7 @@ class BoatOptionType < Configurator
   has_many :selected_options, dependent: :delete_all
   has_many :boat_types, through: :configurator_entities
   has_many :boat_for_sales, through: :selected_options
+  has_many :boat_type_modifications, dependent: :destroy
   
   def self.transoms #транцы
     where(tag: "transom")
@@ -20,5 +21,10 @@ class BoatOptionType < Configurator
   
   def s_name #создана для вывода сокращенного имени 
     short_name.blank? ? name : short_name 
+  end
+  
+  
+  def self.standarts 
+    where(rec_type: Configurator.rec_type_standart)
   end
 end

@@ -20,6 +20,9 @@
             <li class = 'tabs-title '>
                <a href="#option_groups">Наборы опций</a>
             </li>
+            <li class = 'tabs-title '>
+               <a href="#modifications">Модификации</a>
+            </li>
         </ul>
     </div>
 </div>
@@ -185,6 +188,33 @@
                 <%end%>
             </div>
         </div>
+    </div>
+    <div class = "tabs-panel" id = "modifications">     
+        <div class="row">
+            <div class="small-12 columns">
+                <h4>
+                    Активные модификации
+                </h4>
+                <% if @boat_type.active_modifications.blank? %>
+                    <p>
+                        Нет активных модификаций.
+                    </p>
+                <%else%>
+                    <%= render "modifications_table", modifications: @boat_type.active_modifications %>
+                <%end%>
+                
+            </div>
+        </div>
+        <% if !@boat_type.not_active_modifications.blank? %>
+            <div class="row">
+                <div class="small-12 columns">
+                    <h3>
+                        Не активные модификации
+                    </h3>
+                    <%= render "modifications_table", modifications: @boat_type.not_active_modifications %>
+                </div>
+            </div>
+        <%end%>
     </div>
 </div>
 

@@ -1,6 +1,1 @@
-    <div class = 'row'>
-        <div class = 'small-12 columns'>
-          <%= link_to "Удалить сборку", @boat_for_sale, method: :delete, confirmation: "Нажав 'Да', Вы удалите данную сборку", class: "button alert"  %>
-        </div>
-    </div>
-<%= react_component 'BoatTypeShow', { data: @boat_type.hash_view }, html: {"data-turbolinks"=>false} %>
+<%= react_component 'BoatTypeShow', { data: @boat_for_sale.hash_view }, "data-turbolinks"=>false %>

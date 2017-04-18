@@ -179,6 +179,18 @@ class BoatForSale < Configurator
     return nil
   end
   
+  def hash_view
+    hash_bfs = {
+                 id: id,
+                 shop: shop.nil? ? nil : {name: shop.name, location: shop.full_location},
+                 selected_options: selected_options_for_show
+               }
+    hash = boat_type.hash_view
+    hash[:bfs] = hash_bfs
+    return hash
+
+  end
+  
   private
   
   def check_build_code

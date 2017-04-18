@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :boat_type_modifications, only: [:edit, :update]
+  
   #shops
   resources :shops
   get "/manage_shops/:id", to: "shops#manage_show", as: :manage_shop                #страница управления магазином

@@ -20,7 +20,11 @@
 #= require components
 #= require_tree .
 
-
+#Обрезает текст t по длине l
+@TrimText = (t, l)->
+    if t is undefined then console.error "Не задан текст"
+    if l is undefined then console.error "Не задана длина"
+    if t.length > l then "#{t[0..l-1]}..." else t
 #ищем номер элемента в массиве
 @IndexOf = (arr, el)->
     for i in [0..arr.length]
@@ -52,9 +56,9 @@
         t = parseInt(v, 10)
         return if t is NaN then 0 else t 
 #формирует строку для data-interchange из хэша фотографии
-@MakeInterchangeData = (ph)->
+@MakeInterchangeData = (ph, isWide)->
     if ph is null or ph is undefined then return ""
-    "[#{ph.small}, small], [#{ph.medium}, medium], [#{ph.large}, large]"
+    if isWide then "[#{ph.wide_small}, small], [#{ph.wide_medium}, medium], [#{ph.wide_large}, large]" else "[#{ph.small}, small], [#{ph.medium}, medium], [#{ph.large}, large]" 
 
 @AddWhiteSpaceToNumb = (n)->
     n = n.toString()

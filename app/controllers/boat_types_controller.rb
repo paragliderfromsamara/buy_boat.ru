@@ -52,6 +52,7 @@ class BoatTypesController < ApplicationController
     @title = @header = "Редактирование типа лодки"
     @confFileExists = @boat_type.remote_cnf_file_exists?
     @additionScript = @boat_type.cnf_data_file_url if @confFileExists
+    @modifications = @boat_type.check_modifications
   end
   
   #POST /add_configurator_entity - сюда присылаем опции для добавления в бд

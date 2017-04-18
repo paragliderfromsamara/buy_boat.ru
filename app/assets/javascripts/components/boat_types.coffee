@@ -1,177 +1,6 @@
 #@BoatParameterType = React.createClass
 #    render: ->
 
-#Используется для отображения цены в таблице с выбранными опциями
-
-getCurBfsById = (bfss, id)->
-    if bfss.length is 0 then return null
-    if id is undefined or id is null then id = bfss[0].id
-    for bfs in bfss
-        if id is bfs.id then return bfs     
-    return null
-
-@SelOptAmount = (n)->
-    if n is undefined then return ''
-    if n is 0 then '' else "#{n} ₽"
-    
-
-@SelectedOptionRow = React.createClass
-    render: ->
-        cols = 3
-        React.DOM.tr null,
-            React.DOM.td null, @props.so.name
-            React.DOM.td null, SelOptAmount(@props.so.amount)
-            
-
-@BoatForSaleGroup = React.createClass  
-    toggleGroup: (e)->
-        @props.group.isOpen = !@props.group.isOpen
-        @props.toggleHandle(@props.group)
-    componentDidMount: ->
-        
-    componentWillMount: ->
-    
-    render: ->
-        React.DOM.div null,
-            React.DOM.hr null, null
-            React.DOM.div 
-                className: 'row'
-                React.DOM.div
-                    className: "small-8 columns"
-                    React.DOM.h5 
-                        key: "#{@props.group.id}-h4" 
-                        onClick: @toggleGroup,
-                        style: {cursor: 'pointer'}
-                        React.DOM.i
-                            className: "fi-#{if @props.group.isOpen then "minus" else "plus"}"
-                        React.DOM.span null,
-                            " #{@props.group.name}"
-                React.DOM.div
-                    className: "small-4 columns text-right"
-                    React.DOM.p null,
-                        SelOptAmount(@props.bfsList[@props.group.id].amount)
-            if @props.group.isOpen
-                React.DOM.div   
-                    id: "table-container-#{@props.group.id}"
-                    React.DOM.table key: "table-#{@props.group.id}",
-                        React.DOM.tbody null,
-                            for so in [@props.group.id+1..@props.bfsList.length-1]
-                                 if @props.bfsList[so].rec_level is '1' then break
-                                 if @props.bfsList[so].rec_type isnt "Группа" then React.createElement SelectedOptionRow, key: "#{so}-ot", so: @props.bfsList[so]
-
-@BoatForSaleShow = React.createClass
-    toggleGroup: (g)->
-        @props.updBfsListFunc(@props.groups.map (grp)-> if grp.name is g.name then g else grp)
-    render: ->
-        React.DOM.div
-            id: 'bfs-show'
-            for g in @props.groups
-                if g.isEnable then React.createElement BoatForSaleGroup, key: "group-#{g.id}", group: g, bfsList: @props.bfs.selected_options_for_show, toggleHandle: @toggleGroup 
-        
-
-@BoatForSalesItem = React.createClass
-    setBfs: ->
-        @props.setBfsHandle(@props.item.id)
-    render: ->
-        React.DOM.li
-            className: "#{if @props.curBfsId is @props.item.id then "active" else ''}"
-            React.DOM.a 
-                onClick: @setBfs,
-                "#{@props.item.amount}-#{@props.item.id}"
-
-@BoatForSales = React.createClass
-    getInitialState: ->
-        curBfs: null
-        bfsList: @props.bfsList
-        bfsData: @props.bfsData
-        groups: @props.groups
-    getDefaultProps: ->
-        bfsList: [] 
-        bfsData: []
-        groups: [] 
-    calcAmount: (arr)->
-        if arr is undefined then return []
-        my = []
-        return arr.map (e, i)->
-            if e.rec_type is "Группа"
-                v = 0
-                for j in [i+1..arr.length-1]
-                    if parseInt(arr[j].rec_level) <= parseInt(e.rec_level) then break
-                    v += arr[j].amount
-                e.amount = v
-            return e
-            
-    findBfsInData: (id)->
-        getCurBfsById(@state.bfsList, id)
-    
-    getStepIdx: (name)->
-        if @state.groups.length is 0 then return -1
-        for i in [0..@state.groups.length-1]
-            if name is @state.groups[i].name then return i 
-        return -1
-    findStepsInData: (sOpts)-> #ищем группы в selected_options
-        s = []
-        for i in [0..sOpts.length-1]
-            if sOpts[i].rec_type is "Группа" and sOpts[i].rec_level is '1' then s[s.length] = {name: sOpts[i].name, id: i, isEnable: true, isOpen: false} 
-        return s
-    updStepsList: (sOpts)->
-        if sOpts is undefined then return []
-        s = @findStepsInData(sOpts)
-        cur = @state.groups
-        v = []
-        if cur.length is 0 then cur = s
-        else
-            s = s.map (so)=>
-                        idx = @getStepIdx(so.name)
-                        if idx isnt -1 
-                            so.isOpen = @state.groups[idx].isOpen
-                        return so
-            for c in cur
-                f = false
-                for so in s
-                    if (f=so.name is c.name) then break
-                if !f
-                    c.isEnable = false
-                    s[s.length] = c
-        return s
-        
-    updBfsList: (arr)->
-        @setState groups: arr
-    setBfs: (id)->
-        bfs = @findBfsInData(id)
-        if bfs isnt null
-            steps = if bfs.selected_options_for_show.length > 0 then @updStepsList(bfs.selected_options_for_show) else []
-            @setState curBfs: bfs, groups: steps
-        else
-            $.get(
-                    "/boat_for_sales/#{id}",
-                    {},
-                    (data)=>
-                        groups = if data.selected_options_for_show.length > 0 then @updStepsList(data.selected_options_for_show) else []
-                        data.selected_options_for_show = @calcAmount(data.selected_options_for_show)
-                        arr = @state.bfsData
-                        arr[arr.length] = data
-                        @setState curBfs: data, bfsData: arr, groups: groups
-                        return true
-                    ,
-                    "json"
-                 )
-    componentDidMount: ->
-        if @state.curBfs is null
-            @setBfs(@state.bfsList[0].id)
-            React.DOM.div null, ''
-    render: ->
-        React.DOM.div
-            className: "row tb-pad-m"
-            React.DOM.div
-                className: "small-4 columns"
-                React.DOM.ul
-                    className: "menu vertical"
-                    for i in @state.bfsList
-                        React.createElement BoatForSalesItem, key: "bfs-item-#{i.id}", item: i, curBfsId: @state.curBfs.id, setBfsHandle: @setBfs 
-            React.DOM.div
-                className: "small-8 columns"
-                React.createElement BoatForSaleShow, key: "bfs-#{@state.curBfs.id}", bfs: @state.curBfs, bfsList: @state.bfsList, updBfsListFunc: @updBfsList, groups: @state.groups
 
 @BoatPhoto = React.createClass
     render: ->
@@ -185,12 +14,66 @@ getCurBfsById = (bfss, id)->
                     "data-image-versions": "[#{@props.photo.small}, small], [#{@props.photo.medium}, medium],[#{@props.photo.large}, large]"  
                     #"data-interchange": "[#{@props.photo.small}, small], [#{@props.photo.medium}, medium],[#{@props.photo.large}, large]"
 
+@BoatTypeTitleBlock = React.createClass
+    render: ->
+        React.DOM.div
+            className: "tb-pad-s"
+            React.DOM.div 
+                className: "bb-wide-block"
+                "data-interchange": MakeInterchangeData(@props.b.photo, true)
+                React.DOM.div
+                    className: "rc-fog hard-fog dark-blue-bg"
+                    null
+                React.DOM.div
+                    className: "row tb-pad-s"
+                    React.DOM.div
+                        className: "small-12 columns text-center"
+                        React.DOM.h3 null, @props.b.name
+                React.DOM.div
+                    className: "row show-for-large"
+                    React.DOM.div
+                        className: 'medium-12 columns text-center'
+                        React.DOM.p
+                            title: @props.b.description,
+                            TrimText(@props.b.description, 500)
+                React.DOM.div
+                    className: "row tb-pad-s"
+                    for i in [0..@props.prms.length-1]
+                        if i > 5 then break
+                        React.DOM.div
+                            key: "parameter-#{i}"
+                            className: "small-2 columns"
+                            React.DOM.div
+                                 className: "stat text-center rc-param-val-b"
+                                 React.DOM.span null, @props.prms[i].value
+                            React.DOM.p 
+                                 className: "rc-param-name-b text-center"
+                                 @props.prms[i].name
+                React.DOM.div
+                    className: "row"
+                    React.DOM.div
+                        className: "small-12 columns"
+                        React.DOM.img
+                            className: "float-center"
+                            src: @props.b.trademark.white_logo.small
+                    #        className: "button expanded"
+                    #        href: "#"
+                    #        "ПОДРОБНЕЕ"
+                    #React.DOM.div
+                    #    className: "small-4 small-offset-4 columns"
+                    #    React.DOM.a
+                    #        className: "button expanded"
+                    #        href: "#"
+                    #        "КУПИТЬ"
+
+        
 @BoatTypeShow = React.createClass
     getInitialState: ->
-       type: @props.data.type
+       type: @props.data
        parameters: @props.data.parameters
        photos: @props.data.photos
        bfsList: @props.data.boat_for_sales
+       curBfs: if @props.data.bfs is undefined then null else @props.data.bfs
     getDefaultProps: ->
        type: null
        parameters: []
@@ -202,6 +85,8 @@ getCurBfsById = (bfss, id)->
         #console.log "componentWillUnmount()"
     render: ->
         React.DOM.div null,
+            React.createElement BoatTypeTitleBlock, b: @state.type, prms: @state.parameters
+            if @state.curBfs isnt null then React.createElement BoatForSaleShow, key: "bfs-#{@state.curBfs.id}", bfs: @state.curBfs
             React.DOM.div
                 className: "row tb-pad-m"
                 React.DOM.div
@@ -212,7 +97,7 @@ getCurBfsById = (bfss, id)->
                         id: "bb-tabs"
                         "data-deep-link": "false"
                         "data-turbolinks":"false"
-                        if @state.bfsList.length > 0
+                        if @state.curBfs isnt null
                             React.DOM.li
                                 className: "tabs-title is-active"
                                 React.DOM.a
@@ -228,6 +113,12 @@ getCurBfsById = (bfss, id)->
                             React.DOM.a
                                 href: "#photos"
                                 "Фото"
+                        if @state.bfsList.length > 0
+                            React.DOM.li
+                                className: "tabs-title"
+                                React.DOM.a
+                                    href: "#available-collection"
+                                    "В наличии"
             React.DOM.div
                 className: "tabs-content"
                 "data-tabs-content": "bb-tabs"
@@ -250,113 +141,23 @@ getCurBfsById = (bfss, id)->
                             React.createElement BoatPhoto, key: p.id, photo: p
                 if @state.bfsList.length > 0
                     React.DOM.div
+                        className: "tabs-panel"
+                        id: "available-collection"
+                        "data-animate":"fade-in fade-out"
+                        React.DOM.div
+                            className: "row"
+                            React.DOM.div
+                                className: "small-12"
+                                React.DOM.h3
+                                     className: "tb-pad-s"
+                                     "Доступные комплектации #{@state.type.name}"
+                        React.createElement BFSFilteringResult, key: "bfs-list", data: @state.bfsList, colsClass: "small-up-1 medium-up-2 large-up-3"
+                        #React.createElement BoatForSales, key: "bfs-list", bfsList: @state.bfsList, curBfs: @state.bfsList
+                if @state.curBfs isnt null
+                    React.DOM.div
                         className: "tabs-panel is-active"
                         id: "options-collection"
                         "data-animate":"fade-in fade-out"
-                        React.DOM.p null, "Здесь должно быть описание готовой лодки"
+                        React.createElement BFSSelectedOptions, options: @state.curBfs.selected_options
+                        #React.createElement BFSFilteringResult, key: "bfs-list", data: @state.bfsList, colsClass: "small-up-1 medium-up-2 large-up-3"
                         #React.createElement BoatForSales, key: "bfs-list", bfsList: @state.bfsList, curBfs: @state.bfsList
-
-MiniBlockParameterRow = React.createClass
-    render: ->
-        React.DOM.div
-            className: "row parameters"
-            React.DOM.div
-                className: "small-6 columns"
-                React.DOM.p
-                    className: "rc-param-name-b text-center"
-                    @props.p.name
-            React.DOM.div
-                className: "small-6 columns"
-                React.DOM.div
-                    className: "stat text-center rc-param-val-b"
-                    React.DOM.span null, @props.p.value
-                    
-@BoatTypeMiniBlock = React.createClass
-    componentDidMount: ->
-        $("[data-bfs-id=#{@props.bfs.id}]").fadeIn(500)
-    componentWillUnmount: ->
-        $("[data-bfs-id=#{@props.bfs.id}]").fadeOut(500)
-    render: ->
-        i = 0
-        React.DOM.div
-            className: "column tb-pad-xs"
-            React.DOM.div
-                className: "bb-mini-block"
-                style: {backgroundImage: "url('#{@props.bfs.photo.small}')", display: "none"}
-                "data-bfs-id": @props.bfs.id
-                React.DOM.div
-                    className: "rc-fog hard-fog dark-blue-bg",
-                    null
-                React.DOM.div
-                    className: "bb-mini-control"
-                    React.DOM.div
-                        className: "row"
-                        React.DOM.div
-                            className: "small-12 columns button-group expanded"
-                            React.DOM.a
-                                className: "button small"
-                                href: "/boat_for_sales/#{@props.bfs.id}"
-                                "ПОДРОБНЕЕ"
-                            React.DOM.a
-                                className: "button success small"
-                                href: "#"
-                                "КУПИТЬ"
-                React.DOM.div 
-                    className: "row"
-                    React.DOM.div
-                        className: "small-12 columns text-center"
-                        React.DOM.h4 null, @props.bfs.name
-                for p in @props.bfs.parameters
-                    React.createElement MiniBlockParameterRow, key: "parameter-#{i++}", p: p                            
-                React.DOM.div 
-                    className: "row tb-pad-xs"
-                    React.DOM.div
-                        className: "small-12 small-centered columns"
-                        React.DOM.div
-                            className: "stat text-center rc-param-val-b"
-                            id: "cost"
-                            if @props.bfs.amount isnt undefined
-                                React.DOM.span null, if parseInt(@props.bfs.amount) is NaN then @props.bfs.amount else AddWhiteSpaceToNumb(@props.bfs.amount)
-                            React.DOM.span
-                                className: "rubl"
-                                ""
-
-GroupByLocation = (bfss)->
-    locations = []
-    for bfs in bfss
-        if IndexOf(locations, bfs.region) is -1 then locations.push(bfs.region)
-    locations.sort()
-
-@LocaleListBlock = React.createClass
-    render: ->
-        React.DOM.div 
-            className: "tb-pad-s",
-            React.DOM.div
-                className: "row"
-                React.DOM.div
-                    className: "small-12 columns"
-                    React.DOM.h4 null, @props.location
-            React.DOM.div
-                className: "row small-up-1 medium-up-2"
-                for bfs in @props.bfss
-                    if bfs.region is @props.location then React.createElement BoatTypeMiniBlock, key: "#{bfs.id}", bfs: bfs
-    
-@BFSFilteringResult = React.createClass
-    render: ->
-        @locations = GroupByLocation(@props.data)
-        if @props.data.length is 0
-            React.DOM.div
-                className: "row"
-                React.DOM.div
-                    className: "small-12 columns"
-                    React.DOM.p null, "Поиск не дал результатов, попробуйте поменять критерии"
-        else
-            if @locations.length > 0
-                React.DOM.div null,
-                    for l in @locations
-                        React.createElement LocaleListBlock, key: "#{l}", location: l, bfss: @props.data
-            else
-                React.DOM.div
-                    className: "row small-up-1 medium-up-2 large-up-3"
-                    for bfs in @props.data
-                        React.createElement BoatTypeMiniBlock, key: "#{bfs.id}", bfs: bfs

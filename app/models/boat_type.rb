@@ -4,8 +4,9 @@ class BoatType < ApplicationRecord
   belongs_to :creator, class_name: "User" #кто создал
   belongs_to :modifier, class_name: "User" #кто изменил
   
+  has_many :boat_type_modifications, dependent: :destroy
   
-  has_many :boat_photos, dependent: :delete_all
+  has_many :boat_photos, dependent: :destroy
   has_many :photos, through: :boat_photos
   #belongs_to :photo
   
@@ -21,6 +22,7 @@ class BoatType < ApplicationRecord
   
   has_many :configurator_entities, dependent: :destroy
   accepts_nested_attributes_for :configurator_entities
+
   
   def length
     bpt = BoatParameterType.includes(:boat_parameter_values).where(tag: "max_length").first
@@ -43,9 +45,9 @@ class BoatType < ApplicationRecord
     photos.first
   end
   
-  def photos_hash_view
+  def photos_hash_view(is_wide=false)
     return "" if photos.blank?
-    photos.map {|ph| ph.hash_view}
+    photos.map {|ph| ph.hash_view(is_wide)}
   end
   
   def self.show_page_scope
@@ -91,6 +93,8 @@ class BoatType < ApplicationRecord
         end
       end  
       self.configurator_entities.create(attrs.values)
+      self.reload
+      self.check_modifications #ищем в загруженном файле стандарты и вносим их в список модификаций
       #attrs.each {|a| self.configurator_entities.create(attrs.values)}
       #attrs.each {|ph| self.photos.create(link: ph[:link], uploader_id: self.modifier_id)}
     end
@@ -132,10 +136,14 @@ class BoatType < ApplicationRecord
   
   def hash_view
     {
-      type: self,
+      id: self.id,
+      trademark: self.trademark.hash_view,
+      name: self.catalog_name,
+      description: self.description,
+      photo: self.photos_hash_view(true).first, 
       parameters: self.boat_parameters_for_react,
       photos: self.photos_hash_view,
-      boat_for_sales: self.boat_for_sales#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
+      boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
     }
   end
   
@@ -151,8 +159,52 @@ class BoatType < ApplicationRecord
   def self.body_types
     select(:body_type).order("body_type ASC").uniq.map{|bt| bt.body_type if !bt.body_type.blank?}
   end
+  
+  
+  #Проверяет наличие стандартов привязанных к boat_type в листе конфигурации. Те которых нет - создает, те которые есть проверяет.
+  #Если они есть в модификациях, но нет в списке для сборки - вешается флажок is_active=false, если есть то is_active = true. 
+  #Вновь добавленные модификации наследуют название и описание у типа опции
+  def check_modifications
+    return [] if self.configurator_entities.blank?
+    #вытаскиваем все стандарты
+    mdfs_in_option_types = BoatOptionType.standarts 
+    #вытаскиваем все стандарты из configurator_entities для того чтобы выяснить актуальные типы
+    mdfs_in_cnf_ids = self.configurator_entities.where(boat_option_type_id: mdfs_in_option_types.ids).pluck(:boat_option_type_id) 
+    return [] if mdfs_in_cnf_ids.blank?
+    bt_mdfs = self.boat_type_modifications
     
+    if !bt_mdfs.blank? #если есть, то проверяем их актуальность 
+      bt_mdfs.each do |mdf|
+        idx = mdfs_in_cnf_ids.index(mdf.boat_option_type_id)
+        if idx.nil?
+          mdf.set_activity_flag(false)
+        else
+          mdf.set_activity_flag(true)
+          mdfs_in_cnf_ids.delete_at(idx)
+        end
+      end
+      
+    end 
+    add_modifications_by_option_type_ids(mdfs_in_cnf_ids) if !mdfs_in_cnf_ids.blank?
+      
+  end
+  
+  def active_modifications
+    boat_type_modifications.where(is_active: true)
+  end
+  
+  def not_active_modifications
+    boat_type_modifications.where(is_active: false)
+  end
   private
+  
+  #Добавляет новые модификации по ключам таблицы boat_option_type
+  def add_modifications_by_option_type_ids(option_type_ids)
+    o_types = BoatOptionType.where(id: option_type_ids)
+    mdfs = []
+    o_types.each{|t| mdfs.push({boat_option_type_id: t.id, name: t.name, description: t.description}) }
+    self.boat_type_modifications.create(mdfs)
+  end
   
   def make_boat_parameter_values #создаёт таблицу значений параметров лодки 
     if !copy_params_table_from_id.blank?
@@ -187,6 +239,7 @@ class BoatType < ApplicationRecord
   def cnf_file_name 
     "boatOptions_#{self.id}.js"
   end
+  
   
 
 end
