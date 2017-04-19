@@ -31,7 +31,8 @@ class BoatForSale < Configurator
   end
   
   def self.filtered_collection(ids=[])
-    bfss = ids.blank? ? active.includes(:boat_type, :selected_options, :city) : active.where(id: ids).includes(:boat_type, :selected_options, :city)
+    return [] if ids.blank? 
+    bfss = active.where(id: ids).includes(:boat_type, :selected_options, :city)
     bfss.map do |bfs|
       hp_range = bfs.boat_type.horse_power_range
       {

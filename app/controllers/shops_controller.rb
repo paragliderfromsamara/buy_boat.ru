@@ -41,7 +41,7 @@ class ShopsController < ApplicationController
   
   def manage_show
     @title = @header = @shop.name
-    @boat_for_sales =  BoatForSale.filter_collection(@shop.boat_for_sales.ids)
+    @boat_for_sales = BoatForSale.filtered_collection(@shop.boat_for_sales.ids)
   end
   
   def create

@@ -7,7 +7,7 @@ class BoatForSalesController < ApplicationController
       else
         ids = params[:ids].blank? ? [] : params[:ids]
       end
-      @boat_for_sales = BoatForSale.filtered_collection(ids)
+      @boat_for_sales = BoatForSale.filtered_collection(ids.blank? ? BoatForSale.active.ids : ids)
       respond_to do |format|
         format.html 
         format.json {render json: @boat_for_sales}

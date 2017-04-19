@@ -55,6 +55,7 @@ filteredIds = (filters, data)->
     return ids   
     
 getFilters = (d)->
+    if d.length is 0 then return [] 
     filters = []
     if d[0].min_hp isnt undefined and d[0].max_hp isnt undefined then filters.push hpFilterData(d) else console.error "Указаны не все атрибуты hp"
     if d[0].transom isnt undefined then filters.push transomFilterData(d) else console.error "Отсутствует атрибут Transom"
@@ -175,28 +176,33 @@ getFilters = (d)->
     render: ->
         React.DOM.div
             className: "row tb-pad-m",
-            React.DOM.div
-                id: "filters"
-                className: "small-12 medium-4 large-3 columns"
-                React.DOM.h5 
-                    className: "tb-pad-xs",
-                    React.DOM.i
-                        className: "fi-filter"
-                        " "
-                    React.DOM.span null, "Фильтр"
-                for f in @state.filters
-                    if f.min isnt undefined and f.max isnt undefined
-                        React.createElement SliderFilter, key: f.name, f: f
-                    else if f.values isnt undefined
-                        if f.values.length > 0 then React.createElement ListFilter, key: f.name, f: f
-                React.DOM.div null, 
-                    React.DOM.div
-                        className: "button-group tb-pad-xs"
-                        React.DOM.a
-                            className: "button success"
-                            onClick: @filteringHandle
-                            "Поиск"
-            React.DOM.div 
-                className: "small-12 medium-8 large-9 columns"
-                React.createElement BFSFilteringResult, key: "f-result", data: @state.boatForSales
+            if @state.filters.length is 0 
+                React.DOM.div
+                    className: "small-12 columns"
+                    React.DOM.p null, "Лодки в наличии отсутствуют."
+            else
+                React.DOM.div
+                    id: "filters"
+                    className: "small-12 medium-4 large-3 columns"
+                    React.DOM.h5 
+                        className: "tb-pad-xs",
+                        React.DOM.i
+                            className: "fi-filter"
+                            " "
+                        React.DOM.span null, "Фильтр"
+                    for f in @state.filters
+                        if f.min isnt undefined and f.max isnt undefined
+                            React.createElement SliderFilter, key: f.name, f: f
+                        else if f.values isnt undefined
+                            if f.values.length > 0 then React.createElement ListFilter, key: f.name, f: f
+                    React.DOM.div null, 
+                        React.DOM.div
+                            className: "button-group tb-pad-xs"
+                            React.DOM.a
+                                className: "button success"
+                                onClick: @filteringHandle
+                                "Поиск"
+                React.DOM.div 
+                    className: "small-12 medium-8 large-9 columns"
+                    React.createElement BFSFilteringResult, key: "f-result", data: @state.boatForSales
             
