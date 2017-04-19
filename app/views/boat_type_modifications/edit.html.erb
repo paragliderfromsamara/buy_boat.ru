@@ -1,0 +1,51 @@
+<%= form_for(@boat_type_modification) do |f| %>
+<div class = "row">
+    <div class = 'small-12 medium-6 end columns'>
+        <%= f.label :name, "Название модификации"%>
+        <%= f.text_field :name %>
+    </div>
+</div>
+<div class = "row">
+    <div class = 'small-12 medium-6 end columns'>
+        <%= f.label :description, "Описание модификации"%>
+        <%= f.text_area :description %>
+    </div>
+</div>
+<div class = "row">
+    <div class = 'small-12 medium-6 end columns tb-pad-s'>
+        <label>Вид спереди</label>
+        <%= image_tag @boat_type_modification.aft_view.small if !@boat_type_modification.aft_view.nil? %>
+        <%= f.file_field :aft_view %>
+    </div>
+</div>
+<div class = "row">
+    <div class = 'small-12 medium-6 end columns tb-pad-s'>
+        <label>Вид сзади</label>
+        <%= image_tag @boat_type_modification.bow_view.small if !@boat_type_modification.bow_view.nil? %>
+        <%= f.file_field :bow_view %>
+    </div>
+</div>
+<div class = "row">
+    <div class = 'small-12 medium-6 end columns tb-pad-s'>
+        <label>Вид сверху</label>
+        <%= image_tag @boat_type_modification.top_view.small if !@boat_type_modification.top_view.nil? %>
+        <%= f.file_field :top_view %>
+    </div>
+</div>
+<div class = "row">
+    <div class = 'small-12 medium-6 end columns tb-pad-s'>
+        <label>Схема размещения пассажиров</label>
+        <%= image_tag @boat_type_modification.accomodation_view.small if !@boat_type_modification.accomodation_view.nil? %>
+        <%= f.file_field :accomodation_view %>
+    </div>
+</div>
+<div class = "row">
+    <div class = 'small-12 medium-6 end columns'>
+        <div class = 'button-group'>
+            <%= f.submit "Сохранить изменения", class: "button success" %>
+            <button type = "reset" class = "button secondary">Сброс</button>
+        </div>
+    </div>
+</div>
+<%end%>
+

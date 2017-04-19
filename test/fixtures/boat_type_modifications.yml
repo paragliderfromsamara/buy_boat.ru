@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  boat_type_id: 1
+  boat_option_type_id: 1
+  name: MyString
+  description: MyString
+  bow_view: MyString
+  aft_view: MyString
+  top_view: MyString
+  accomodation_view: MyString
+
+two:
+  boat_type_id: 1
+  boat_option_type_id: 1
+  name: MyString
+  description: MyString
+  bow_view: MyString
+  aft_view: MyString
+  top_view: MyString
+  accomodation_view: MyString

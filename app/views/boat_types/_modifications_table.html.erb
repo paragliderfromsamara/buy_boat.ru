@@ -1,0 +1,58 @@
+<div class = "tb-pad-s">
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        Название
+                    </th>
+                    <th>
+                        Описание
+                    </th>
+                    <th>
+                        Вид спереди
+                    </th>
+                    <th>
+                        Вид сзади
+                    </th>
+                    <th>
+                        Вид сверху
+                    </th>
+                    <th>
+                        Рассадка
+                    </th>
+                    <th>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <% modifications.each do |mdf| %>
+                    <tr>
+                        <td>
+                            <%= mdf.name %>
+                        </td>
+                        <td>
+                            <%= mdf.description %>
+                        </td>
+                        <td>
+                            <%= image_tag mdf.aft_view.small if !mdf.aft_view.nil? %>
+                        </td>
+                        <td>
+                            <%= image_tag mdf.bow_view.small if !mdf.bow_view.nil? %>
+                        </td>
+                        <td>
+                            <%= image_tag mdf.top_view.small if !mdf.top_view.nil? %>
+                        </td>
+                        <td>
+                            <%= image_tag mdf.accomodation_view.small if !mdf.accomodation_view.nil? %>
+                        </td>
+                        <td>
+                            <%= link_to "<i class = 'fi-pencil'></i> Редактировать".html_safe, edit_boat_type_modification_path(mdf) %>
+                        </td>
+                    </tr>
+                <%end%>
+            </tbody>
+            
+        </table>
+    </div>
+
+

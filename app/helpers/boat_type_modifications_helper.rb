@@ -1,0 +1,2 @@
+module BoatTypeModificationsHelper
+end
