@@ -1,0 +1,38 @@
+<% if Country.locations_file_exists? %>
+    <%= form_for(:country) do |f| %>
+    <div class = "row tb-pad-s">
+        <div class = "small-6 medium-3 columns">
+            <%= f.select :name, Country.countries_list.collect{|l| [l, l]}, {include_blank: 'Выберите страну из списка'} %>
+        </div>
+        <div class = "small-6 medium-3 end columns">
+            <%= f.submit "Добавить", class: "button" %>
+        </div>
+    </div>
+    <%end%>
+<%else%>
+    <div class = "row">
+        <div class = "small-6 medium-3 columns">
+            <p>
+                Файл локациями не существует
+            </p>
+        </div>
+    </div>
+<%end%>
+<div class = "row tb-pad-s">
+    <div class = "small-12 columns">
+        <h4>
+            Загруженные страны
+        </h4>
+        <% if @countries.blank? %>
+            <p>
+                Локации не добавлены
+            </p>
+        <%else%>
+            <% @countries.each do |c| %>
+                <p>
+                    <%= c.name %> (регионов: <%= c.regions.count %>, нас.пунктов: <%= c.cities.count %>)
+                </p>
+            <%end%>
+        <%end%>
+    </div>
+</div>
