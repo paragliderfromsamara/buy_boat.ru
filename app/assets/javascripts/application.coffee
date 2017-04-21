@@ -24,6 +24,7 @@
 @TrimText = (t, l)->
     if t is undefined then console.error "Не задан текст"
     if l is undefined then console.error "Не задана длина"
+    if t is null then return ""
     if t.length > l then "#{t[0..l-1]}..." else t
 #ищем номер элемента в массиве
 @IndexOf = (arr, el)->

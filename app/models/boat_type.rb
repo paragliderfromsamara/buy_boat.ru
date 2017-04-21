@@ -134,10 +134,12 @@ class BoatType < ApplicationRecord
     end
   end
   
-  def hash_view
+  #подготавливает тип лодки для отрисовки React.js, в boat_types/show
+  def hash_view 
     {
       id: self.id,
       trademark: self.trademark.hash_view,
+      modifications: self.boat_type_modifications.map{|mdf| mdf.hash_view},
       name: self.catalog_name,
       description: self.description,
       photo: self.photos_hash_view(true).first, 

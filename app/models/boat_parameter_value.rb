@@ -2,8 +2,8 @@ class BoatParameterValue < ApplicationRecord
   attr_accessor :set_value
   
   before_validation :select_value_type
-  belongs_to :boat_parameter_type, optional: :true
-  belongs_to :boat_type, optional: :true
+  belongs_to :boat_parameter_type
+  belongs_to :boat_type
   
   def self.active
     where(boat_type_id: BoatType.active.ids)

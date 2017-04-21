@@ -39,7 +39,7 @@ module ApplicationHelper
   def top_block
     return @top_block if !@top_block.nil?
     {
-      boat_type: @boat_type.nil? ? BoatType.first : @boat_type
+      boat_type: @boat_type.nil? ? BoatType.active.first : @boat_type
       #sub_menu_items: [{text: "url name", url: link}, ...]
     }
   end

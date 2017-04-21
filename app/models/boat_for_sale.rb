@@ -59,7 +59,16 @@ class BoatForSale < Configurator
   end
   
   def selected_options_for_show
-      selected_options.includes(:boat_option_type).map {|opt| {arr_id: opt.arr_id, name: opt.boat_option_type.nil? ? opt.param_name : opt.boat_option_type.name, name: opt.boat_option_type.nil? ? opt.param_name : opt.boat_option_type.name, amount: opt.amount, rec_type: opt.rec_type, rec_level: opt.rec_level}}
+      selected_options.includes(:boat_option_type).map {|opt| {
+                                                                boat_option_type_id: opt.boat_option_type_id, 
+                                                                arr_id: opt.arr_id, 
+                                                                name: opt.boat_option_type.nil? ? opt.param_name : opt.boat_option_type.name, 
+                                                                name: opt.boat_option_type.nil? ? opt.param_name : opt.boat_option_type.name, 
+                                                                amount: opt.amount, 
+                                                                rec_type: opt.rec_type, 
+                                                                rec_level: opt.rec_level
+                                                              }
+                                                      }
   end
   
   #Извлекаем данные из файла и делаем вывод о его годности 

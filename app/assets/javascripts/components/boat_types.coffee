@@ -66,7 +66,32 @@
                     #        href: "#"
                     #        "КУПИТЬ"
 
-        
+@BoatModificationRow = React.createClass
+    modelViews: ->
+        views = []
+        if @props.mdf.views.aft isnt null then views.push({title: "Вид спереди", view: @props.mdf.views.aft})
+        if @props.mdf.views.bow isnt null then views.push({title: "Вид сзади", view: @props.mdf.views.bow})
+        if @props.mdf.views.top isnt null then views.push({title: "Вид сверху", view: @props.mdf.views.top})
+        return views
+    render: ->
+        views = @modelViews()
+        React.DOM.div null,
+            React.DOM.div
+                className: "row"
+                React.DOM.div
+                    className: "small-12 columns"
+                    React.DOM.h4 null, @props.mdf.name
+            if views.length > 0
+                React.DOM.div
+                    className: "row tb-pad-s small-up-2 medium-up-3",
+                    for v in views
+                        React.DOM.div
+                            key: "view-#{v.title}"
+                            className: "column"
+                            React.DOM.h6 null, v.title
+                            React.DOM.img
+                                "data-interchange": MakeInterchangeData(v.view)
+                
 @BoatTypeShow = React.createClass
     getInitialState: ->
        type: @props.data
@@ -83,10 +108,31 @@
         #console.log "componentDidMount()"
     componentWillUnmount: ->
         #console.log "componentWillUnmount()"
+    getCurrentModificationId: ->
+        #поиск модификации по выбранному стандарту лодки
+        if @state.type.modifications.length is 0 then return null
+        if @state.curBfs is null then return 0
+        id = -1
+        for so in @state.curBfs.selected_options
+            if so.rec_type is "Стандарт"
+                for i in [0..@state.type.modifications.length-1]
+                    if @state.type.modifications[i].boat_option_type_id is so.boat_option_type_id
+                        id = i
+                        break
+                    if id isnt -1 then break
+        return id
+                 
     render: ->
+        curMdf = @getCurrentModificationId()
         React.DOM.div null,
             React.createElement BoatTypeTitleBlock, b: @state.type, prms: @state.parameters
             if @state.curBfs isnt null then React.createElement BoatForSaleShow, key: "bfs-#{@state.curBfs.id}", bfs: @state.curBfs
+            if curMdf isnt null
+                React.createElement BoatModificationRow, key: "mdf-#{@state.type.modifications[curMdf].id}", mdf: @state.type.modifications[curMdf]
+            else
+                React.DOM.div null,
+                    for mdf in @state.type.modifications
+                        React.createElement BoatModificationRow, key: "mdf-#{mdf.id}", mdf: mdf
             React.DOM.div
                 className: "row tb-pad-m"
                 React.DOM.div
@@ -104,7 +150,7 @@
                                     href: "#options-collection"
                                     "Комплектация"
                         React.DOM.li
-                            className: "tabs-title#{if @state.bfsList.length > 0 then "" else " is-active"}"
+                            className: "tabs-title#{if @state.curBfs isnt null then "" else " is-active"}"
                             React.DOM.a
                                 href: "#technical"
                                 "Технические характеристики"
@@ -123,7 +169,7 @@
                 className: "tabs-content"
                 "data-tabs-content": "bb-tabs"
                 React.DOM.div
-                    className: "tabs-panel#{if @state.bfsList.length > 0 then "" else " is-active"}"
+                    className: "tabs-panel#{if @state.curBfs isnt null then "" else " is-active"}"
                     id: "technical"
                     "data-animate":"fade-in fade-out"
                     React.DOM.div

@@ -12,7 +12,26 @@ class BoatTypeModification < ApplicationRecord
     self.update_attribute(:is_active, f) if self.is_active == !f
   end
   
+  def hash_view
+    {
+      id: id,
+      name: name,
+      description: description,
+      boat_option_type_id: boat_option_type.id,
+      is_active: is_active,
+      views: { 
+                aft: get_mdf_views(aft_view),
+                bow: get_mdf_views(bow_view),
+                top: get_mdf_views(top_view),
+                accomodation: get_mdf_views(accomodation_view)
+             }
+    }
+  end
+  
   private
   
+  def get_mdf_views(view)
+    view.url.nil? ? nil : {small: view.small.url, medium: view.medium.url, large: view.large.url} 
+  end
 
 end

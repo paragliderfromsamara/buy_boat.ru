@@ -174,13 +174,15 @@ getFilters = (d)->
     #componentWillUnmount: ->
     #    console.log "BFSFilter WillUnmount"
     render: ->
-        React.DOM.div
-            className: "row tb-pad-m",
-            if @state.filters.length is 0 
+        if @state.filters.length is 0 
+            React.DOM.div
+                className: "row tb-pad-m",
                 React.DOM.div
                     className: "small-12 columns"
                     React.DOM.p null, "Лодки в наличии отсутствуют."
-            else
+        else
+            React.DOM.div
+                className: "row tb-pad-m",
                 React.DOM.div
                     id: "filters"
                     className: "small-12 medium-4 large-3 columns"
