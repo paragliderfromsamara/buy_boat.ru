@@ -1,1 +1,1 @@
-<%= react_component 'BFSFilter', { data: @filters_data, boatForSales: @boat_for_sales} %>
+<%= react_component 'BFSFilter', { data: @filters_data, boatForSales: @boat_for_sales, curBfs: @boat_for_sale.nil? ? nil : @boat_for_sale.hash_view} %>

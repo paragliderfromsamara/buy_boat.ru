@@ -1,1 +1,2 @@
-<%= react_component 'BoatTypeShow', { data: @boat_for_sale.hash_view }, "data-turbolinks"=>false %>
+<%# react_component 'BoatTypeShow', { data: @boat_for_sale.hash_view }, "data-turbolinks"=>false %>
+<%= react_component 'BFSFilter', { data: @filters_data, boatForSales: @boat_for_sales, curBfs: @boat_for_sale.nil? ? nil : @boat_for_sale.hash_view} %>

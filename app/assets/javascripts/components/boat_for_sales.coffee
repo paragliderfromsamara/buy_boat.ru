@@ -52,7 +52,9 @@ getCurBfsById = (bfss, id)->
                                          if @props.options[so].rec_type isnt "Группа"
                                              React.DOM.tr key: "#{so}-ot",
                                                  React.DOM.td null, @props.options[so].name
-                                                 React.DOM.td null, SelOptAmount(@props.options[so].amount) 
+                                                 React.DOM.td 
+                                                     className: "text-right", 
+                                                     SelOptAmount(@props.options[so].amount) 
                     
 
 @BoatForSaleShow = React.createClass
@@ -199,6 +201,10 @@ MiniBlockParameterRow = React.createClass
         $("[data-bfs-id=#{@props.bfs.id}]").fadeIn(500)
     componentWillUnmount: ->
         $("[data-bfs-id=#{@props.bfs.id}]").fadeOut(500)
+    moreClickHandle: (e)->
+        if @props.goToBfsClickHandle isnt undefined
+            e.preventDefault()
+            @props.goToBfsClickHandle(@props.bfs.id)
     render: ->
         i = 0
         React.DOM.div
@@ -219,6 +225,7 @@ MiniBlockParameterRow = React.createClass
                             React.DOM.a
                                 className: "button small"
                                 href: "/boat_for_sales/#{@props.bfs.id}"
+                                onClick: @moreClickHandle 
                                 "ПОДРОБНЕЕ"
                             React.DOM.a
                                 className: "button success small"
@@ -244,43 +251,5 @@ MiniBlockParameterRow = React.createClass
                                 className: "rubl"
                                 ""
 
-GroupByLocation = (bfss)->
-    locations = []
-    for bfs in bfss
-        if IndexOf(locations, bfs.region) is -1 then locations.push(bfs.region)
-    locations.sort()
 
-@LocaleListBlock = React.createClass
-    render: ->
-        React.DOM.div 
-            className: "tb-pad-s",
-            React.DOM.div
-                className: "row"
-                React.DOM.div
-                    className: "small-12 columns"
-                    React.DOM.h4 null, @props.location
-            React.DOM.div
-                className: "row #{@props.colsClass}"
-                for bfs in @props.bfss
-                    if bfs.region is @props.location then React.createElement BFSMiniBlock, key: "#{bfs.id}", bfs: bfs
     
-@BFSFilteringResult = React.createClass
-    render: ->
-        colsClass = if @props.colsClass is undefined || @props.colsClass is null then "small-up-1 medium-up-2" else @props.colsClass
-        @locations = GroupByLocation(@props.data)
-        if @props.data.length is 0
-            React.DOM.div
-                className: "row"
-                React.DOM.div
-                    className: "small-12 columns"
-                    React.DOM.p null, "Поиск не дал результатов, попробуйте поменять критерии"
-        else
-            if @locations.length > 0
-                React.DOM.div null,
-                    for l in @locations
-                        React.createElement LocaleListBlock, key: "#{l}", location: l, bfss: @props.data, colsClass: colsClass
-            else
-                React.DOM.div
-                    className: "row #{colsClass}"
-                    for bfs in @props.data
-                        React.createElement BFSMiniBlock, key: "#{bfs.id}", bfs: bfs

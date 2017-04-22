@@ -16,8 +16,7 @@
 
 @BoatTypeTitleBlock = React.createClass
     render: ->
-        React.DOM.div
-            className: "tb-pad-s"
+        React.DOM.div null,#className: "tb-pad-s"
             React.DOM.div 
                 className: "bb-wide-block"
                 "data-interchange": MakeInterchangeData(@props.b.photo, true)
@@ -105,13 +104,17 @@
        photos: []
        bfsList: []
     componentDidMount: ->
+        InitViewer()
+        $("#boat_type_block").foundation()
+        $("#boat_type_block").fadeIn(500)
+        initTabs() #инициализация таб
         #console.log "componentDidMount()"
     componentWillUnmount: ->
         #console.log "componentWillUnmount()"
     getCurrentModificationId: ->
         #поиск модификации по выбранному стандарту лодки
         if @state.type.modifications.length is 0 then return null
-        if @state.curBfs is null then return 0
+        if @state.curBfs is null then return -1
         id = -1
         for so in @state.curBfs.selected_options
             if so.rec_type is "Стандарт"
@@ -124,10 +127,12 @@
                  
     render: ->
         curMdf = @getCurrentModificationId()
-        React.DOM.div null,
+        React.DOM.div 
+            id: "boat_type_block",
+            style: {display: "none"}
             React.createElement BoatTypeTitleBlock, b: @state.type, prms: @state.parameters
             if @state.curBfs isnt null then React.createElement BoatForSaleShow, key: "bfs-#{@state.curBfs.id}", bfs: @state.curBfs
-            if curMdf isnt null
+            if curMdf isnt null and curMdf isnt -1
                 React.createElement BoatModificationRow, key: "mdf-#{@state.type.modifications[curMdf].id}", mdf: @state.type.modifications[curMdf]
             else
                 React.DOM.div null,

@@ -1,13 +1,7 @@
 class BoatForSalesController < ApplicationController
-  before_action :set_boat_for_sale, only: [:show, :update, :destroy]
+  before_action :set_boat_for_sale, only: [:update, :destroy]
+  before_action :set_boat_filter_data, only: [:show, :index]
   def index
-      if request.format == "html"
-        @filters_data = BoatForSale.filters 
-        ids = params[:ids].blank? ? [] : params[:ids].split(%r{,\s*}) 
-      else
-        ids = params[:ids].blank? ? [] : params[:ids]
-      end
-      @boat_for_sales = BoatForSale.filtered_collection(ids.blank? ? BoatForSale.active.ids : ids)
       respond_to do |format|
         format.html 
         format.json {render json: @boat_for_sales}
@@ -17,6 +11,10 @@ class BoatForSalesController < ApplicationController
   def show
     @boat_type = @boat_for_sale.boat_type
     @title = @boat_type.catalog_name
+    respond_to do |format|
+      format.html 
+      format.json {render json: @boat_for_sale.hash_view }
+    end
   end
   
   def update
@@ -51,6 +49,17 @@ class BoatForSalesController < ApplicationController
   end
     
   private
+  
+  def set_boat_filter_data
+    if request.format == "html"
+      @filters_data = BoatForSale.filters 
+      ids = params[:ids].blank? ? [] : params[:ids].split(%r{,\s*}) 
+    else
+      ids = params[:ids].blank? ? [] : params[:ids]
+    end
+    @boat_for_sales = BoatForSale.filtered_collection(ids.blank? ? BoatForSale.active.ids : ids) if params[:no_filtered_collection].nil? 
+    @boat_for_sale = BoatForSale.find_by(id: params[:id])
+  end
   
   def set_boat_for_sale
     @boat_for_sale = BoatForSale.find(params[:id])

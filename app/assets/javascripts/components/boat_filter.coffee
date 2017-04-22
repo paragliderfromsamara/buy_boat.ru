@@ -148,15 +148,33 @@ getFilters = (d)->
 @BFSFilter = React.createClass
     getInitialState: ->
         data: @props.data
+        curBfs: if @props.curBfs is undefined then null else @props.curBfs
         filters: getFilters(@props.data)
         boatForSales: if @props.boatForSales is undefined then [] else @props.boatForSales
     setDefaultState: ->
         data: []
+        curBfs: null
         filters: []
         boatForSales: []
     setBfss: (bfss)->
         @setState boatForSales: bfss
+    resetCurBfs: ->
+        if @state.cutBfs is null then return
+        @setState curBfs: null
+        window.history.pushState(null, null, "/boat_for_sales")
+        
+    goToBfsClickHandle: (bfs_id)->
+        loc =  "/boat_for_sales/#{bfs_id}"
+        $.ajax(
+                url: loc
+                dataType: "json"
+                success: (d)=>
+                    @setState curBfs: d
+                    window.history.pushState(null, null, loc)
+              )
+        console.log "goToBfsClickHandle"
     filteringHandle: ->
+        @resetCurBfs()
         vals = filteredIds(@state.filters, @state.data)
         str_loc = "#{window.location.pathname}?#{$.param([{name: "ids", value: vals}])}"
         if vals.length > 0
@@ -204,7 +222,53 @@ getFilters = (d)->
                                 className: "button success"
                                 onClick: @filteringHandle
                                 "Поиск"
-                React.DOM.div 
-                    className: "small-12 medium-8 large-9 columns"
-                    React.createElement BFSFilteringResult, key: "f-result", data: @state.boatForSales
-            
+                if @state.curBfs isnt null
+                    React.DOM.div 
+                        className: "small-12 medium-8 large-9 columns"
+                        React.createElement BoatTypeShow, key: "bfs-show", data: @state.curBfs 
+                else
+                    React.DOM.div 
+                        className: "small-12 medium-8 large-9 columns"
+                        React.createElement BFSFilteringResult, key: "f-result", data: @state.boatForSales, goToBfsClickHandle: @goToBfsClickHandle
+
+
+GroupByLocation = (bfss)->
+    locations = []
+    for bfs in bfss
+        if IndexOf(locations, bfs.region) is -1 then locations.push(bfs.region)
+    locations.sort()
+
+@LocaleListBlock = React.createClass
+    render: ->
+        React.DOM.div 
+            className: "tb-pad-s",
+            React.DOM.div
+                className: "row"
+                React.DOM.div
+                    className: "small-12 columns"
+                    React.DOM.h4 null, @props.location
+            React.DOM.div
+                className: "row #{@props.colsClass}"
+                for bfs in @props.bfss
+                    if bfs.region is @props.location then React.createElement BFSMiniBlock, key: "#{bfs.id}", bfs: bfs, goToBfsClickHandle: @props.goToBfsClickHandle 
+
+@BFSFilteringResult = React.createClass
+    render: ->
+        colsClass = if @props.colsClass is undefined || @props.colsClass is null then "small-up-1 medium-up-2" else @props.colsClass
+        @locations = GroupByLocation(@props.data)
+        if @props.data.length is 0
+            React.DOM.div
+                className: "row"
+                React.DOM.div
+                    className: "small-12 columns"
+                    React.DOM.p null, "Поиск не дал результатов, попробуйте поменять критерии"
+        else
+            if @locations.length > 0
+                React.DOM.div null,
+                    for l in @locations
+                        React.createElement LocaleListBlock, key: "#{l}", location: l, bfss: @props.data, colsClass: colsClass, goToBfsClickHandle: @props.goToBfsClickHandle
+            else
+                React.DOM.div
+                    className: "row #{colsClass}"
+                    for bfs in @props.data
+                        React.createElement BFSMiniBlock, key: "#{bfs.id}", bfs: bfs, goToBfsClickHandle: @props.goToBfsClickHandle          

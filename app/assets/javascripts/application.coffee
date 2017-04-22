@@ -70,7 +70,7 @@
     $.trim v.reverse().join("")
         
 
-initTabs = ->
+@initTabs = ->
     requestHash = window.location.hash
     tabEl = document.getElementById "bb-tabs"
     if tabEl isnt null
