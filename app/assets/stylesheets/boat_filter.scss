@@ -7,9 +7,22 @@
 {
     background-color: $light-gray;
     border: 1px solid $medium-gray;
+    font-size: 0.8rem;
+    h5
+    {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    input
+    {
+        margin-top: 0.45rem;
+        font-size: 0.9rem;
+        height: 1.8rem;
+    }
 }
 .string-vals-filter
 {
+    margin-bottom: 2rem;
     ul
     {
         padding: 0;
@@ -25,5 +38,15 @@
             margin-right: 5px;
         }
     }
+}
 
+#filter-result-control
+{
+    position: relative;
+    margin-bottom: 1.5rem;
+    .menu 
+    {
+        i{font-size: 1.5rem;}
+        span{font-size: 1.0rem; vertical-align: 0.25rem;}
+    }
 }

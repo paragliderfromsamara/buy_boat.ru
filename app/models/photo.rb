@@ -7,23 +7,16 @@ class Photo < ApplicationRecord
   mount_uploader :link, PhotoUploader
   
   def hash_view(is_wide=false)
-    if is_wide
-      {
-        id: self.id,
-        wide_small: link.wide_small.url,
-        wide_medium: link.wide_medium.url,
-        wide_large: link.wide_large.url
-      }
-    else
-      {
-        id: self.id,
-        thumb: link.thumb.url,
-        small: link.small.url,
-        medium: link.medium.url,
-        large: link.large.url
-      }
-    end
-    
+        {
+          id: self.id,
+          wide_small: link.wide_small.url,
+          wide_medium: link.wide_medium.url,
+          wide_large: link.wide_large.url,
+          thumb: link.thumb.url,
+          small: link.small.url,
+          medium: link.medium.url,
+          large: link.large.url
+        }
   end
   
   

@@ -39,7 +39,7 @@ class BoatForSale < Configurator
         id: bfs.id, 
         region: bfs.city.region.name,
         amount: bfs.amount, 
-        photo: bfs.alter_photo_hash, 
+        photo: bfs.alter_photo_hash(true), 
         name: bfs.boat_type.catalog_name, 
         parameters: [
                       {name: "длина", value: %{#{bfs.boat_type.length/1000.0}, м}}, 
@@ -184,8 +184,8 @@ class BoatForSale < Configurator
     self.boat_type.alter_photo #if self.photos.blank?
   end
   
-  def alter_photo_hash
-    return self.alter_photo.hash_view if !self.alter_photo.blank?
+  def alter_photo_hash(is_wide = false)
+    return self.alter_photo.hash_view(is_wide) if !self.alter_photo.blank?
     return nil
   end
   
@@ -193,7 +193,8 @@ class BoatForSale < Configurator
     hash_bfs = {
                  id: id,
                  shop: shop.nil? ? nil : {name: shop.name, location: shop.full_location},
-                 selected_options: selected_options_for_show
+                 selected_options: selected_options_for_show,
+                 amount: amount
                }
     hash = boat_type.hash_view
     hash[:bfs] = hash_bfs

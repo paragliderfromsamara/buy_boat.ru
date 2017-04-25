@@ -122,7 +122,9 @@ initBoxPhotos = (phs)->
     bPhotos = document.getElementsByClassName("kra-ph-box")
     if bPhotos.length > 0
         initBoxPhotos(bPhotos)
-        $("body").append("<div class=\"reveal\" id=\"#{viewerElementId}\" data-reveal data-v-offset = \"10%\"><div id = \"viewer-info\"><span id = \"#{counterId}\"></span><span id = \"#{titleAttrName}\"></span></div> <div id = \"ph-container\"><div id = \"#{prevArrId}\" class = \"arrows\"><span>&#12296;</span></div><div data-close id = \"#{middleImgEscId}\"></div><div id = \"#{nextArrId}\" class = \"arrows\"><span>&#12297;</span></div></div><button style = \"position: absolute;\" class=\"close-button\" data-close type=\"button\"><span aria-hidden=\"true\">&times;</span></button></div>")
+        if document.getElementById(viewerElementId) is null 
+            $("body").append("<div class=\"reveal\" id=\"#{viewerElementId}\" data-reveal data-v-offset = \"10%\"><div id = \"viewer-info\"><span id = \"#{counterId}\"></span><span id = \"#{titleAttrName}\"></span></div> <div id = \"ph-container\"><div id = \"#{prevArrId}\" class = \"arrows\"><span>&#12296;</span></div><div data-close id = \"#{middleImgEscId}\"></div><div id = \"#{nextArrId}\" class = \"arrows\"><span>&#12297;</span></div></div><button style = \"position: absolute;\" class=\"close-button\" data-close type=\"button\"><span aria-hidden=\"true\">&times;</span></button></div>")
+            $("##{viewerElementId}").foundation()    
         viewer = $("##{viewerElementId}")
         viewer.find(".arrows").click ()-> changePhoto(this.id) 
         

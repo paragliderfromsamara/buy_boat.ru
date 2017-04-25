@@ -91,9 +91,9 @@ getFilters = (d)->
         #sel = f.find()
     render: ->
         React.DOM.div
-            className: "tb-pad-xs string-vals-filter"
+            className: "string-vals-filter"
             "data-filter-name": @props.f.name
-            React.DOM.p 
+            React.DOM.h6 
                 id: 'filter-title',
                 @props.f.title
             React.DOM.ul null, 
@@ -114,9 +114,8 @@ getFilters = (d)->
 @SliderFilter = React.createClass
     render: ->
         React.DOM.div
-            className: "tb-pad-xs"
             "data-filter-name": @props.f.name
-            React.DOM.p null, @props.f.title
+            React.DOM.h6 null, @props.f.title
             React.DOM.div
                 className: "row"
                 React.DOM.div
@@ -151,6 +150,7 @@ getFilters = (d)->
         curBfs: if @props.curBfs is undefined then null else @props.curBfs
         filters: getFilters(@props.data)
         boatForSales: if @props.boatForSales is undefined then [] else @props.boatForSales
+        showAsList: true 
     setDefaultState: ->
         data: []
         curBfs: null
@@ -172,8 +172,12 @@ getFilters = (d)->
                     @setState curBfs: d
                     window.history.pushState(null, null, loc)
               )
-        console.log "goToBfsClickHandle"
-    filteringHandle: ->
+    SwitchListToThumbnail: (e)->
+        e.preventDefault()
+        console.log "SwitchListToThumbnail"
+        @setState showAsList: !@state.showAsList
+    filteringHandle: (e)->
+        e.preventDefault()
         @resetCurBfs()
         vals = filteredIds(@state.filters, @state.data)
         str_loc = "#{window.location.pathname}?#{$.param([{name: "ids", value: vals}])}"
@@ -194,7 +198,7 @@ getFilters = (d)->
     render: ->
         if @state.filters.length is 0 
             React.DOM.div
-                className: "row tb-pad-m",
+                className: "row tb-pad-s",
                 React.DOM.div
                     className: "small-12 columns"
                     React.DOM.p null, "Лодки в наличии отсутствуют."
@@ -204,8 +208,7 @@ getFilters = (d)->
                 React.DOM.div
                     id: "filters"
                     className: "small-12 medium-4 large-3 columns"
-                    React.DOM.h5 
-                        className: "tb-pad-xs",
+                    React.DOM.h5 null,
                         React.DOM.i
                             className: "fi-filter"
                             " "
@@ -219,17 +222,33 @@ getFilters = (d)->
                         React.DOM.div
                             className: "button-group tb-pad-xs"
                             React.DOM.a
-                                className: "button success"
+                                className: "button success expanded"
                                 onClick: @filteringHandle
-                                "Поиск"
-                if @state.curBfs isnt null
-                    React.DOM.div 
-                        className: "small-12 medium-8 large-9 columns"
-                        React.createElement BoatTypeShow, key: "bfs-show", data: @state.curBfs 
-                else
-                    React.DOM.div 
-                        className: "small-12 medium-8 large-9 columns"
-                        React.createElement BFSFilteringResult, key: "f-result", data: @state.boatForSales, goToBfsClickHandle: @goToBfsClickHandle
+                                "ПРИМЕНИТЬ"
+                React.DOM.div 
+                    className: "small-12 medium-8 large-9 columns"
+                    if @state.curBfs isnt null
+                        React.createElement BoatForSaleInFilter, key: "bfs-show", data: @state.curBfs 
+                    else
+                        React.DOM.div null,
+                            React.DOM.div
+                                className: "row"
+                                React.DOM.div
+                                    id: "filter-result-control"
+                                    className: "small-12 columns"
+                                    React.DOM.ul
+                                        className: "menu"
+                                        React.DOM.li
+                                            null,
+                                            React.DOM.a
+                                                onClick: @SwitchListToThumbnail
+                                                React.DOM.i
+                                                    className: "fi-#{if @state.showAsList then "thumbnails" else "list"}"
+                                                    ""
+                                                React.DOM.span
+                                                    className: "hide-on-small"
+                                                    if @state.showAsList then " миниатюры" else " список"
+                            React.createElement BFSFilteringResult, key: "f-result", data: @state.boatForSales, goToBfsClickHandle: @goToBfsClickHandle, showAsList: @state.showAsList
 
 
 GroupByLocation = (bfss)->
@@ -254,7 +273,7 @@ GroupByLocation = (bfss)->
 
 @BFSFilteringResult = React.createClass
     render: ->
-        colsClass = if @props.colsClass is undefined || @props.colsClass is null then "small-up-1 medium-up-2" else @props.colsClass
+        colsClass = if @props.colsClass is undefined || @props.colsClass is null then "small-up-2 large-up-4" else @props.colsClass
         @locations = GroupByLocation(@props.data)
         if @props.data.length is 0
             React.DOM.div
@@ -263,10 +282,15 @@ GroupByLocation = (bfss)->
                     className: "small-12 columns"
                     React.DOM.p null, "Поиск не дал результатов, попробуйте поменять критерии"
         else
-            if @locations.length > 0
+            #if @locations.length > 0
+            #    React.DOM.div null,
+            #        for l in @locations
+            #            React.createElement LocaleListBlock, key: "#{l}", location: l, bfss: @props.data, colsClass: colsClass, goToBfsClickHandle: @props.goToBfsClickHandle
+            #else
+            if @props.showAsList
                 React.DOM.div null,
-                    for l in @locations
-                        React.createElement LocaleListBlock, key: "#{l}", location: l, bfss: @props.data, colsClass: colsClass, goToBfsClickHandle: @props.goToBfsClickHandle
+                    for bfs in @props.data
+                        React.createElement BFSWideBlock, key: "#{bfs.id}", bfs: bfs, goToBfsClickHandle: @props.goToBfsClickHandle  
             else
                 React.DOM.div
                     className: "row #{colsClass}"

@@ -52,9 +52,17 @@ $rc-blue: #005aff;
         color: $rc-primary-dark-blue;
     }
 }
+.light-gray-bg
+{
+    background-color: $light-gray;
+    p, h1, h2, h3, h4, h5, h6 
+    {
+        color: $rc-primary-dark-blue;
+    }
+}
 .blue-bg
 {
-    background-color: $rc-blue;
+    background-color: smart-scale($rc-primary-dark-blue, 20%);
     p, h1, h2, h3, h4, h5, h6 
     {
         color: $white;
