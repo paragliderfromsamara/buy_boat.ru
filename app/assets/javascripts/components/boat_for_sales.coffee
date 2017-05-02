@@ -30,49 +30,9 @@ GroupSelectedOptions = (sOpts)->
                  groupAmount += sOpts[so].amount
                  items.push({name: sOpts[so].name, amount: sOpts[so].amount})
         groups.push({name: name, amount: groupAmount, items: items})
-    console.log groups
     groups
         
-@BFSSelectedOptions = React.createClass
-    componentDidMount: ->
-        $("[data-so-group-id]").click ()->
-            if $(this).find("i").hasClass("fi-plus")
-                $(this).find("i").attr("class", "fi-minus")
-                $("[data-so-group=#{$(this).attr("data-so-group-id")}]").show()
-            else
-                $("[data-so-group=#{$(this).attr("data-so-group-id")}]").hide()
-                $(this).find("i").attr("class", "fi-plus")
-    render: -> 
-        React.DOM.div
-            className: "row",
-            React.DOM.div
-                className: "small-12 columns"
-                for idx in [0..@props.options.length-1]
-                    if @props.options[idx].rec_type isnt "Группа" or @props.options[idx].rec_level isnt '1' then continue
-                    React.DOM.div
-                        key: "option-group-#{idx}",
-                        React.DOM.h5 
-                            "data-so-group-id": idx
-                            style: {cursor: 'pointer'}
-                            React.DOM.i
-                                className: "fi-plus"
-                            React.DOM.span null,
-                                " #{@props.options[idx].name}"
-                        React.DOM.div
-                            "data-so-group": idx
-                            style: {display: "none"}
-                            React.DOM.table key: "table-#{@props.options[idx].id}",
-                                React.DOM.tbody null,
-                                    for so in [idx+1..@props.options.length-1]
-                                         if @props.options[so].rec_level is '1' 
-                                             idx = so
-                                             break
-                                         if @props.options[so].rec_type isnt "Группа"
-                                             React.DOM.tr key: "#{so}-ot",
-                                                 React.DOM.td null, @props.options[so].name
-                                                 React.DOM.td 
-                                                     className: "text-right", 
-                                                     SelOptAmount(@props.options[so].amount) 
+
                     
 @BFSSelectedOptionsDarkBlue = React.createClass
     componentDidMount: ->
@@ -255,6 +215,11 @@ MiniBlockParameterRow = React.createClass
 
 
 @BoatForSalePhotos = React.createClass
+    componentDidMount: ->
+        $("[data-show-params]").click ->
+            dispIsNone = $("[data-params-table]").css('display') is "none"
+            if dispIsNone then $("[data-params-table]").slideDown(300) else $("[data-params-table]").slideUp(300)
+            $(this).text(if !dispIsNone then "ПОКАЗАТЬ ВСЕ ХАРАКТЕРИСТИКИ" else "СКРЫТЬ ТАБЛИЦУ")
     render: ->
         React.DOM.div null,
             React.DOM.div
@@ -275,9 +240,7 @@ MiniBlockParameterRow = React.createClass
                                 React.DOM.h6 
                                     style: {padding: "10px 25px 0 0"}
                                     @props.b.name
-            React.DOM.img
-                "data-interchange": MakeInterchangeData(@props.b.photo, true)
-                style: {width: "100%"}
+            React.createElement PhotoSimpleSlider, phs: @props.b.photos
             React.DOM.div
                 className: "row"
                 React.DOM.div
@@ -297,6 +260,21 @@ MiniBlockParameterRow = React.createClass
                                     React.DOM.div
                                          className: "stat text-center rc-param-val-b"
                                          React.DOM.span null, @props.prms[i].value
+                        React.DOM.div 
+                            className: "row"
+                            React.DOM.div
+                                className: "small-12 columns"
+                                React.DOM.a
+                                    "data-show-params": ""
+                                    className: "button expanded"
+                                    "ПОКАЗАТЬ ВСЕ ПАРАМЕТРЫ"
+                        React.DOM.div
+                            className: 'row'
+                            "data-params-table": ""
+                            style: {display: "none"}
+                            React.DOM.div
+                                className: "small-12 columns"
+                                React.createElement BoatParameterValuesTableShow, key: "BoatParameterValuesTableShow", data: @props.prms
                                     
 
 
@@ -314,9 +292,9 @@ MiniBlockParameterRow = React.createClass
        bfsList: []
     componentDidMount: ->
         InitViewer()
-        $("#boat_type_block").foundation()
         $("#boat_type_block").fadeIn(500)
-        initTabs() #инициализация таб
+        $("#boat_type_block").foundation()
+       # initTabs() #инициализация таб
         #console.log "componentDidMount()"
     componentWillUnmount: ->
         #console.log "componentWillUnmount()"
@@ -340,60 +318,4 @@ MiniBlockParameterRow = React.createClass
             id: "boat_type_block"
             style: {display: "none"},
             React.createElement BoatForSalePhotos, b: @state.type, prms: @state.parameters
-            React.createElement BoatForSaleShow, key: "bfs-#{@state.curBfs.id}", bfs: @state.curBfs
-            React.DOM.div
-                className: "row tb-pad-m"
-                React.DOM.div
-                    className: "small-12 columns"
-                    React.DOM.ul
-                        className: "bb-inline-menu"
-                        "data-tabs": ""
-                        id: "bb-tabs"
-                        "data-deep-link": "false"
-                        "data-turbolinks":"false"
-                        React.DOM.li
-                            className: "tabs-title is-active"
-                            React.DOM.a
-                                href: "#description"
-                                "Описание"
-                        React.DOM.li
-                            className: "tabs-title"
-                            React.DOM.a
-                                href: "#technical"
-                                "Технические характеристики"
-                        React.DOM.li
-                            className: "tabs-title"
-                            React.DOM.a
-                                href: "#photos"
-                                "Фото"
-            React.DOM.div
-                className: "tabs-content"
-                "data-tabs-content": "bb-tabs"
-                React.DOM.div
-                    className: "tabs-panel#{if @state.curBfs isnt null then "" else " is-active"}"
-                    id: "technical"
-                    "data-animate":"fade-in fade-out"
-                    React.DOM.div
-                        className: "row tb-pad-m"
-                        React.DOM.div
-                            className: "small-12 columns"
-                            React.createElement BoatParameterValuesTableShow, key: "BoatParameterValuesTableShow_1", data: @state.parameters
-                React.DOM.div
-                    className: "tabs-panel"
-                    id: "photos"
-                    "data-animate":"fade-in fade-out"
-                    React.DOM.div
-                        className: "row small-up-1 medium-up-3 large-up-4 tb-pad-m"
-                        for p in @state.photos
-                            React.createElement BoatPhoto, key: p.id, photo: p
-                if @state.curBfs isnt null
-                    React.DOM.div
-                        className: "tabs-panel is-active"
-                        id: "description"
-                        "data-animate":"fade-in fade-out"
-                        if curMdf isnt null and curMdf isnt -1
-                            React.createElement BoatModificationRow, key: "mdf-#{@state.type.modifications[curMdf].id}", mdf: @state.type.modifications[curMdf]
-                        React.DOM.h4 null, "Комлектность"
-                        #React.createElement BFSSelectedOptions, options: @state.curBfs.selected_options
-                        #React.createElement BFSFilteringResult, key: "bfs-list", data: @state.bfsList, colsClass: "small-up-1 medium-up-2 large-up-3"
-                        #React.createElement BoatForSales, key: "bfs-list", bfsList: @state.bfsList, curBfs: @state.bfsList    
+            React.createElement BoatForSaleShow, key: "bfs-#{@state.curBfs.id}", bfs: @state.curBfs   

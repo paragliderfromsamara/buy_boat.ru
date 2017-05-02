@@ -99,5 +99,41 @@
             className: @state._class
             for li in @state.liList
                 React.createElement LiItem, {key: i++, liElement: li}
-                
+
+@PhotoSimpleSlider = React.createClass
+    render: ->
+        idx = jdx = -1
+        React.DOM.div
+            className: 'orbit'
+            id: "b-img-slider"
+            role: "region"
+            "data-orbit": ''
+            "aria-label": 'Изображения лодки'
+            React.DOM.ul
+                className: "orbit-container"
+                React.DOM.button
+                    className: "orbit-previous"
+                    React.DOM.span
+                        className: "show-for-sr"
+                        "Пред."
+                    React.DOM.i
+                        className: "fi-arrow-left"
+                React.DOM.button
+                    className: "orbit-next"
+                    React.DOM.span
+                        className: "show-for-sr"
+                        "След."
+                    React.DOM.i
+                        className: "fi-arrow-right"
+                for p in @props.phs
+                    idx++
+                    React.DOM.li
+                        key: "slider-item-#{idx}"
+                        className: "orbit-slide"
+                        React.DOM.img
+                            className: "orbit-image"
+                            src: p.wide_medium
+
+                            
+   
       

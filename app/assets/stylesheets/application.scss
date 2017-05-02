@@ -32,7 +32,7 @@
 @include foundation-sticky;
 @include foundation-dropdown;
 @include foundation-dropdown-menu;
-//@include foundation-orbit;
+@include foundation-orbit;
 @include foundation-flex-video;
 @include foundation-reveal;
 @include foundation-close-button;
@@ -43,6 +43,7 @@
 @include foundation-global-styles;
 //@include foundation-badge;
 @include foundation-slider;
+@include foundation-callout;
 
 @mixin covered-bg
 {
@@ -427,10 +428,10 @@
 }
 .orbit
 {
-    @include breakpoint(small) {height: 150px;}
-    @include breakpoint(medium) {height: 250px;}
-    @include breakpoint(large) {height: 400px;}
-    @include breakpoint(xlarge) {height: 500px;}
+    //@include breakpoint(small) {height: 150px;}
+    //@include breakpoint(medium) {height: 250px;}
+    //@include breakpoint(large) {height: 400px;}
+    //@include breakpoint(xlarge) {height: 500px;}
     #rc-boat-slogan
     {
         @include breakpoint(small) {font-size: 1.0rem;}
