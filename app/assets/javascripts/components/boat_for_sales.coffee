@@ -64,10 +64,7 @@ GroupSelectedOptions = (sOpts)->
                                     React.DOM.h5 
                                         style: {marginLeft: "1.25rem", cursor: "pointer"}
                                         "data-so-group-id": idx
-                                        React.DOM.i
-                                            className: "fi-plus"
-                                        React.DOM.span null,
-                                            " #{g.name}"
+                                        React.createElement IconWithText, fig: "plus", txt: "#{g.name}"    
                                 React.DOM.div
                                     className: "small-4 columns"
                                     React.DOM.p null, if g.amount is 0 then "Входит в стд. комплектацию" else SelOptAmount(g.amount)
@@ -103,7 +100,7 @@ GroupSelectedOptions = (sOpts)->
                     className: "row "
                     React.DOM.div
                         className: "small-6 columns text-center"
-                        React.DOM.p null, "Стоимость опций" 
+                        ""
                     React.DOM.div
                         className: "small-6 columns text-center"
                         React.DOM.p null, "Общая стоимость лодки"
@@ -128,6 +125,14 @@ MiniBlockParameterRow = React.createClass
             React.DOM.div
                 className: "small-6 columns text-center"
                 React.DOM.p null, @props.p.value
+                
+WideBlockParameterRow = React.createClass
+    render: ->
+        React.DOM.div
+            className: "column text-center"
+            React.DOM.p null, @props.p.name
+            React.DOM.p null, @props.p.value
+                
                     
 @BFSWideBlock = React.createClass
     componentDidMount: ->
@@ -140,32 +145,53 @@ MiniBlockParameterRow = React.createClass
             @props.goToBfsClickHandle(@props.bfs.id)
     render: ->
         i = 0
-        React.DOM.div 
-            className: "row"
-            React.DOM.div
-                className: "small-12 columns"
+        React.DOM.div
+            className: "bb-list-block",
+            React.DOM.div 
+                className: "row"
                 React.DOM.div
-                    className: "light-gray-bg"
+                    className: "small-12 columns"
                     React.DOM.div
-                        className: "row bfs-wide-block"
-                        "data-bfs-id": @props.bfs.id
-                        style: {display: "none"}
+                        className: "head-row"
                         React.DOM.div
-                            className: "small-6 medium-5 columns"
-                            React.DOM.img
-                                src: @props.bfs.photo.medium
-                        React.DOM.div
-                            className: "small-6 medium-7 columns"
-                            React.DOM.h5 null, @props.bfs.name
+                            className: "row"
                             React.DOM.div
-                                className: "parameters"
-                                for p in @props.bfs.parameters
-                                    React.createElement MiniBlockParameterRow, key: "parameter-#{i++}", p: p
-                            React.DOM.a
-                                className: "button small expanded"
-                                href: "/boat_for_sales/#{@props.bfs.id}"
-                                onClick: @moreClickHandle 
-                                "ПОДРОБНЕЕ"
+                                className: "small-6 columns"
+                                React.DOM.h6 null, @props.bfs.name
+                            React.DOM.div
+                                className: "small-6 columns text-right"
+                                React.DOM.h6 null, "#{SelOptAmount(@props.bfs.amount)}"
+            React.DOM.div 
+                className: "row"
+                React.DOM.div
+                    className: "small-12 columns"
+                    React.DOM.div
+                        className: "light-gray-bg"
+                        React.DOM.div
+                            className: "row bfs-wide-block"
+                            "data-bfs-id": @props.bfs.id
+                            style: {display: "none"}
+                            React.DOM.div
+                                className: "small-12 large-5 columns"
+                                React.DOM.img
+                                    src: @props.bfs.photo.medium
+                                    "data-interchange": "[#{@props.bfs.photo.wide_small}, small], [#{@props.bfs.photo.wide_medium}, medium], [#{@props.bfs.photo.medium}, large]"
+                            React.DOM.div
+                                className: "small-12 large-7 columns"
+                                React.DOM.div
+                                    className: "text-center"
+                                    React.DOM.p 
+                                        className: "tb-pad-xs", 
+                                        "#{@props.bfs.region}, #{@props.bfs.city}"
+                                React.DOM.div
+                                    className: "parameters row small-up-3"
+                                    for p in @props.bfs.parameters
+                                        React.createElement WideBlockParameterRow, key: "parameter-#{i++}", p: p
+                                React.DOM.a
+                                    className: "button small expanded"
+                                    href: "/boat_for_sales/#{@props.bfs.id}"
+                                    onClick: @moreClickHandle 
+                                    "ПОДРОБНЕЕ"
                     
 @BFSMiniBlock = React.createClass
     componentDidMount: ->
@@ -244,6 +270,19 @@ MiniBlockParameterRow = React.createClass
             React.DOM.div
                 className: "row"
                 React.DOM.div
+                    className: "small-12 medium-6 columns tb-pad-s"
+                    React.DOM.h6 null, "Место нахождения"
+                    React.DOM.a 
+                        href: "/shops/#{@props.b.bfs.shop.id}",
+                        target: "_blank" 
+                        "#{@props.b.bfs.shop.name}, #{@props.b.bfs.shop.location}"
+                React.DOM.div
+                    className: "small-12 medium-6 columns tb-pad-s"
+                    React.DOM.h6 null, "О лодке"
+                    @props.b.description
+            React.DOM.div
+                className: "row"
+                React.DOM.div
                     className: "small-12 columns"
                     React.DOM.div
                         className: "light-gray-bg"
@@ -319,3 +358,59 @@ MiniBlockParameterRow = React.createClass
             style: {display: "none"},
             React.createElement BoatForSalePhotos, b: @state.type, prms: @state.parameters
             React.createElement BoatForSaleShow, key: "bfs-#{@state.curBfs.id}", bfs: @state.curBfs   
+
+
+BFSManageTableRow = React.createClass
+    editRowHandle: (e)->
+        e.preventDefault()
+        @props.editRowToggleHandle(@props.bfs.id)
+    render: ->
+        if @props.isEdit
+            React.DOM.tr null,
+                React.DOM.td null, @props.bfs.name
+                React.DOM.td null, @props.bfs.amount
+                React.DOM.td null, @props.bfs.discount
+                React.DOM.td null, @props.bfs.request_limit
+                React.DOM.td null, 
+                    React.DOM.a
+                        onClick: @editRowHandle
+                        React.createElement IconWithText, txt: "сохранить", fig: 'save'
+        else
+            React.DOM.tr null,
+                React.DOM.td null, @props.bfs.name
+                React.DOM.td null, @props.bfs.amount
+                React.DOM.td null, @props.bfs.discount
+                React.DOM.td null, @props.bfs.request_limit
+                React.DOM.td null, 
+                    React.DOM.a
+                        onClick: @editRowHandle
+                        React.createElement IconWithText, txt: "изменить", fig: 'pencil'
+                    
+@BFSManageTable = React.createClass
+    getInitialState: ->
+        bfss: @props.data
+        edRowId: null
+    getDefaultProps: ->
+        bfss: []
+        edRowId: null
+    editRowToggle: (id)->
+        @setState edRowId: id
+    render: ->
+        React.DOM.div
+            className: "row"
+            React.DOM.div 
+                className: "small-12 columns"
+                React.DOM.table null,
+                    React.DOM.thead null,
+                        React.DOM.tr null,
+                            React.DOM.th null, "Название лодки"
+                            React.DOM.th null, "Стоимость"
+                            React.DOM.th null, "Скидка, %"
+                            React.DOM.th null, "Количество, шт."
+                            React.DOM.th null, null
+                    React.DOM.tbody null,
+                        for bfs in @state.bfss
+                            React.createElement BFSManageTableRow, key: "bfs-#{bfs.id}", bfs: bfs, isEdit: (@state.edRowId is bfs.id), editRowToggleHandle: @editRowToggle
+
+                            
+        

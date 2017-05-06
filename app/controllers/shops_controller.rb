@@ -1,5 +1,5 @@
 class ShopsController < ApplicationController
-  before_action :set_shop, only: [:change_status, :manage_show]
+  before_action :set_shop, only: [:change_status, :manage_show, :show]
   before_action :check_grants
   
   def change_status #возможные статусы #to_open to_close to_disable
@@ -39,9 +39,12 @@ class ShopsController < ApplicationController
   def index
   end
   
-  def manage_show
-    @title = @header = @shop.name
+  def show
     @boat_for_sales = BoatForSale.filtered_collection(@shop.boat_for_sales.ids)
+  end
+  
+  def manage_show
+    @boat_for_sales = BoatForSale.manage_collection(@shop.boat_for_sales.ids)
   end
   
   def create
@@ -59,6 +62,7 @@ class ShopsController < ApplicationController
   private
   def set_shop
     @shop = Shop.find(params[:id])
+    @title = @header = @shop.name
   end
   def check_grants
     redirect_to "/404" if !could_manage_all_shops?

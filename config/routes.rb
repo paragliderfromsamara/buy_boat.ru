@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
-  resources :boat_type_modifications, only: [:edit, :update]
   
+  resources :boat_type_modifications, only: [:edit, :update]
+  #user_requests
+  resources :user_requests
+  get "my_boats", to: "user_requests#my_requests", as: :my_boats #мои лодки 
   #shops
   resources :shops
   get "/manage_shops/:id", to: "shops#manage_show", as: :manage_shop                #страница управления магазином
@@ -18,6 +21,8 @@ Rails.application.routes.draw do
   post "/parse_selected_options_file", to: "boat_for_sales#parse_selected_options_file"
   get "/parse_selected_options_file", to: "boat_for_sales#parse_selected_options_file"
   get "/manage_boat_for_sale", to: "boat_for_sales#manage_index", as: :manage_boat_for_sales
+  get "/boat_for_sales/:id/switch_favorites", to: "boat_for_sales#switch_favorites"
+  get "/favorites", to: "boat_for_sales#favorites"
   #end
   resources :boat_option_types, only: [:index, :show, :update]
 

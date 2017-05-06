@@ -3,6 +3,9 @@ class User < ApplicationRecord
   
   has_many :shops, foreign_key: "manager_id", dependent: :destroy
   
+  has_many :user_requests, dependent: :delete_all
+  has_many :favorites_boats, dependent: :delete_all
+  
   before_save :encrypt_password, :set_default_user_type#, :check_email_update
   before_validation :check_email_update
   before_validation :check_password_on_create, on: :create
@@ -92,6 +95,12 @@ class User < ApplicationRecord
   def full_name
     %{#{last_name} #{first_name} #{third_name}}
   end
+  
+  def get_session_id(s_id) #считываем id сессии
+    return self.session_id if !self.session_id.blank?
+    self.update_attribute(:session_id, s_id)
+    return s_id
+  end
   private
   
   def editor_is_admin?
@@ -142,6 +151,6 @@ class User < ApplicationRecord
 	  Digest::SHA2.hexdigest(string)
   end
   
-
+  
   
 end

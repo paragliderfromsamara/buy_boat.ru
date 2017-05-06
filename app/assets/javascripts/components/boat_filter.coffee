@@ -144,41 +144,71 @@ getFilters = (d)->
                         type: "number"
                         id: "hp-val"
 
+@BFSFilterBoatsListMenu = React.createClass
+    setActionHandle: (e)->
+        e.preventDefault()
+        @props.goToFunc()
+    changeListHandle: (e)->
+        e.preventDefault()
+        @props.changeList()
+    render: ->
+        React.DOM.div
+            className: "row"
+            React.DOM.div
+                id: "filter-result-control"
+                className: "small-12 columns"
+                React.DOM.div
+                    className: "button-group"
+                    React.DOM.a
+                        onClick: @setActionHandle
+                        className: "button secondary"
+                        React.createElement IconWithText, txt: (if @props.action is "favorites" then "к списку лодок" else "избранное"), fig: (if @props.action is "favorites" then "arrow-left" else "star")
+                    React.DOM.a
+                        onClick: @changeListHandle
+                        className: "button secondary"
+                        React.createElement IconWithText, txt: (if @props.is_list then "миниатюры" else "список"), fig: (if @props.is_list then "thumbnails" else "list")
+                    
+        
 @BFSFilter = React.createClass
     getInitialState: ->
         data: @props.data
         curBfs: if @props.curBfs is undefined then null else @props.curBfs
         filters: getFilters(@props.data)
         boatForSales: if @props.boatForSales is undefined then [] else @props.boatForSales
+        favorites: if @props.favorites is undefined then [] else @props.favorites
+        action: @props.action
         showAsList: true 
     setDefaultState: ->
         data: []
         curBfs: null
         filters: []
+        action: "index"
         boatForSales: []
+        favorites: []
     setBfss: (bfss)->
         @setState boatForSales: bfss
-    resetCurBfs: ->
-        if @state.cutBfs is null then return
-        @setState curBfs: null
+    SetAction: (name, bfs)->
+        @setState action: name, curBfs: (if bfs is undefined then null else bfs)
+    GoToIndex: -> 
+        @SetAction("index")
         window.history.pushState(null, null, "/boat_for_sales")
-        
+    GoToFavorites: -> 
+        @SetAction("favorites")
+        window.history.pushState(null, null, "/favorites")
     goToBfsClickHandle: (bfs_id)->
         loc =  "/boat_for_sales/#{bfs_id}"
         $.ajax(
                 url: loc
                 dataType: "json"
                 success: (d)=>
-                    @setState curBfs: d
+                    @SetAction("show", d)
                     window.history.pushState(null, null, loc)
               )
-    SwitchListToThumbnail: (e)->
-        e.preventDefault()
-        console.log "SwitchListToThumbnail"
+    SwitchListToThumbnail: ->
         @setState showAsList: !@state.showAsList
     filteringHandle: (e)->
         e.preventDefault()
-        @resetCurBfs()
+        @GoToIndex() 
         vals = filteredIds(@state.filters, @state.data)
         str_loc = "#{window.location.pathname}?#{$.param([{name: "ids", value: vals}])}"
         if vals.length > 0
@@ -190,7 +220,21 @@ getFilters = (d)->
                     window.history.replaceState(null, null, str_loc)
             )
         else @setBfss([])
-    #componentDidMount: ->
+    IsOnFavorites: (id)->
+        if @state.favorites.length is 0 then return false
+        for f in @state.favorites
+            if f.id is id then return true
+        return false
+    switchFavoriteHandle: (e)->
+        e.preventDefault()
+        $.getJSON( 
+                "/boat_for_sales/#{@state.curBfs.bfs.id}/switch_favorites",
+                {},
+                (d)=>
+                    if d.favorites isnt undefined then @setState favorites: d.favorites
+             )
+    componentDidMount: ->
+        $("#filters").foundation()
     #    console.log "BFSFilter DidMount"
     #    console.log @state.filters
     #componentWillUnmount: ->
@@ -204,58 +248,76 @@ getFilters = (d)->
                     React.DOM.p null, "Лодки в наличии отсутствуют."
         else
             React.DOM.div
-                className: "row tb-pad-m",
+                id: "BaseFilterRow"
+                className: "row tb-pad-m",          
                 React.DOM.div
-                    id: "filters"
-                    className: "small-12 medium-4 large-3 columns"
-                    React.DOM.h5 null,
-                        React.DOM.i
-                            className: "fi-filter"
-                            " "
-                        React.DOM.span null, "Фильтр"
-                    for f in @state.filters
-                        if f.min isnt undefined and f.max isnt undefined
-                            React.createElement SliderFilter, key: f.name, f: f
-                        else if f.values isnt undefined
-                            if f.values.length > 0 then React.createElement ListFilter, key: f.name, f: f
-                    React.DOM.div null, 
-                        React.DOM.div
-                            className: "button-group tb-pad-xs"
-                            React.DOM.a
-                                className: "button success expanded"
-                                onClick: @filteringHandle
-                                "ПРИМЕНИТЬ"
+                    className: "small-12 medium-4 large-3 columns show-for-medium"
+                    "data-sticky-container":""
+                    React.DOM.div
+                        className: "sticky"
+                        "data-sticky":""
+                        id: "filters"
+                        "data-top-anchor": "BaseFilterRow:top" #начинает отрываться когда скролл проходит данный элемент
+                        React.DOM.h5 null,
+                            React.DOM.i
+                                className: "fi-filter"
+                                " "
+                            React.DOM.span null, "Фильтр"
+                        for f in @state.filters
+                            if f.min isnt undefined and f.max isnt undefined
+                                React.createElement SliderFilter, key: f.name, f: f
+                            else if f.values isnt undefined
+                                if f.values.length > 0 then React.createElement ListFilter, key: f.name, f: f
+                        React.DOM.div null, 
+                            React.DOM.div
+                                className: "button-group"
+                                React.DOM.a
+                                    className: "button success expanded"
+                                    onClick: @filteringHandle
+                                    "ПРИМЕНИТЬ"
                 React.DOM.div 
                     className: "small-12 medium-8 large-9 columns"
-                    if @state.curBfs isnt null
-                        React.createElement BoatForSaleInFilter, key: "bfs-show", data: @state.curBfs 
-                    else
+                    if @state.action is "show"
                         React.DOM.div null,
                             React.DOM.div
                                 className: "row"
                                 React.DOM.div
                                     id: "filter-result-control"
                                     className: "small-12 columns"
-                                    React.DOM.ul
-                                        className: "menu"
-                                        React.DOM.li
-                                            null,
-                                            React.DOM.a
-                                                onClick: @SwitchListToThumbnail
-                                                React.DOM.i
-                                                    className: "fi-#{if @state.showAsList then "thumbnails" else "list"}"
-                                                    ""
-                                                React.DOM.span
-                                                    className: "hide-on-small"
-                                                    if @state.showAsList then " миниатюры" else " список"
-                            React.createElement BFSFilteringResult, key: "f-result", data: @state.boatForSales, goToBfsClickHandle: @goToBfsClickHandle, showAsList: @state.showAsList
-
-
+                                    React.DOM.div
+                                        className: "button-group"
+                                        React.DOM.a
+                                            onClick: @GoToIndex
+                                            className: "button secondary"
+                                            React.createElement IconWithText, txt: "к списку лодок", fig: "arrow-left"
+                                        React.DOM.a
+                                            onClick: @GoToFavorites
+                                            className: "button secondary"
+                                            React.createElement IconWithText, txt: "избранное", fig: "star"
+                                        React.DOM.a
+                                            onClick: @switchFavoriteHandle
+                                            className: "button rc-blue"
+                                            React.createElement IconWithText, txt: (if @IsOnFavorites(@state.curBfs.bfs.id) then "убрать из избранного" else "добавить в избранное"), fig: "star"
+                                        React.DOM.a
+                                            onClick: @createRequest
+                                            className: "button rc-blue"
+                                            React.createElement IconWithText, txt: "купить", fig: "shopping-cart"
+                            React.createElement BoatForSaleInFilter, key: "bfs-show", data: @state.curBfs 
+                    else if @state.action is "favorites"
+                        React.DOM.div null,
+                            React.createElement BFSFilterBoatsListMenu, action: @state.action, goToFunc: @GoToIndex, is_list: @state.showAsList, changeList: @SwitchListToThumbnail
+                            React.createElement BFSFilteringResult, key: "f-favorites", data: @state.favorites, goToBfsClickHandle: @goToBfsClickHandle, showAsList: @state.showAsList, action: @state.action
+                    else
+                        React.DOM.div null,
+                            React.createElement BFSFilterBoatsListMenu, action: @state.action, goToFunc: @GoToFavorites, is_list: @state.showAsList, changeList: @SwitchListToThumbnail
+                            React.createElement BFSFilteringResult, key: "f-result", data: @state.boatForSales, goToBfsClickHandle: @goToBfsClickHandle, showAsList: @state.showAsList, action: @state.action
 GroupByLocation = (bfss)->
     locations = []
     for bfs in bfss
         if IndexOf(locations, bfs.region) is -1 then locations.push(bfs.region)
     locations.sort()
+
+
 
 @LocaleListBlock = React.createClass
     render: ->
@@ -280,7 +342,7 @@ GroupByLocation = (bfss)->
                 className: "row"
                 React.DOM.div
                     className: "small-12 columns"
-                    React.DOM.p null, "Поиск не дал результатов, попробуйте поменять критерии"
+                    React.DOM.p null, if @props.action is "favorites" then "В избранном ничего нет" else "Поиск не дал результатов, попробуйте поменять критерии"
         else
             #if @locations.length > 0
             #    React.DOM.div null,

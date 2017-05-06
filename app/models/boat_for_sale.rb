@@ -6,6 +6,8 @@ class BoatForSale < Configurator
   has_one :city, through: :shop
   
   has_many :selected_options, dependent: :delete_all
+  has_many :user_requests, dependent: :delete_all
+  has_many :favorites_boats, dependent: :delete_all
   
   after_save :check_build_code
   
@@ -38,13 +40,30 @@ class BoatForSale < Configurator
       {
         id: bfs.id, 
         region: bfs.city.region.name,
+        city: bfs.city.name,
         amount: bfs.amount, 
         photo: bfs.alter_photo_hash(true), 
         name: bfs.boat_type.catalog_name, 
+        description: bfs.boat_type.description,
         parameters: [
                       {name: "длина", value: %{#{bfs.boat_type.length/1000.0}, м}}, 
                       {name: "мотор", value: %{#{hp_range[:min]}-#{hp_range[:max]}, л.с.}}, 
                       {name: "выс. транца", value: bfs.transom_name}]
+      }
+    end
+  end
+  
+  def self.manage_collection(ids=[]) #используется на странице управления магазином shops#manage_show
+    return [] if ids.blank? 
+    bfss = all.where(id: ids).includes(:boat_type)
+    bfss.map do |bfs|
+      {
+        id: bfs.id, 
+        amount: bfs.amount, 
+        name: bfs.boat_type.catalog_name, 
+        description: bfs.boat_type.description,
+        request_limit: bfs.request_limit,
+        discount: bfs.discount.nil? ? 0 : bfs.discount
       }
     end
   end
@@ -192,7 +211,7 @@ class BoatForSale < Configurator
   def hash_view
     hash_bfs = {
                  id: id,
-                 shop: shop.nil? ? nil : {name: shop.name, location: shop.full_location},
+                 shop: shop.nil? ? nil : {id: shop.id, name: shop.name, location: shop.full_location},
                  selected_options: selected_options_for_show,
                  amount: amount
                }

@@ -1,4 +1,3 @@
-<%= render 'boat_for_sales/form' if could_modify_shop? %>
 <% if @boat_for_sales.blank? %>
     <div class = "row tb-pad-s">
         <div class = "small-12 columns">
@@ -8,5 +7,5 @@
         </div>
     </div>    
 <%else%>
-    <%= react_component 'BFSManageTable', { data: @boat_for_sales} %>
+    <%= react_component 'BFSFilteringResult', { data: @boat_for_sales} %>
 <%end%>

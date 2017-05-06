@@ -8,9 +8,12 @@
     background-color: $light-gray;
     border: 1px solid $medium-gray;
     font-size: 0.8rem;
+    @include breakpoint(small) {padding: 0.75rem;}
+    @include breakpoint(medium) {padding: 1.0rem;}
+    @include breakpoint(large) {padding: 1.5rem;}
     h5
     {
-        margin-top: 1.5rem;
+        //margin-top: 1.5rem;
         margin-bottom: 1.5rem;
     }
     input
@@ -43,7 +46,7 @@
 #filter-result-control
 {
     position: relative;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.0rem;
     .menu 
     {
         i{font-size: 1.5rem;}

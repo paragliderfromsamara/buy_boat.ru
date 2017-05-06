@@ -11,6 +11,7 @@
 
   <body>
       <div id = "top">
+          
           <div class = "top-bar">
                 <div class = "row">
                           <!--
@@ -57,7 +58,7 @@
                                       </li>
                                       <%end%>
                                       <li>
-                                          <%= link_to "МОИ ЛОДКИ(0)", "/my_boats" %>
+                                          <%= link_to "МОИ ЛОДКИ(0)", my_boats_path %>
                                       </li>
                                       <li>
                                           <%= link_to "ЛИЧНЫЙ КАБИНЕТ", my_path %>
@@ -94,8 +95,9 @@
               </div>
           </div>
           <%end%>
-          <%= render "layouts/top_image" if show_top_image? %>
+
       </div>
+      <%= render "layouts/top_image" if show_top_image? %>
       <div id = "middle">
           <%if !@header.blank? %>
               <div class = "row tb-pad-s">

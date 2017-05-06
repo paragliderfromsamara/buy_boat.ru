@@ -13,7 +13,12 @@
             className: "fi-#{@props.fig}",
             " "
             
-
+@IconWithText = React.createClass
+    render: ->
+        React.DOM.span null, 
+            React.createElement FIcon, fig: @props.fig
+            React.DOM.span null, @props.txt
+        
 @getRemoteForm = (p)->
     c = $(p.winId).find("#reveal_content")
     if p.winHeader isnt undefined then $(p.winId).find("h3").html p.winHeader
