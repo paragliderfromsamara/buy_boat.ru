@@ -1,0 +1,60 @@
+<table>
+    <thead>
+        <tr>
+            <th>
+                Производитель
+            </th>
+            <th>
+                Название
+            </th>
+            <th>
+                Фотографий
+            </th>
+            <th>
+                Добавлен в магазинах
+            </th>
+            <th colspan=3>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <%if products.blank? %>
+            <tr>
+                <td colspan=7>
+                    <p>
+                        Нет ни одного товара в данной категории
+                    </p>
+                </td>
+            </tr>
+        <%else%>
+            <% products.each do |product| %>
+                <tr>
+                    <td>
+                        <%= product.manufacturer %>
+                    </td>
+                    <td>
+                        <%= product.name %>
+                    </td>
+                    <td>
+                        0<%#= product.photos.count %>
+                    </td>
+                    <td>
+                        0<%#= product.product_shops.count %>
+                    </td>
+                    <td>
+                        <%= link_to "<i class = 'fi-arrow-right'></i>".html_safe, product_path(product) %>
+                    </td>
+                    <td>
+                        <%= link_to "<i class = 'fi-pencil'></i>".html_safe, edit_product_path(product) %>
+                    </td>
+                    <td>
+                        <%= link_to "<i class = 'fi-trash'></i>".html_safe, product_path(product), method: "DELETE", confirm: "Вы уверены?" %>
+                    </td>
+                
+                </tr>
+            <% end %>
+        <% end %>
+    </tbody> 
+</table>
+
+

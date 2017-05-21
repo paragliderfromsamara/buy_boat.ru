@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  ru_name: MyString
+  en_name: MyString
+  ru_measure: MyString
+  en_measure: MyString
+
+two:
+  ru_name: MyString
+  en_name: MyString
+  ru_measure: MyString
+  en_measure: MyString

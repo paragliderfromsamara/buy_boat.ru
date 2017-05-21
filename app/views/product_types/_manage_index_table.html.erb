@@ -1,0 +1,51 @@
+<table>
+    <thead>
+        <tr>
+            <th>
+                Название типа
+            </th>
+            <th>
+                Описание типа
+            </th>
+            <th>
+                Характеристики
+            </th>
+            <th colspan=2>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <% product_types.each do |t| %>
+            <tr>
+                <td>
+                    <%= t.name %>
+                </td>
+                <td>
+                    <%= t.description %>
+                </td>
+                <td>
+                    <% if t.properties_list.blank? %>
+                        <p>
+                            нет
+                        </p>
+                    <%else%>
+                        <ul>
+                        <%t.properties_list.each do |p|%>
+                            <li type='1'><%= p.ru_name %></li>
+                        <% end %>
+                        </ul>
+                    <% end %>
+                </td>
+                <td>
+                    <%= link_to "<i class = 'fi-pencil'></i>".html_safe, edit_product_type_path(t) %>
+                </td>
+                <td>
+                    <%= link_to "<i class = 'fi-trash'></i>".html_safe, product_type_path(t), method: "DELETE", confirm: "Вы уверены?" %>
+                </td>
+                
+            </tr>
+        <% end %>
+    </tbody> 
+</table>
+
+

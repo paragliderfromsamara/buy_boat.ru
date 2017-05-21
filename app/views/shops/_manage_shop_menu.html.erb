@@ -1,0 +1,16 @@
+<div class = 'light-gray-bg  tb-pad-xs'>
+    <div class = "row">
+        <div class = "small-12 columns tb-pad-xs">
+            <ul class = 'menu' data-tabs>
+                <li class = '<%= controller.action_name == "boats_for_sale" ? "active" : "" %>'>
+                    <%= link_to "Лодки", manage_bfs_in_shop_path(@shop) %>
+                </li>
+                <% @product_types.each do |a| %>
+                    <li class = '<%= a == @product_type ? "active" : "" %>'>
+                        <%= link_to a.plural_name, manage_products_in_shop_path(id: @shop.id, product_type_id: a.id) %>
+                    </li>
+                <%end%>
+            </ul>
+        </div>
+    </div>
+</div>

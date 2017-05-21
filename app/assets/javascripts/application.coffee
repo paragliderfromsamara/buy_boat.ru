@@ -20,6 +20,9 @@
 #= require components
 #= require_tree .
 
+#для выводит мультилокальную строку в виде записи 'ru {com}'
+@MultLocStr = (ru, com)-> "#{ru}#{if com is '' then '' else " {#{com}}"}"
+
 #Обрезает текст t по длине l
 @TrimText = (t, l)->
     if t is undefined then console.error "Не задан текст"
@@ -28,8 +31,13 @@
     if t.length > l then "#{t[0..l-1]}..." else t
 #ищем номер элемента в массиве
 @IndexOf = (arr, el)->
-    for i in [0..arr.length]
+    for i in [0..arr.length-1]
         if arr[i] is el then return i
+    -1
+@IndexOfById = (arr, id)->
+    if arr.length is 0 then return -1
+    for i in [0..arr.length-1]
+        if arr[i].id is id then return i
     -1
 #ищем последний номер элемента el в массиве arr    
 @LastIndexOf = (arr, el)->
@@ -37,7 +45,6 @@
     for i in [0..arr.length]
         if arr[i] is el then idx = i
     idx
-
 @ConvertArrToStr = (a)-> "[#{a.join()}]"
 #use on boat_filter
 @MakeStrArrayFromString = (s)->
@@ -69,6 +76,10 @@
         if (idx+1) % 3 is 0 then " #{item}" else "#{item}"
     $.trim v.reverse().join("")
         
+@UpdArrItem = (arr, o, n)->
+    idx = IndexOf(arr, o)
+    if idx isnt -1 then arr[idx] = n
+    return arr
 
 @initTabs = ->
     requestHash = window.location.hash

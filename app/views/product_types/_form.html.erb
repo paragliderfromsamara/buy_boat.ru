@@ -1,0 +1,33 @@
+<%= form_for(product_type) do |f| %>
+    <div class = "row">
+        <div class = "small-12 medium-3 columns">
+            <%= f.label :name, "Название в ед. числе" %>
+            <%= f.text_field :name, placeholder: "например: мотор, прицеп, эхолот" %>
+        </div>
+        <div class = "small-12 medium-3 columns">
+            <%= f.label :plural_name, "Название во мн. числе" %>
+            <%= f.text_field :plural_name, placeholder: "например: моторы, прицепы, эхолоты" %>
+        </div>
+        <div class = "small-6 medium-3 columns">
+            <%= f.label :number_on_boat, "Количество на лодке" %>
+            <%= f.number_field :number_on_boat%>
+        </div>
+        <div class = "small-6 medium-3 columns">
+            <%= f.label :is_active, "Активен" %>
+            <%= f.check_box :is_active %>
+        </div>
+    </div>
+    <div class = "row">
+        <div class = "small-12 medium-12 columns">
+            <%= f.label :description, "Описание типа продукта" %>
+            <%= f.text_area :description %>
+        </div>
+    </div>
+    <%= react_component 'PropertyTypeSelectList', { all: PropertyType.for_select_list, selected: product_type.new_record? ? [] : product_type.properties_list, form_name: "product_type" } if !product_type.new_record? %>
+    <div class = "row tb-pad-s">
+        <div class = "small-12 medium-12 columns">
+            <%= f.submit product_type.new_record? ? "Добавить" : "Сохранить изменения", class: "button success expanded" %>
+        </div>
+    </div>
+<%end%>
+

@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  en_name: MyString
+  ru_name: MyString
+  number_on_boat: 1
+  is_primary: false
+
+two:
+  en_name: MyString
+  ru_name: MyString
+  number_on_boat: 1
+  is_primary: false

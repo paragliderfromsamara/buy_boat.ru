@@ -2,6 +2,7 @@ class Shop < ApplicationRecord
   belongs_to :manager, class_name: "User"
   belongs_to :city
   has_many :boat_for_sales, dependent: :destroy
+  has_many :shop_products, dependent: :delete_all
 
   def region_location
     %{#{city.region.name}, #{city.name}}

@@ -1,0 +1,15 @@
+<%= form_for(:shop_product, url: add_product_to_shop_path(@shop), html: {remote: true}) do |f| %>
+    <div class = "row">
+        <div class = "small-12 medium-4 columns tb-pad-xs">
+            <%= f.label :name, @product_type.name %>
+            <%= f.collection_select :product_id, @product_type.products.order("name ASC"), :id, :full_name %>
+        </div>
+        <div class = "small-12 medium-4 columns tb-pad-xs">
+            <%= f.label :amount, "Цена, руб." %>
+            <%= f.number_field :amount, placeholder: "Цена в рублях" %>
+        </div>
+        <div class = "small-12 medium-4 columns tb-pad-xs">
+            <%= f.submit "Добавить", class: "button success" %>
+        </div>
+    </div>
+<%end%>

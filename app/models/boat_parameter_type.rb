@@ -12,6 +12,16 @@ class BoatParameterType < ApplicationRecord
   
   validates :value_type, inclusion: { in: %w(integer bool float string option)}
   
+  def self.value_types
+    [
+      ['integer', "целочисленный"],
+      ['bool', "да/нет"],
+      ['float', "десятичный"],
+      ['string', "текст"],
+      ['option', 'опция (связь по тэгу)']
+    ]
+  end
+  
   def self.filter_data
     filterItems = {}
     where(tag: ["max_hp", "min_hp", "max_length", "min_length"]).includes(:boat_parameter_values).each{|t| filterItems[t.tag.to_sym] = {

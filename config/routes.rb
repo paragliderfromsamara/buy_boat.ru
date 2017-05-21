@@ -1,5 +1,13 @@
 Rails.application.routes.draw do
   
+  resources :property_types
+  #products
+  resources :products
+  get "/manage_products", to: "products#manage_index", as: :manage_products
+  #product_types
+  resources :product_types
+  get "/manage_product_types", to: "product_types#manage_index", as: :manage_product_types
+  #boat_type_modifications
   resources :boat_type_modifications, only: [:edit, :update]
   #user_requests
   resources :user_requests
@@ -9,6 +17,9 @@ Rails.application.routes.draw do
   get "/manage_shops/:id", to: "shops#manage_show", as: :manage_shop                #страница управления магазином
   get "/manage_shops", to: "shops#manage_index", as: :manage_shops                  #управление магазинами
   get "/change_shop_status/:id", to: "shops#change_status", as: :change_shop_status #изменение статуса
+  get "/manage_shops/:id/boats_for_sale", to: "shops#boats_for_sale", as: :manage_bfs_in_shop #управление лодками в магазине
+  get "/manage_shops/:id/products/:product_type_id", to: "shops#products", as: :manage_products_in_shop #управление товарами магазине
+  post "/manage_shops/:id/products", to: "shops#add_product_to_shop", as: :add_product_to_shop #управление товарами магазине
   #end
   #locations
   get "/locations/regions/:country_id", to: "locations#regions"

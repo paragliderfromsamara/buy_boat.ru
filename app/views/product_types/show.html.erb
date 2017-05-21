@@ -1,0 +1,29 @@
+<div class = 'light-gray-bg  tb-pad-xs'>
+    <div class = "row">
+        <div class = "small-12 columns tb-pad-xs">
+            <ul class = 'menu' data-tabs>
+                <% @product_types.each do |a| %>
+                    <li class = '<%= a == @product_type ? "active" : "" %>'>
+                        <%= link_to %{#{a.plural_name}(#{a.products.count})}, a %>
+                    </li>
+                <%end%>
+            </ul>
+        </div>
+    </div>
+    <div class = "row">
+        <div class = "small-12 columns tb-pad-xs">
+            <div class = 'button-group '>
+                <%= link_to "<i class = \"fi-plus\"></i> Добавить новый тип товара".html_safe, new_product_type_path, class: "button small" %>
+                <%= link_to "<i class = 'fi-pencil'></i> Редактировать тип товара #{@product_type.name}".html_safe, edit_product_type_path(@product_type), class: "button small" %>
+                <%= link_to "<i class = 'fi-trash'></i> Удалить тип товара #{@product_type.name}".html_safe, product_type_path(@product_type), class: "button small", method: :delete %>
+            </div>
+        </div>
+    </div>
+</div>
+<div class = "row">
+    <div class = "small-12 columns tb-pad-s">
+        <%= link_to "<i class = 'fi-plus'></i> Добавить товар #{@product_type.name}".html_safe, new_product_path(product_type_id: @product_type.id), class: "button success small expanded" %>
+        <%= render "products/manage_index_table", products: @product_type.products %>
+    </div>
+</div>
+
