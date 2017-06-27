@@ -45,24 +45,39 @@
     for i in [0..arr.length]
         if arr[i] is el then idx = i
     idx
-@ConvertArrToStr = (a)-> "[#{a.join()}]"
+@ConvertArrToStr = (a)-> "#{a.join()}"
 #use on boat_filter
 @MakeStrArrayFromString = (s)->
     arr = []
     if s.length > 0
         tmp = ''
+        idx = 0
         for c in s
-            if c is "," or c is ']' and tmp.length > 0
-                arr.push($.trim(tmp))
+            if c is "," or c is ']' or idx is s.length and tmp.length > 0
+                arr.push("#{$.trim(tmp)}")
                 tmp = ''
-            else if c isnt "[" then tmp += c 
+            else if c isnt "[" then tmp += c
+            idx++ 
     return arr
+@ESCQuotes = (txt)->
+    s = ""
+    idx = 0
+    for l in txt
+        if l is '"' then s += '\\'
+        s+=l
+    return s
 
+@SelOptAmount = (n)->
+    if n is undefined then return ''
+    if n is 0 then '' else "#{AddWhiteSpaceToNumb(n)} ₽"
+
+    
 @MakeIntArrayFromString = (s)->
-    arr = MakeStrArrayFromString(s)
-    arr.map (v)->
+    ConvertArrMembersToInt(MakeStrArrayFromString(s))
+@ConvertArrMembersToInt = (a)->
+    a.map (v)->
         t = parseInt(v, 10)
-        return if t is NaN then 0 else t 
+        return if t is NaN then 0 else t
 #формирует строку для data-interchange из хэша фотографии
 @MakeInterchangeData = (ph, isWide)->
     if ph is null or ph is undefined then return ""

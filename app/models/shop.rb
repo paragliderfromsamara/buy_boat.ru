@@ -3,7 +3,21 @@ class Shop < ApplicationRecord
   belongs_to :city
   has_many :boat_for_sales, dependent: :destroy
   has_many :shop_products, dependent: :delete_all
-
+  
+  
+  def products(product_type_id=nil)
+   if product_type_id.nil? 
+     shop_products.joins(:product).order("products.name ASC")
+   else
+     shop_products.joins(:product).where("products.product_type_id = #{product_type_id}").order("products.name ASC")
+   end
+  end
+ 
+  
+  def all_products
+    Product.where(id: shop_products.pluck(:product_id))
+  end
+  
   def region_location
     %{#{city.region.name}, #{city.name}}
   end
@@ -48,7 +62,13 @@ class Shop < ApplicationRecord
     !is_opened? && !is_closed?
   end
   
-
+  def available_product_types
+    ProductType.where(id: shop_products.joins(:product).select("products.product_type_id AS product_type_id").pluck(:product_type_id)).select(:id, :name, :number_on_boat).distinct
+  end
+  
+  def hash_view
+    {id: id, name: name, location: full_location, product_types: available_product_types}
+  end
   
   def set_enable_status(status = true) #управляет статусами доступности менеджеру
     self.update_attributes(is_opened: status, is_active: status)

@@ -3,11 +3,13 @@ class BoatForSale < Configurator
 
   belongs_to :boat_type
   belongs_to :shop
+  
   has_one :city, through: :shop
   
   has_many :selected_options, dependent: :delete_all
   has_many :user_requests, dependent: :delete_all
   has_many :favorites_boats, dependent: :delete_all
+  has_many :photos, through: :boat_type
   
   after_save :check_build_code
   
@@ -18,23 +20,48 @@ class BoatForSale < Configurator
     self.selected_options.create(attrs.values)
     calculate_amount #пересчёт полной стоимости
   end
-
-  def self.filters
-    bfss = active.includes(:boat_type, :selected_options, :city)
-    bfss.map do |bfs|
-      hp_range = bfs.boat_type.horse_power_range
-      {id: bfs.id, min_hp: hp_range[:min], max_hp: hp_range[:max], region: bfs.city.region.name, transom: bfs.transom_name}
-    end
-    #active_bfs = BoatForSale.active.ids
-    #min_hp = BoatParameterValue.where(boat_parameter_type_id: BoatParameterType.min_hp_id, is_binded: true).minimum(:integer_value)
-    #max_hp = BoatParameterValue.where(boat_parameter_type_id: BoatParameterType.max_hp_id, is_binded: true).maximum(:integer_value)
-    #transom = BoatOptionType.transom_filter_data(active_bfs)
-    #return [{name: "hp", min: min_hp, max: max_hp, min_parameter_type_id: BoatParameterType.min_hp_id, min_parameter_type_id: BoatParameterType.max_hp_id, title: "Мощность двигателя, л.с."}, {name: "transom", values: transom, title: "Размер транца"}]
+  
+  #основная фильтрующая функция, выдает данные для фильтра а также boat_for_sales.id элементов, которые фильтрованы
+  def self.filters(prms)
+    selected_transoms = prms[:transom].blank? ? [] : prms[:transom].split(',').map {|v| v.to_i}
+    selected_regions = prms[:regions].blank? ? [] : prms[:regions].split(',').map {|v| v.to_i}
+    regions = active.joins(city: :region).order("regions.name ASC")
+    hps = active.joins(boat_type: {entity_property_values: :property_type}).where(property_types: {tag: [:min_hp, :max_hp]}, entity_property_values: {is_binded: true})
+    transoms = active.joins(selected_options: :boat_option_type).where(boat_option_types: {tag: "transom"})
+    
+    hp_ids = prms[:hp].blank? ? active.ids : hps.where("property_types.tag = :tag AND entity_property_values.integer_value <= :hp", {tag: "min_hp", hp: prms[:hp].to_i}).ids & hps.where("property_types.tag = :tag AND entity_property_values.integer_value >= :hp", {tag: "max_hp", hp: prms[:hp].to_i}).ids  
+    transoms_ids = selected_transoms.blank? ? active.ids : transoms.where(boat_option_types: {id: selected_transoms}).pluck("boat_for_sales.id")
+    regions_ids = selected_regions.blank? ? active.ids : regions.where(regions: {id: selected_regions}).pluck("boat_for_sales.id")
+    fltrs = [
+      {
+        title: "Мощность ПМ, л.с.",
+        type: "range",
+        name: "hp",
+        values: [hps.minimum("entity_property_values.integer_value"), hps.maximum("entity_property_values.integer_value")],
+        default: prms[:hp]
+      },
+      {
+        title: "Высота транца",
+        type: "collection",
+        name: "transom",
+        values: transoms.pluck("boat_option_types.id", "boat_option_types.name").uniq,
+        default: selected_transoms.blank? ? transoms.pluck("boat_option_types.id").uniq : selected_transoms
+        
+      },
+      {
+        title: "Регион",
+        type: "collection",
+        name: "regions",
+        values: regions.pluck("regions.id", "regions.name").uniq,
+        default: selected_regions.blank? ? regions.pluck("regions.id").uniq : selected_regions
+      }
+    ]
+    return {filters: fltrs, filtered_ids: hp_ids & transoms_ids & regions_ids}
   end
   
   def self.filtered_collection(ids=[])
     return [] if ids.blank? 
-    bfss = active.where(id: ids).includes(:boat_type, :selected_options, :city)
+    bfss = active.where(id: ids).includes(:boat_type, :photos, :selected_options, city: :region)
     bfss.map do |bfs|
       hp_range = bfs.boat_type.horse_power_range
       {
@@ -211,7 +238,7 @@ class BoatForSale < Configurator
   def hash_view
     hash_bfs = {
                  id: id,
-                 shop: shop.nil? ? nil : {id: shop.id, name: shop.name, location: shop.full_location},
+                 shop: shop.nil? ? nil : shop.hash_view,
                  selected_options: selected_options_for_show,
                  amount: amount
                }

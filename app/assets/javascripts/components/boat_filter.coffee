@@ -3,92 +3,37 @@
 
 #Используется для отображения цены в таблице с выбранными опциями
 
-#проверяет удовлетворяет ли условию данный элемент
-
-hpFilterData = (d)->
-    min = max = -1
-    for b in d
-        min = if min is -1 then b.min_hp else (if min > b.min_hp then b.min_hp else min)
-        max = if max is -1 then b.max_hp else (if max < b.min_hp then b.max_hp else max)
-    {name: "hp", min: min, max: max, title: "Мощность П.М., л.с."}
-
-transomFilterData = (d)->
-    l = []
-    for b in d
-        if IndexOf(l, b.transom) is -1 then l.push(b.transom)
-    {name: "transom", values: l.sort(), title: "Высота транца"}
-
-regionFilterData = (d)->
-    l = []
-    for b in d
-        if IndexOf(l, b.region) is -1 then l.push(b.region)
-    {name: "region", values: l.sort(), title: "Регион"}
-
-checkCondition = (filter, value, item)->
-    item["min_#{filter.name}"] <= value && item["max_#{filter.name}"] >= value
-
-checkHasInList = (filter, values, item)->  
-    IndexOf(values, item["#{filter.name}"]) > -1
-
-filterValue = (f)->
-    v = $("[data-filter-name=#{f.name}]").find("input").val()
-    if f.min isnt undefined and f.max isnt undefined 
-        v = parseFloat(v, 10)
-        return if v is NaN then 0 else v
-    else if f.values isnt undefined then return MakeStrArrayFromString(v)
-         
-
-filteredIds = (filters, data)->
-    idxs = []
-    data.forEach (d, idx)-> idxs.push(idx)
-    for f in filters
-        v = filterValue(f)
-        func = if $.type(v) is "number" then checkCondition else checkHasInList
-        tmpIdx = []
-        for idx in idxs
-            if func(f, v, data[idx]) then tmpIdx.push(idx)
-        idxs = tmpIdx
-        if idxs.length is 0 then break
-    ids = []
-    for i in idxs
-        ids.push(data[i].id)
-    return ids   
-    
-getFilters = (d)->
-    if d.length is 0 then return [] 
-    filters = []
-    if d[0].min_hp isnt undefined and d[0].max_hp isnt undefined then filters.push hpFilterData(d) else console.error "Указаны не все атрибуты hp"
-    if d[0].transom isnt undefined then filters.push transomFilterData(d) else console.error "Отсутствует атрибут Transom"
-    if d[0].region isnt undefined then filters.push regionFilterData(d) else console.error "Отсутствует атрибут Region"
-    filters    
-
-@ListFilter = React.createClass
-    vals: ->
-        f = $("[data-filter-name=#{@props.f.name}]")
-        arr = []
-        f.find("a[data-filter-item]").each ()->
-            if $(this).hasClass("selected") then arr.push($(this).find("span").text())
-        return arr
-    updVals: ->
-        $("[data-filter-name=#{@props.f.name}]").find("input").val(ConvertArrToStr(@vals()))
-        
-    componentDidMount: ->
-        f = $("[data-filter-name=#{@props.f.name}]")
-        itms = f.find("a[data-filter-item]")
-        _this = @
-        itms.click ()->
-            vals = MakeIntArrayFromString(f.find("input").val())
-            if $(this).hasClass('selected')
-                if vals.length is 1 then alert("Должен быть выбран хотя бы один #{f.find("#filter-title").text()}")
-                else
-                    $(this).removeClass('selected')
-                    $(this).parents("li").find('i').attr("class", "fi-x")
+@ListFilterItem = React.createClass
+    toggleItem: (e)->
+        e.preventDefault()
+        @props.toggleHandle(@props.item[0], @props.isSelected)
+    render: ->
+        React.DOM.li
+            key: "#{@props.f.name}-#{@props.item[0]}"
+            React.DOM.a
+                onClick: @toggleItem
+                React.createElement IconWithText, fig: (if @props.isSelected then "check" else "x"), txt: @props.item[1]
+                
+@ListFilter = React.createClass   
+    toggleItem: (itemIdx, isSelected)->
+        if not isSelected
+            defVals = @props.f.default.slice()
+            defVals.push(itemIdx)
+            @props.changeValueHandle(@props.f.name, defVals)
+        else
+            if @props.f.default.length is 1 
+                alert("Должен быть выбран хотя бы один #{$("[data-filter-name=#{@props.f.name}]").find("#filter-title").text()}")
             else
-                $(this).addClass('selected')
-                $(this).parents("li").find('i').attr("class", "fi-check")
-            _this.updVals()  
-        itms.click()
-        #sel = f.find()
+                defVals = []
+                for d in @props.f.default
+                    if d isnt itemIdx then defVals.push(d)
+                @props.changeValueHandle(@props.f.name, defVals)
+            #if vals.length is 1 then alert("Должен быть выбран хотя бы один #{f.find("#filter-title").text()}")
+    isSelectedItem: (itemIdx)->
+        isSel = false
+        for defVal in @props.f.default
+            if (isSel = defVal is itemIdx) then break
+        isSel
     render: ->
         React.DOM.div
             className: "string-vals-filter"
@@ -98,20 +43,12 @@ getFilters = (d)->
                 @props.f.title
             React.DOM.ul null, 
                 for v in @props.f.values
-                    React.DOM.li
-                        key: "#{@props.f.name}-#{v}"
-                        React.DOM.a
-                            "data-filter-item": ""
-                            React.DOM.i
-                                className: "fi-x" 
-                                " "
-                            React.DOM.span null, v
-            React.DOM.input
-                type: "hidden"
-                value: if @props.f.default isnt undefined then @props.f.default else ConvertArrToStr(@vals())
+                    React.createElement ListFilterItem, key: "#{@props.f.name}-#{v[0]}", item: v, f: @props.f, toggleHandle: @toggleItem, isSelected: @isSelectedItem(v[0]) 
                 
             
 @SliderFilter = React.createClass
+    componentDidMount: ->
+        $("##{@props.f.name}-filter").on "changed.zf.slider", ()=> @props.changeValueHandle(@props.f.name, $("##{@props.f.name}-filter-val").val())
     render: ->
         React.DOM.div
             "data-filter-name": @props.f.name
@@ -124,16 +61,16 @@ getFilters = (d)->
                         id: "#{@props.f.name}-filter"
                         className: "slider"
                         "data-slider": ""
-                        "data-end": @props.f.max
-                        "data-start": @props.f.min
+                        "data-end": @props.f.values[1]
+                        "data-start": @props.f.values[0]
                         "data-step": if @props.f.step is undefined then 5 else @props.f.step
-                        "data-initial-start": if @props.f.default is undefined then @props.f.min else @props.f.default
+                        "data-initial-start": if @props.f.default is undefined then @props.f.values[0] else @props.f.default
                         React.DOM.span
                             className: "slider-handle"
                             "data-slider-handle": ""
                             role: "slider"
                             tabIndex: 1
-                            "aria-controls": "hp-val"
+                            "aria-controls": "#{@props.f.name}-filter-val"
                             null
                         React.DOM.span
                             className: "slider-fill"
@@ -142,7 +79,7 @@ getFilters = (d)->
                     className: "small-4 columns"
                     React.DOM.input
                         type: "number"
-                        id: "hp-val"
+                        id: "#{@props.f.name}-filter-val"
 
 @BFSFilterBoatsListMenu = React.createClass
     setActionHandle: (e)->
@@ -168,12 +105,10 @@ getFilters = (d)->
                         className: "button secondary"
                         React.createElement IconWithText, txt: (if @props.is_list then "миниатюры" else "список"), fig: (if @props.is_list then "thumbnails" else "list")
                     
-        
 @BFSFilter = React.createClass
     getInitialState: ->
-        data: @props.data
         curBfs: if @props.curBfs is undefined then null else @props.curBfs
-        filters: getFilters(@props.data)
+        filters: @props.data
         boatForSales: if @props.boatForSales is undefined then [] else @props.boatForSales
         favorites: if @props.favorites is undefined then [] else @props.favorites
         action: @props.action
@@ -206,15 +141,27 @@ getFilters = (d)->
               )
     SwitchListToThumbnail: ->
         @setState showAsList: !@state.showAsList
+    updFilterValue: (fName, fValue)->
+        filters = @state.filters.slice()
+        filters.map (f)->
+            if f.name is fName then f.default = fValue
+            return f
+        @setState filters: filters
     filteringHandle: (e)->
         e.preventDefault()
         @GoToIndex() 
-        vals = filteredIds(@state.filters, @state.data)
-        str_loc = "#{window.location.pathname}?#{$.param([{name: "ids", value: vals}])}"
-        if vals.length > 0
+        prms = []
+        prmsObj = {}
+        for f in @state.filters
+            v = if f.type is "collection" then ConvertArrToStr(f.default) else f.default #$("##{f.name}-filter-val").val()
+            prms.push {name: f.name, value: v}
+            prmsObj[f.name] = v
+        #vals = [] #filteredIds(@state.filters, @state.data)
+        str_loc = "#{window.location.pathname}?#{$.param(prms)}"
+        if prms.length > 0
             $.getJSON(
                 window.location.pathname, 
-                {ids: vals}, 
+                prmsObj, 
                 (data)=>
                     @setBfss(data)
                     window.history.replaceState(null, null, str_loc)
@@ -264,10 +211,10 @@ getFilters = (d)->
                                 " "
                             React.DOM.span null, "Фильтр"
                         for f in @state.filters
-                            if f.min isnt undefined and f.max isnt undefined
-                                React.createElement SliderFilter, key: f.name, f: f
-                            else if f.values isnt undefined
-                                if f.values.length > 0 then React.createElement ListFilter, key: f.name, f: f
+                            if f.type is "range"
+                                React.createElement SliderFilter, key: f.name, f: f, changeValueHandle: @updFilterValue
+                            else
+                                if f.values.length > 0 then React.createElement ListFilter, key: f.name, f: f, changeValueHandle: @updFilterValue
                         React.DOM.div null, 
                             React.DOM.div
                                 className: "button-group"
@@ -299,9 +246,10 @@ getFilters = (d)->
                                             className: "button rc-blue"
                                             React.createElement IconWithText, txt: (if @IsOnFavorites(@state.curBfs.bfs.id) then "убрать из избранного" else "добавить в избранное"), fig: "star"
                                         React.DOM.a
-                                            onClick: @createRequest
                                             className: "button rc-blue"
+                                            href: "/boat_for_sales/#{@state.curBfs.bfs.id}/buy"
                                             React.createElement IconWithText, txt: "купить", fig: "shopping-cart"
+                                            
                             React.createElement BoatForSaleInFilter, key: "bfs-show", data: @state.curBfs 
                     else if @state.action is "favorites"
                         React.DOM.div null,

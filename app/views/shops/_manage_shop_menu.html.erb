@@ -7,7 +7,7 @@
                 </li>
                 <% @product_types.each do |a| %>
                     <li class = '<%= a == @product_type ? "active" : "" %>'>
-                        <%= link_to a.plural_name, manage_products_in_shop_path(id: @shop.id, product_type_id: a.id) %>
+                        <%= link_to a.plural_name, manage_shop_products_path(id: @shop.id, product_type_id: a.id) %>
                     </li>
                 <%end%>
             </ul>

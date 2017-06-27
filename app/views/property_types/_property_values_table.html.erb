@@ -1,0 +1,46 @@
+<h4>
+    Технические характеристики
+</h4>
+<table>
+    <thead>
+        <tr>
+            <th>
+                Характеристика, мера
+            </th>
+            <th>
+                Значение
+            </th>
+            <th>
+                Используется
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <%= form.fields_for :entity_property_values, property_values do |ep| %>
+            <tr>
+                <td>
+                    <%= ep.hidden_field :property_type_id %>
+                    <%= ep.label :set_value, ep.object.property_type.name_and_measure %>
+                </td>
+                <td>
+                    <%if ep.object.property_type.value_type == "integer" %>
+                        <%= ep.number_field :set_value, value: ep.object.get_value %>
+                    <%elsif ep.object.property_type.value_type == "bool" %>
+                        <%= ep.check_box :set_value, value: ep.object.get_value %>
+                    <%elsif ep.object.property_type.value_type == "float" %>
+                        <%= ep.text_field :set_value, placeholder: "0.0", value: ep.object.get_value %>
+                    <%elsif ep.object.property_type.value_type == "option" %>
+                        <p>
+                            <%= ep.object.get_value %>(Определяется набором возможных опций с указанным тэгом)
+                        </p>
+                        <%= ep.hidden_field :set_value, value: ""%>
+                    <%end%>
+                </td>
+                <td>
+                    <%= ep.check_box :is_binded %>
+                </td>
+            </tr>
+        <%end%>
+    </tbody>
+</table>
+

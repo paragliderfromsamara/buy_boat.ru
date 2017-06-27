@@ -14,7 +14,7 @@
             @props.val.value
     render: ->
         React.DOM.tr null,
-            React.DOM.td null, @props.number
+            React.DOM.td null, @props.order_number
             React.DOM.td null, @props.val.name
             React.DOM.td null, @valueCol()
 

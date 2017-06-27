@@ -1,0 +1,51 @@
+<%= render "manage_shop_menu" %>
+<%= render "shop_products/form" %>
+<div class = "row">
+    <div class = 'small-12 columns'>
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        Название
+                    </th>
+                    <th>
+                        Цена, руб.
+                    </th>
+                    <th colspan=3>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if @products.blank? %>
+                <tr>
+                    <td colspan=5>
+                        В магазине нет ни одного товара типа "<%= @product_type.name %>"
+                    </td>
+                </tr>
+                <% else %>
+                    <% @products.each do |shop_product| %>
+                        <tr>
+                            <td>
+                                <%= shop_product.product.full_name %>
+                            </td>
+                            <td>
+                                <%= shop_product.amount %>
+                            </td>
+                            <td>
+                                <%= link_to "<i class = 'fi-arrow-right'></i>".html_safe, shop_product_path(id: @shop.id, product_id: shop_product.product_id), target: "_blank" %>
+                            </td>
+                            <td>
+                                
+                                <%= link_to "<i class = 'fi-trash'></i>".html_safe, shop_product_path(shop_product), method: :delete, remote: true %>
+                            </td>
+                            <td>
+                                <%#= link_to "<i class = 'fi-trash'></i>".html_safe, delete_product_from_shop, method: :delete, remote: true %>
+                            </td>
+                        </tr>
+                    <%end%>
+                <% end %>
+                
+            </tbody>
+        </table>
+    </div>
+</div>

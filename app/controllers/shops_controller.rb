@@ -1,7 +1,16 @@
 class ShopsController < ApplicationController
   before_action :check_grants
-  before_action :set_shop, only: [:change_status, :manage_show, :show, :boats_for_sale, :products, :add_product_to_shop]
-  before_action :set_product_types, only: [:boats_for_sale, :products]
+  before_action :set_shop, only: [
+                                  :change_status, 
+                                  :manage_show, 
+                                  :show, 
+                                  :boats_for_sale, 
+                                  :manage_shop_products, 
+                                  :shop_products,
+                                  :add_product_to_shop, 
+                                  :delete_product_from_shop
+                                ]
+  before_action :set_product_types, only: [:boats_for_sale, :manage_shop_products]
   
   def change_status #возможные статусы #to_open to_close to_disable
     #возможные статусы #to_enable to_open to_close to_disable
@@ -48,35 +57,19 @@ class ShopsController < ApplicationController
     @boat_for_sales = BoatForSale.filtered_collection(@shop.boat_for_sales.ids)
   end
   
-  def products
-    @products = @shop.shop_products
+  def shop_products
+    criteria_params = 
     @product_type = ProductType.find(params[:product_type_id])
+    @products = @shop.products(@product_type.id).to_a.map {|s_product| {id: s_product.id, name: s_product.product.full_name, amount: s_product.amount}}
+    render json: @products 
   end
   
-  def add_product_to_shop
-    @shop_product = @shop.shop_products.find_by(product_id: shop_product_params[:product_id])
-    if @shop_product.nil?
-      @shop_product = @shop.shop_products.build(shop_product_params)
-      respond_to do |format|
-        if @shop_product.save
-          render json: {status: :ok}
-        else
-          render json: {status: :err}
-        end
-      end
-    else
-      respond_to do |format|
-        if @shop_product.update_attributes(shop_product_params)
-          render json: {status: :ok}
-        else
-          render json: {status: :err}
-        end
-      end
-    end
+  def manage_shop_products
+    @product_type = ProductType.find(params[:product_type_id])
+    @products = @shop.products(@product_type.id)
+    @shop_product = ShopProduct.new
+  end
     
-
-  end
-  
   def manage_show
     redirect_to manage_bfs_in_shop_path(@shop)
   end
@@ -94,6 +87,7 @@ class ShopsController < ApplicationController
   end
   
   private
+  
   def set_product_types
     @product_types = ProductType.not_draft
   end

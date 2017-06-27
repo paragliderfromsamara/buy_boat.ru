@@ -3,7 +3,7 @@ class PropertyTypesController < ApplicationController
   
   
   def index
-    @title = @header = "Типы свойств"
+    @title = @header = "Типы характеристик"
     @property_types = PropertyType.all.order("ru_name ASC")
     @value_types = PropertyType.value_types
   end

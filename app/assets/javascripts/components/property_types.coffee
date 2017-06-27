@@ -107,6 +107,7 @@ PropTypesRow = React.createClass
             name: @refs.name.value
             short_name: @refs.short_name.value
             measure: @refs.measure.value
+            tag: @refs.tag.value
         $.ajax
             method: "PUT"
             url: "/property_types/#{@props.pt.id}"
@@ -216,10 +217,6 @@ PropertyTypeSelListItem = React.createClass
     rmItem: (e)->
         e.preventDefault()
         @props.handleRemove(@props.pt)
-    cngReqFlag: (e)->
-        e.preventDefault()
-        @props.pt.is_required = !@props.pt.is_required
-        @props.handleUpd(@props.pt)
     clone: ->
         {
             id: @props.pt.id
@@ -240,24 +237,17 @@ PropertyTypeSelListItem = React.createClass
         @props.handleUpd(pt)
     render: ->
         React.DOM.tr null,
+            React.DOM.td null, @props.pt.order_number
             React.DOM.td null, 
                 React.DOM.input 
                     type: "hidden"
-                    name: "#{@props.form_name}[product_types_property_types_attributes][#{@props.pt.order_number}][property_type_id]"
+                    name: "#{@props.form_name}[#{@props.form_name}s_property_types_attributes][#{@props.pt.order_number}][property_type_id]"
                     value: @props.pt.id
                 React.DOM.input 
                     type: "hidden"
-                    name: "#{@props.form_name}[product_types_property_types_attributes][#{@props.pt.order_number}][is_required]"
-                    value: @props.pt.is_required
-                React.DOM.input 
-                    type: "hidden"
-                    name: "#{@props.form_name}[product_types_property_types_attributes][#{@props.pt.order_number}][order_number]"
+                    name: "#{@props.form_name}[#{@props.form_name}s_property_types_attributes][#{@props.pt.order_number}][order_number]"
                     value: @props.pt.order_number  
                 nameWithMeasure(@props.pt)
-            React.DOM.td null, 
-                React.DOM.a 
-                    onClick: @cngReqFlag
-                    React.createElement IconWithText, txt: (if @props.pt.is_required then "да" else "нет"), fig: if @props.pt.is_required then "check" else "x"
             React.DOM.td null, 
                 React.DOM.a 
                     onClick: @mvDwn
@@ -353,9 +343,9 @@ PropertyTypeSelListItem = React.createClass
                         React.DOM.thead null,
                             React.DOM.tr null,
                                 React.DOM.th null,
-                                    "Название свойства"
+                                    "#"
                                 React.DOM.th null,
-                                    "Обязательно"
+                                    "Название свойства"
                                 React.DOM.th
                                      colSpan: 2
                                      null
@@ -387,7 +377,7 @@ PropertyTypeSelListItem = React.createClass
                                         colSpan: 4
                                         React.DOM.input
                                             type: "hidden"
-                                            name: "#{@state.form_name}[product_types_property_types_attributes][]"
+                                            name: "#{@state.form_name}[#{@state.form_name}s_property_types_attributes][]"
                                         React.DOM.p null, "Список характеристик пуст"
                             else
                                 for s in @state.selected

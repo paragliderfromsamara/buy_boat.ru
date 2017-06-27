@@ -1,16 +1,19 @@
 class BoatType < ApplicationRecord
   attr_accessor :copy_params_table_from_id
   after_create :make_boat_parameter_values
+  
   belongs_to :creator, class_name: "User" #кто создал
   belongs_to :modifier, class_name: "User" #кто изменил
   
   has_many :boat_type_modifications, dependent: :destroy
   
+  has_many :entity_property_values, as: :entity, dependent: :delete_all
+  accepts_nested_attributes_for :entity_property_values
+  
   has_many :boat_photos, dependent: :destroy
   has_many :photos, through: :boat_photos
   #belongs_to :photo
   
-  has_many :boat_parameter_values, dependent: :delete_all
   belongs_to :boat_series, optional: true, validate: false
   belongs_to :trademark
   
@@ -24,19 +27,51 @@ class BoatType < ApplicationRecord
   accepts_nested_attributes_for :configurator_entities
 
   
+  def self.property_types
+    PropertyType.all.joins(:boat_property_type).select(
+                                                      "
+                                                        property_types.ru_name AS ru_name,
+                                                        property_types.com_name AS com_name,
+                                                        property_types.ru_measure AS ru_measure,
+                                                        property_types.com_measure AS com_measure,
+                                                        property_types.ru_short_name AS ru_short_name,
+                                                        property_types.com_short_name AS com_short_name,
+                                                        property_types.tag AS tag,
+                                                        property_types.value_type AS value_type,
+                                                        boat_property_types.property_type_id AS id,
+                                                        boat_property_types.order_number AS order_number
+                                                      "
+                                                    ).order("boat_property_types.order_number ASC")
+  end
+  
+  def property_values(locale = "ru")
+    entity_property_values.includes(property_type: :boat_property_type).order("boat_property_types.order_number ASC").to_a.map {|epv| {
+      id: epv.id,
+      name: epv.property_type["#{locale}_name".to_sym],
+      short_name: epv.property_type["#{locale}_short_name".to_sym],
+      measure: epv.property_type["#{locale}_measure".to_sym],
+      value: epv.get_value,
+      is_binded: epv.is_binded, 
+      order_number: epv.property_type.boat_property_type.nil? ? 0 : epv.property_type.boat_property_type.order_number
+     }
+    }
+  end
+  
+
+  
   def length
-    bpt = BoatParameterType.includes(:boat_parameter_values).where(tag: "max_length").first
+    bpt = get_property_values_by_tags("max_length").first
     return 0 if bpt.nil?
-    return bpt.boat_parameter_values.find_by(boat_type_id: self.id).get_value
+    return bpt.get_value
   end
   
   def horse_power_range
-    bpts = BoatParameterType.includes(:boat_parameter_values).where(tag: ["min_hp", "max_hp"])
+    bpts = get_property_values_by_tags(["min_hp", "max_hp"])
     min = 0
     max = 0
     bpts.each do |bpt|
-      min = bpt.boat_parameter_values.find_by(boat_type_id: self.id).get_value if bpt.tag == "min_hp"
-      max = bpt.boat_parameter_values.find_by(boat_type_id: self.id).get_value if bpt.tag == "max_hp"  
+      min = bpt.get_value if bpt.property_type.tag == "min_hp"
+      max = bpt.get_value if bpt.property_type.tag == "max_hp"  
     end 
     return {max: max, min: min}
   end
@@ -72,6 +107,20 @@ class BoatType < ApplicationRecord
   
   def self.deprecated  #устаревшие
     where(is_deprecated: true)
+  end
+  
+  def entity_property_values_attributes=(attrs)
+    return if attrs.blank?
+    to_add = []
+    attrs.values.each do |v|
+      pv = self.entity_property_values.find_by(property_type_id: v[:property_type_id])
+      if pv.nil?
+        to_add.push v
+      else
+        pv.update_attributes(v)
+      end
+    end
+    self.entity_property_values.create(to_add) if !to_add.blank?
   end
   
   def photos_attributes=(attrs)
@@ -135,7 +184,7 @@ class BoatType < ApplicationRecord
   end
   
   #подготавливает тип лодки для отрисовки React.js, в boat_types/show
-  def hash_view 
+  def hash_view(locale = "ru")
     {
       id: self.id,
       trademark: self.trademark.hash_view,
@@ -143,14 +192,10 @@ class BoatType < ApplicationRecord
       name: self.catalog_name,
       description: self.description,
       photo: self.photos_hash_view(true).first, 
-      parameters: self.boat_parameters_for_react,
+      parameters: self.property_values(locale), #self.boat_parameters_for_react,
       photos: self.photos_hash_view,
       boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
     }
-  end
-  
-  def boat_parameters_for_react #для скармливания React.js
-    boat_parameter_values.for_react.map {|v| {id: v.id, name: v.name_and_measure, boat_type_id: self.id, short_name: v.name_and_measure(true), value_type: v.get_value_type, number: v.number, value: v.get_value, is_binded: v.is_binded}}
   end
   
   def catalog_name #название типа лодки с наименованием производителя, серией и типом корпуса
@@ -188,7 +233,6 @@ class BoatType < ApplicationRecord
       
     end 
     add_modifications_by_option_type_ids(mdfs_in_cnf_ids) if !mdfs_in_cnf_ids.blank?
-      
   end
   
   def active_modifications
@@ -199,6 +243,11 @@ class BoatType < ApplicationRecord
     boat_type_modifications.where(is_active: false)
   end
   private
+  
+  #Достаёт свойства по тэгам 
+  def get_property_values_by_tags(tags)
+    entity_property_values.includes(:property_type).where(property_types: {tag: ["min_hp", "max_hp"]})
+  end
   
   #Добавляет новые модификации по ключам таблицы boat_option_type
   def add_modifications_by_option_type_ids(option_type_ids)
@@ -212,7 +261,7 @@ class BoatType < ApplicationRecord
     if !copy_params_table_from_id.blank?
       bt = BoatType.find_by(id: copy_params_table_from_id)
       make_clear_parameter_values if bt.nil?
-      clone_parameter_values(bt.boat_parameter_values) if !bt.nil?
+      clone_parameter_values(bt.entity_property_values) if !bt.nil?
     else
       make_clear_parameter_values
     end
@@ -221,17 +270,17 @@ class BoatType < ApplicationRecord
   def clone_parameter_values(input_vals)
     vals = []
     input_vals.each do |v|
-      vals[vals.length] = {set_value: v.get_value, boat_parameter_type_id: v.boat_parameter_type_id, is_binded: v.is_binded}
+      vals[vals.length] = {set_value: v.get_value, property_type_id: v.property_type_id, is_binded: v.is_binded}
     end
     make_clear_parameter_values if vals.blank?          #если список не сформировался - хуярим пустой список
-    boat_parameter_values.create(vals) if !vals.blank?  #если список сформировался - создаем
+    entity_property_values.create(vals) if !vals.blank?  #если список сформировался - создаем
   end
   def make_clear_parameter_values #создает новую таблицу параметров
     vals = []
-    BoatParameterType.all.each do |t|
-      vals[vals.length] = {set_value: t.default_value, boat_parameter_type_id: t.id, is_binded: true}
+    PropertyType.where(id: BoatPropertyType.all.pluck(:property_type_id)).each do |t|
+      vals[vals.length] = {set_value: t.default_value, property_type_id: t.id, is_binded: true}
     end
-    boat_parameter_values.create vals
+    entity_property_values.create vals
   end
   
   def cnf_folder_name #папка в которой хранятся файлы конфигуратора

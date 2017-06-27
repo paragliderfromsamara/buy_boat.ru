@@ -3,6 +3,7 @@ class PropertyType < ApplicationRecord
   before_save :split_attrs_by_locale
   has_many :product_types_property_types, dependent: :delete_all
   has_many :entity_property_values, dependent: :delete_all
+  has_one :boat_property_type, dependent: :delete
 
   
   def self.value_types

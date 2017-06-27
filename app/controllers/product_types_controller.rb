@@ -9,10 +9,12 @@ class ProductTypesController < ApplicationController
   end
   
   def manage_index
-    product_type = ProductType.first
-    redirect_to product_type_path(product_type) and return if !product_type.nil?
-    @title = @header = "Управление типами товаров"
-    
+    product_type = ProductType.not_draft.first
+    if !product_type.nil?
+      redirect_to product_type_path(product_type)
+    else
+      redirect_to new_product_type_path
+    end
   end
 
   def create
@@ -40,7 +42,7 @@ class ProductTypesController < ApplicationController
     pt_params = product_type_params
     pt_params[:is_draft] = false
     respond_to do |format|
-      if @product_type.update_attributes(product_type_params)
+      if @product_type.update_attributes(pt_params)
         format.html {redirect_to @product_type}
       else
         @title=@header= is_draft ? "Новый тип товара" : "Изменение типа товара"
@@ -62,7 +64,7 @@ class ProductTypesController < ApplicationController
   end
   
   def product_type_params
-    params.require(:product_type).permit(:name, :plural_name, :number_on_boat, :is_active, :description, product_types_property_types_attributes:[:property_type_id, :is_required, :order_number])
+    params.require(:product_type).permit(:name, :plural_name, :number_on_boat, :is_active, :description, :tag, product_types_property_types_attributes:[:property_type_id, :order_number])
   end
   
   def set_product_type

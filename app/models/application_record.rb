@@ -14,9 +14,9 @@ class ApplicationRecord < ActiveRecord::Base
       t.gsub(reg) do |t|
         v[:com] = $1
       end
-      v[:ru] = t[0..i-1] if i > 0
+      v[:ru] = (t[0..i-1]).strip if i > 0
     else
-      v[:ru] = t
+      v[:ru] = t.strip
     end
     return v
   end

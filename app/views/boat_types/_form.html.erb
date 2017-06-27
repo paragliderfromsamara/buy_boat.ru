@@ -79,7 +79,16 @@
                   </div>
               </div>
           <%end%>
-          
+          <% if !boat_type.new_record? %>
+              <div class = 'row'>      
+                  <div class="small-12 columns field tb-pad-s">
+                      <% if boat_type.entity_property_values.count > 0 %>
+                          <%= render "property_types/property_values_table", form: f, property_values: boat_type.entity_property_values %>
+                      <% else %>
+                      <% end %>
+                  </div>
+              </div>
+          <%end%>
           <div class="actions button-group tb-pad-s">
             <button class = "success button" type = "submit">
                 <% if boat_type.new_record? %>

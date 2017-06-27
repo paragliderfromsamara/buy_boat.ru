@@ -1,0 +1,15 @@
+
+<%= form_for :boat do |f| %>
+    <div class = "row">
+        <div class = "small-12 columns">
+            <%= react_component 'PropertyTypeSelectList', { all: @property_types, selected: @boat_property_types, form_name: "boat" } %>
+        </div>
+    </div>
+    <div class = "row">
+        <div class = "small-12 columns">
+            <%= f.submit "Сохранить", class: "button"  %>
+        </div>
+    </div>
+<%end%>
+
+

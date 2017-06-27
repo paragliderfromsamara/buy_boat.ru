@@ -1,8 +1,13 @@
 class BoatForSalesController < ApplicationController
   include BoatForSalesHelper
-  before_action :set_boat_for_sale, only: [:update, :destroy]
+  before_action :set_boat_for_sale, only: [:update, :destroy, :buy]
   before_action :set_boat_filter_data, only: [:show, :index, :favorites]
 
+  def buy
+    
+  end
+  
+  
   def favorites
     respond_to do |format|
       format.html {render "index"}
@@ -69,13 +74,9 @@ class BoatForSalesController < ApplicationController
   private
   
   def set_boat_filter_data
-    if request.format == "html"
-      @filters_data = BoatForSale.filters 
-      ids = params[:ids].blank? ? [] : params[:ids].split(%r{,\s*}) 
-    else
-      ids = params[:ids].blank? ? [] : params[:ids]
-    end
-    @boat_for_sales = BoatForSale.filtered_collection(ids.blank? ? BoatForSale.active.ids : ids) if params[:no_filtered_collection].nil? 
+    @filters_data = BoatForSale.filters(params) 
+    ids = @filters_data[:filtered_ids] #@filters_data[:filtered_ids].blank? ? BoatForSale.active.ids : @filters_data[:filtered_ids]
+    @boat_for_sales = BoatForSale.filtered_collection(ids) if params[:no_filtered_collection].nil? 
     @boat_for_sale = BoatForSale.find_by(id: params[:id])
     @favorites = BoatForSale.filtered_collection(get_favorites) if params[:no_filtered_collection].nil? 
   end

@@ -8,14 +8,14 @@ class EntityPropertyValue < ApplicationRecord
   def get_value 
     return self["#{get_value_type}_value".to_sym] if get_value_type != "option"
     #раскоментировать после присоединения к этой таблице типов лодок
-    #return "-" if tag.blank?
-    #ce = boat_type.configurator_entities.where(boat_option_type_id: BoatOptionType.select(:id).where(tag: get_tag))
-    #if ce.blank?
-    #  v = "-"
-    #else
-    #  v = ce.to_a.map{|c| c.boat_option_type.s_name }.join(", ")
-    #end
-    #return v
+    return "-" if property_type.tag.blank? || entity_type != "BoatType"
+    ce = entity.configurator_entities.where(boat_option_type_id: BoatOptionType.select(:id).where(tag: property_type.tag))
+    if ce.blank?
+      v = "-"
+    else
+      v = ce.to_a.map{|c| c.boat_option_type.s_name }.join(", ")
+    end
+    return v
   end
   
   def get_value_type

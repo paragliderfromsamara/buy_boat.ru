@@ -10,10 +10,6 @@ getCurBfsById = (bfss, id)->
         if id is bfs.id then return bfs     
     return null
 
-@SelOptAmount = (n)->
-    if n is undefined then return ''
-    if n is 0 then '' else "#{AddWhiteSpaceToNumb(n)} ₽"
-    
 
 GroupSelectedOptions = (sOpts)->
     groups = []
@@ -33,7 +29,6 @@ GroupSelectedOptions = (sOpts)->
     groups
         
 
-                    
 @BFSSelectedOptionsDarkBlue = React.createClass
     componentDidMount: ->
         $("[data-so-group-id]").click ()->
@@ -46,52 +41,53 @@ GroupSelectedOptions = (sOpts)->
     render: -> 
         grps = GroupSelectedOptions(@props.options)
         idx = 0
-        React.DOM.div
-            className: "row",
-            React.DOM.div
-                className: "small-12 columns"
+        React.DOM.div null,
+            for g in grps
+                idx++
                 React.DOM.div
-                    style: {paddingTop: "0.25rem", paddingBottom: "0.25rem"}
-                    className: "blue-bg",
-                    for g in grps
-                        idx++
+                    key: "option-group-#{idx}"
+                    React.DOM.div
+                        className: "row"
                         React.DOM.div
-                            key: "option-group-#{idx}"
-                            React.DOM.div
-                                className: "row"
-                                React.DOM.div
-                                    className: "small-8 columns"
-                                    React.DOM.h5 
-                                        style: {marginLeft: "1.25rem", cursor: "pointer"}
-                                        "data-so-group-id": idx
-                                        React.createElement IconWithText, fig: "plus", txt: "#{g.name}"    
-                                React.DOM.div
-                                    className: "small-4 columns"
-                                    React.DOM.p null, if g.amount is 0 then "Входит в стд. комплектацию" else SelOptAmount(g.amount)
-                            React.DOM.div
-                                "data-so-group": idx
-                                style: {display: "none"}
-                                React.DOM.table key: "table-#{idx}",
-                                    React.DOM.tbody null,
-                                        for so in g.items
-                                            idx++
-                                            React.DOM.tr key: "#{idx}-ot",
-                                                 React.DOM.td null, 
-                                                     React.DOM.div 
-                                                         className: "row"
-                                                         React.DOM.div 
-                                                             className: "small-8 columns"
-                                                             so.name
-                                                         React.DOM.div
-                                                             className: "small-4 columns"
-                                                             if so.amount is 0
-                                                                 React.DOM.i
-                                                                      className: "fi-check"
-                                                                      title: "Входит в стандартную комплектацию"
-                                                                      ""
-                                                             else SelOptAmount(so.amount) 
-
+                            className: "small-8 columns"
+                            React.DOM.h5 
+                                style: {marginLeft: "1.25rem", cursor: "pointer"}
+                                "data-so-group-id": idx
+                                React.createElement IconWithText, fig: "plus", txt: "#{g.name}"    
+                        React.DOM.div
+                            className: "small-4 columns"
+                            React.DOM.p null, if g.amount is 0 then "Входит в стд. комплектацию" else SelOptAmount(g.amount)
+                    React.DOM.div
+                        "data-so-group": idx
+                        style: {display: "none"}
+                        React.DOM.table key: "table-#{idx}",
+                            React.DOM.tbody null,
+                                for so in g.items
+                                    idx++
+                                    React.DOM.tr key: "#{idx}-ot",
+                                         React.DOM.td null, 
+                                             React.DOM.div 
+                                                 className: "row"
+                                                 React.DOM.div 
+                                                     className: "small-8 columns"
+                                                     so.name
+                                                 React.DOM.div
+                                                     className: "small-4 columns"
+                                                     if so.amount is 0
+                                                         React.DOM.i
+                                                              className: "fi-check"
+                                                              title: "Входит в стандартную комплектацию"
+                                                              ""
+                                                     else SelOptAmount(so.amount) 
+ 
 @BoatForSaleShow = React.createClass
+    getInitialState: ->
+        products_amount: 0
+        selected_products: []
+    sumAmount: ->
+        @props.bfs.amount + @state.products_amount
+    updProductsAmount: (a)->
+        @setState products_amount: a
     render: -> 
         React.DOM.div null,
             React.DOM.div
@@ -99,13 +95,22 @@ GroupSelectedOptions = (sOpts)->
                 React.DOM.div
                     className: "row "
                     React.DOM.div
-                        className: "small-6 columns text-center"
-                        ""
-                    React.DOM.div
-                        className: "small-6 columns text-center"
+                        className: "small-12 medium-4 columns text-center"
                         React.DOM.p null, "Общая стоимость лодки"
-                        React.DOM.p className: "stat", SelOptAmount(@props.bfs.amount)
-            React.createElement BFSSelectedOptionsDarkBlue, options: @props.bfs.selected_options
+                        React.DOM.p className: "stat", id: "sum-amount", SelOptAmount(@sumAmount())
+                        React.DOM.a
+                            className: "button success expanded"
+                            href: ""
+                            React.createElement IconWithText, fig: "shopping-cart", txt: "КУПИТЬ"
+            React.DOM.div
+                className: "row",
+                React.DOM.div
+                    className: "small-12 columns"
+                    React.DOM.div
+                        style: {paddingTop: "0.25rem", paddingBottom: "0.25rem"}
+                        className: "blue-bg",
+                        React.createElement ShopProductsMenu, bfs: @props.bfs, updAmount: @updProductsAmount
+                        React.createElement BFSSelectedOptionsDarkBlue, options: @props.bfs.selected_options, products: @state.selected_products
     #toggleGroup: (g)->
     #    @props.updBfsListFunc(@props.groups.map (grp)-> if grp.name is g.name then g else grp)
     #render: ->
@@ -203,7 +208,6 @@ WideBlockParameterRow = React.createClass
             e.preventDefault()
             @props.goToBfsClickHandle(@props.bfs.id)
     render: ->
-        i = 0
         React.DOM.div
             className: "column"
             React.DOM.div
@@ -230,7 +234,7 @@ WideBlockParameterRow = React.createClass
                 React.DOM.div
                     className: "parameters"
                     for p in @props.bfs.parameters
-                        React.createElement MiniBlockParameterRow, key: "parameter-#{i++}", p: p
+                        React.createElement MiniBlockParameterRow, key: "parameter-#{p.name}", p: p
             React.DOM.a
                 className: "button tiny expanded"
                 href: "/boat_for_sales/#{@props.bfs.id}"

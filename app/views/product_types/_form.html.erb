@@ -12,9 +12,13 @@
             <%= f.label :number_on_boat, "Количество на лодке" %>
             <%= f.number_field :number_on_boat%>
         </div>
-        <div class = "small-6 medium-3 columns">
+        <div class = "small-6 medium-1 columns">
             <%= f.label :is_active, "Активен" %>
             <%= f.check_box :is_active %>
+        </div>
+        <div class = "small-6 medium-2 columns">
+            <%= f.label :tag, "Служебный тэг" %>
+            <%= f.text_field :tag %>
         </div>
     </div>
     <div class = "row">

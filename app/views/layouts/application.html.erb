@@ -92,7 +92,7 @@
                                   <%end%>
                                   <%if could_manage_boat_parameter_types?%>
                                       <li>
-                                          <%= link_to "Типы характеристик", boat_parameter_types_path %>
+                                          <%= link_to "Характеристики", boat_property_types_path %>
                                       </li>
                                   <%end%>
                                   <%if could_manage_boat_types?%>
@@ -106,22 +106,17 @@
                           
                           <%end%>
                           <li>
-                              <a href = "#">Управление товарами</a>
-                              <ul class = 'menu'>
-                                  <%if is_producer?%>
-                                      <li>
-                                          <%= link_to "Товары", manage_product_types_path %>
-                                      </li>
-                                  <%end%>
-                                  <%if is_producer?%>
-                                      <li>
-                                          <%= link_to "Типы свойств", property_types_path %>
-                                      </li>
-                                  <%end%>
-                              </ul>
-                              
+                              <%if is_producer?%>
+                                  <li>
+                                      <%= link_to "Товары", manage_product_types_path %>
+                                  </li>
+                              <%end%>
                           </li> 
-                          
+                          <%if is_producer?%>
+                              <li>
+                                  <%= link_to "Типы характеристик", property_types_path %>
+                              </li>
+                          <%end%>
                           <%if is_admin?%>
                               <li>
                                   <%= link_to "Страны", "/add_country" %>

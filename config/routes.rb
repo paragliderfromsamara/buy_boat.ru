@@ -18,8 +18,15 @@ Rails.application.routes.draw do
   get "/manage_shops", to: "shops#manage_index", as: :manage_shops                  #управление магазинами
   get "/change_shop_status/:id", to: "shops#change_status", as: :change_shop_status #изменение статуса
   get "/manage_shops/:id/boats_for_sale", to: "shops#boats_for_sale", as: :manage_bfs_in_shop #управление лодками в магазине
-  get "/manage_shops/:id/products/:product_type_id", to: "shops#products", as: :manage_products_in_shop #управление товарами магазине
-  post "/manage_shops/:id/products", to: "shops#add_product_to_shop", as: :add_product_to_shop #управление товарами магазине
+  get "/manage_shops/:id/product_types/:product_type_id", to: "shops#manage_shop_products", as: :manage_shop_products #управление товарами магазине
+  get "/shops/:id/product_types/:product_type_id", to: "shops#shop_products"
+  resources :shop_products, only: [:update, :destroy, :create]
+  get "/shops/:shop_id/products/:product_id", to: "shop_products#show", as: :in_shop_product
+  
+  #shop_products
+  
+
+
   #end
   #locations
   get "/locations/regions/:country_id", to: "locations#regions"
@@ -34,6 +41,7 @@ Rails.application.routes.draw do
   get "/manage_boat_for_sale", to: "boat_for_sales#manage_index", as: :manage_boat_for_sales
   get "/boat_for_sales/:id/switch_favorites", to: "boat_for_sales#switch_favorites"
   get "/favorites", to: "boat_for_sales#favorites"
+  get "/boat_for_sales/:id/buy", to: "boat_for_sales#buy", as: :buy_bfs
   #end
   resources :boat_option_types, only: [:index, :show, :update]
 
@@ -69,6 +77,7 @@ Rails.application.routes.draw do
   delete '/boat_types/:id/photos/:photo_id', to: "boat_types#delete_photo"
   resources :users
   
+  resources :boat_property_types, only: [:index, :create] 
   
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
