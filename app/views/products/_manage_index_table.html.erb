@@ -45,7 +45,7 @@
                         <%= link_to "<i class = 'fi-arrow-right'></i>".html_safe, product_path(product) %>
                     </td>
                     <td>
-                        <%= link_to "<i class = 'fi-pencil'></i>".html_safe, edit_product_path(product) %>
+                        <%= link_to "<i class = 'fi-pencil'></i>".html_safe, edit_product_path(product), "data-turbolinks" => 'false' %>
                     </td>
                     <td>
                         <%= link_to "<i class = 'fi-trash'></i>".html_safe, product_path(product), method: "DELETE", confirm: "Вы уверены?" %>

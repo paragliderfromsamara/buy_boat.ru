@@ -38,14 +38,7 @@
               <%end%>
           </div>
         </div>
-      <div id = "uploaded-photos-container" class="row small-up-2 medium-up-3 tb-pad-s">
-          <% @boat_type.photos.each do |p| %>
-                <div class="column column-block tb-pad-s">
-                    <%= link_to "<i class = 'fi-x'></i>".html_safe, boat_photo_path(id: @boat_type.id, photo_id: p.id), remote: true, method: :DELETE  %><br />
-                    <%= image_tag p.link.thumb, class: "thumbnail", "data-photo-id" => p.id%>
-                </div>
-           <%end%>
-      </div>
+        <div id = "uploaded-photos-container" data-entity-id = "<%= @boat_type.id %>" data-entity-name = "boat_type" class="row small-up-2 medium-up-3 tb-pad-s"></div>
       
     </div>
     <div class = 'tabs-panel' id = "option_groups"> 

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class BoatPhotoTest < ActiveSupport::TestCase
+class PhotosControllerTest < ActionDispatch::IntegrationTest
   # test "the truth" do
   #   assert true
   # end

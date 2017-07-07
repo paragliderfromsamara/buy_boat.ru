@@ -87,14 +87,6 @@ class BoatTypesController < ApplicationController
     @photo = @boat_type.photos.find_by(id: params[:photo_id])
   end
   
-  # delete /boat_types/:boat_type_id/photos/:id
-  def delete_photo
-    @photo = @boat_type.photos.find_by(id: params[:photo_id])
-    return if @photo.nil?
-    @photo.destroy
-    render js: "$('[data-photo-id=#{@photo.id}]').parent('.column').fadeOut(300, function(){$(this).remove();});"
-  end
-  
   # PATCH/PUT /boat_types/1
   # PATCH/PUT /boat_types/1.json
   def update

@@ -41,6 +41,12 @@ ShopProductsLink = React.createClass
 
 updCounter = (id, c)->
     $("#products_list").find("#counter-#{id}").html c
+toggleButtons = (id, isAdd)->
+    $("#products_list").find("a[data-product-id=#{id}]").each ()->
+        if this.id is "sel"
+            if isAdd then $(this).hide() else $(this).show()
+        else if this.id is "unsel"
+            if isAdd then $(this).show() else $(this).hide()
 createProduct = (product)->
     o = new Object()
     o.name = product.name
@@ -52,19 +58,29 @@ cngNumber = (id, act)->
     ptCount += p.count for p in products
     console.log ptCount    
     products.map (p)->
+        v = p.count
         if "#{p.id}" is id
-            v = p.count
-            if act is "add"
-                if ptCount < tmpCart.product_type.number_on_boat then v++ else alert("Данного типа товара не должно быть выбрано более #{tmpCart.product_type.number_on_boat} шт.")
-            else 
-                if v isnt 0 then v--
-            p.count = v
-            updCounter id, v
+            if act is "add" or act is "del"
+                if act is "add"
+                    if ptCount < tmpCart.product_type.number_on_boat then v++ else alert("Данного типа товара не должно быть выбрано более #{tmpCart.product_type.number_on_boat} шт.")
+                else 
+                    if v isnt 0 and act is "del" then v--
+                updCounter id, v
+            else if act is "sel" or "unsel"
+                v = if act is "sel" then 1 else 0
+                toggleButtons(p.id, act is "sel")
+        else 
+            if act is "sel" then v = 0
+            toggleButtons(p.id, false)
+        p.count = v
         p
+    if act is "sel" or act is "unsel" and tmpCart.products.length is 1 then $("#products_list").foundation('close')
 
 @ShopSelectedProduct = React.createClass
     componentDidMount: ->
         $("#sp-#{@props.product.id}").fadeIn(500)
+    componentWillUnmount: ->
+        $("#sp-#{@props.product.id}").fadeOut(300)
     delButClick: (e)->
         e.preventDefault()
         @props.rmvProductHandle(@props.product, @props.product_type)
@@ -115,6 +131,24 @@ cngNumber = (id, act)->
             if pt.id is tmpCart.product_type.id then pt.products = tmpCart.products
             pt
         @updState productTypes
+    numbOnBoatMoreOne: (i)->
+        "
+        <div class = \"small-1 columns\">
+            <span id = \"counter-#{i.id}\">#{i.count}</span>
+        </div>
+        <div class = \"small-2 columns\">
+            <a id = \"add\" data-product-id = \"#{i.id}\"><i class = \"fi-plus\"></i></a>
+            <a id = \"del\" data-product-id = \"#{i.id}\"><i class = \"fi-minus\"></i></a>
+        </div>
+        "
+    numbOnBoatIsOne: (i)->
+        isSelected = i.count is 1
+        unselDisp = if isSelected then "block" else "none"
+        selDisp = if !isSelected then "block" else "none"
+        "<div class = \"small-3 columns\">
+            <a style = \"display: #{unselDisp};\" data-product-id = \"#{i.id}\" id = \"unsel\" class = \"button alert expanded\">Убрать</a>
+            <a style = \"display: #{selDisp};\" data-product-id = \"#{i.id}\" id = \"sel\" class = \"button success expanded\">Выбрать</a>
+         </div>"
     setProductList: (list, pt)->
         txt = ""
         tmpCart.product_type = pt
@@ -127,19 +161,11 @@ cngNumber = (id, act)->
                         <div class = \"small-2 columns\">
                             <p>#{SelOptAmount(i.amount)}</p>
                         </div>
-                        <div class = \"small-1 columns\">
-                            <span id = \"counter-#{i.id}\">#{i.count}</span>
-                        </div>
-                        <div class = \"small-1 columns\">
-                            <a id = \"add\" data-product-id = \"#{i.id}\"><i class = \"fi-plus\"></i></a>
-                        </div>
-                        <div class = \"small-1 columns\">
-                            <a id = \"rmv\" data-product-id = \"#{i.id}\"><i class = \"fi-minus\"></i></a>
-                        </div>
+                        #{if tmpCart.product_type.number_on_boat is 1 then @numbOnBoatIsOne(i) else @numbOnBoatMoreOne(i)}
                     </div>"
         $("#products_list").find('#reveal_content').html "<div class = \"tb-pad-s\">#{txt}</div>"
         $("#products_list").find('#reveal_header').html pt.name
-        $("#products_list").find('a#add, a#rmv').bind "click", ()-> cngNumber $(this).attr("data-product-id"), this.id
+        $("#products_list").find('a#add, a#del, a#sel, a#unsel').bind "click", ()-> cngNumber $(this).attr("data-product-id"), this.id
         $("#products_list").foundation('open')
     render: ->
         React.DOM.div null,

@@ -87,4 +87,10 @@ module GrantsHelper
   def could_destroy_shop?(shop=@shop) #может удалять магазин
     (is_producer? and shop.is_recent?) || is_admin?
   end
+  
+  #photos
+  
+  def could_destroy_photo?(photo=@photo)
+    is_producer?
+  end
 end

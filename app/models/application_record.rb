@@ -25,4 +25,10 @@ class ApplicationRecord < ActiveRecord::Base
     return nil if !has_attribute?("#{locale}_#{a}".to_sym)
     return self["#{locale}_#{a}".to_sym]
   end
+  
+  def photos_hash_view(is_wide=false)
+    return "" if photos.blank?
+    photos.map {|ph| ph.hash_view(is_wide)}
+  end
+  
 end

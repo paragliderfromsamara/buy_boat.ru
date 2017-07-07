@@ -1,32 +1,63 @@
-<%= form_for(product) do |f| %>
-    <div class = "row">
-        <div class = "small-6 medium-3 columns">
-            <%= f.label :manufacturer, "Производитель" %>
-            <%= f.text_field :manufacturer %>
-        </div>
-        <div class = "small-12 medium-6 end columns">
-            <%= f.label :name, "Название" %>
-            <%= f.text_field :name %>
-        </div>
+<div class = "row tb-pad-m">
+    <div class = "small-12 columns">
+        <ul class = 'bb-inline-menu' data-tabs id="bb-tabs" data-deep-link="false" data-turbolinks="false">
+            <li class = 'tabs-title is-active'>
+                <a href="#main">Информация</a>
+            </li>
+            <li class = 'tabs-title '>
+               <a href="#photos">Фото</a>
+            </li>
+        </ul>
     </div>
-    <div class = "row">
-        <div class = "small-12 columns">
-            <%= f.label :description, "Описание" %>
-            <%= f.text_area :description, rows: 7 %>
-        </div>
-    </div>
-    <% if !product.entity_property_values.blank? %>
-        <div class = "row tb-pad-s">
-            <div class = "small-12 columns">
-                <%= render "property_types/property_values_table", form: f, property_values: product.entity_property_values %>
+</div>
+
+<div class = "tabs-content" data-tabs-content="bb-tabs">
+    <div class = 'tabs-panel is-active' id="main">
+        <%= form_for(product) do |f| %>
+            <div class = "row">
+                <div class = "small-6 medium-3 columns">
+                    <%= f.label :manufacturer, "Производитель" %>
+                    <%= f.text_field :manufacturer %>
+                </div>
+                <div class = "small-12 medium-6 end columns">
+                    <%= f.label :name, "Название" %>
+                    <%= f.text_field :name %>
+                </div>
             </div>
-        </div>
-
-    <%end%>
-    <div class = "row">
-        <div class = "small-12 columns">
-            <%= f.submit "Сохранить", class: "button success" %>
-        </div>
+            <div class = "row">
+                <div class = "small-12 columns">
+                    <%= f.label :description, "Описание" %>
+                    <%= f.text_area :description, rows: 7 %>
+                </div>
+            </div>
+            <% if !product.property_values.blank? %>
+                <div class = "row tb-pad-s">
+                    <div class = "small-12 columns">
+                        <%= render "property_types/property_values_table", form: f, property_values: product.property_values %>
+                    </div>
+                </div>
+            <%end%>
+            <div class = "row">
+                <div class = "small-12 columns">
+                    <%= f.submit "Сохранить", class: "button success" %>
+                </div>
+            </div>
+        <%end%>
     </div>
-<%end%>
-
+    <div class = 'tabs-panel'  id="photos">
+        <div class = "row tb-pad-s">
+          <div class="small-12 columns">
+              <%= form_for(product, html: {class: "dropzone"}) do |f| %>
+                  <%= f.fields_for :photos_attributes do |ph| %>
+                      <%= ph.hidden_field :uploader_id, value: current_user.id %>
+                  <%end%>
+              <%end%>
+          </div>
+        </div>
+      <div id = "uploaded-photos-container" data-entity-id = "<%= product.id %>" data-entity-name = "product" class="row small-up-2 medium-up-3 tb-pad-s">
+          
+      </div>
+      
+    </div>
+    
+</div>

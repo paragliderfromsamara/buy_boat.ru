@@ -10,8 +10,8 @@ class BoatType < ApplicationRecord
   has_many :entity_property_values, as: :entity, dependent: :delete_all
   accepts_nested_attributes_for :entity_property_values
   
-  has_many :boat_photos, dependent: :destroy
-  has_many :photos, through: :boat_photos
+  has_many :entity_photos, as: :entity, dependent: :delete_all
+  has_many :photos, through: :entity_photos
   #belongs_to :photo
   
   belongs_to :boat_series, optional: true, validate: false
@@ -80,10 +80,11 @@ class BoatType < ApplicationRecord
     photos.first
   end
   
-  def photos_hash_view(is_wide=false)
-    return "" if photos.blank?
-    photos.map {|ph| ph.hash_view(is_wide)}
-  end
+  #Перенесено в ApplicationRecord
+  #def photos_hash_view(is_wide=false)
+  #  return "" if photos.blank?
+  #  photos.map {|ph| ph.hash_view(is_wide)}
+  #end
   
   def self.show_page_scope
     joins(:trademark).includes(:photos)#.active

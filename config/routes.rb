@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
   
+  get 'photo/show'
+
+  get 'photo/destroy'
+
   resources :property_types
   #products
   resources :products
@@ -43,8 +47,14 @@ Rails.application.routes.draw do
   get "/favorites", to: "boat_for_sales#favorites"
   get "/boat_for_sales/:id/buy", to: "boat_for_sales#buy", as: :buy_bfs
   #end
+  #boat_option_types
   resources :boat_option_types, only: [:index, :show, :update]
-
+  #end
+  #photos
+  resources :photos, only: [:show, :destroy]
+  get "/entity_photos/:entity/:entity_id", to: 'photos#entity_photos'
+  delete "/photos/:id/:entity/:entity_id", to: "photos#destroy_on_entity" #удаляем ссылки на фотографию от boat_type или product (удаление фотографии)
+  #end
   get "/test_page", to: "pages#test_page"
   
   resources :boat_series
@@ -74,7 +84,7 @@ Rails.application.routes.draw do
   get "/manage_boat_types", to: "boat_types#manage_index", as: :manage_boat_types
   get '/boat_types/:id/photos', to: "boat_types#photos", as: :boat_photos
   get '/boat_types/:id/photos/:photo_id', to: "boat_types#photo", as: :boat_photo
-  delete '/boat_types/:id/photos/:photo_id', to: "boat_types#delete_photo"
+  #delete '/boat_types/:id/photos/:photo_id', to: "boat_types#delete_photo"
   resources :users
   
   resources :boat_property_types, only: [:index, :create] 

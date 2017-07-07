@@ -1,8 +1,6 @@
 class Photo < ApplicationRecord
   attr_accessor :x, :y, :w, :h, :file_name
-  has_many :boat_photos, dependent: :delete_all
-  has_many :boat_types, through: :boat_photos
-  
+  has_many :entity_photos, dependent: :delete_all
   before_save :makeNewFileName
   mount_uploader :link, PhotoUploader
   
@@ -13,6 +11,7 @@ class Photo < ApplicationRecord
           wide_medium: link.wide_medium.url,
           wide_large: link.wide_large.url,
           thumb: link.thumb.url,
+          thumb_square: link.thumb_square.url,
           small: link.small.url,
           medium: link.medium.url,
           large: link.large.url
