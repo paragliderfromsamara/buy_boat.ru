@@ -58,7 +58,6 @@ class ShopsController < ApplicationController
   end
   
   def shop_products
-    criteria_params = 
     @product_type = ProductType.find(params[:product_type_id])
     @products = @shop.products(@product_type.id).to_a.map {|s_product| {id: s_product.id, name: s_product.product.full_name, amount: s_product.amount, properties: s_product.product.prop_vals_for_shop, photos: s_product.product.photos.map{|ph| ph.hash_view}}}
     render json: @products 
@@ -97,6 +96,7 @@ class ShopsController < ApplicationController
     @title = @header = @shop.name
   end
   def check_grants
+    return if !signed_in? and self.action_name == "shop_products"
     redirect_to "/404" if !could_manage_all_shops?
   end
   
