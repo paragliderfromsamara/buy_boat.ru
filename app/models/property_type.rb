@@ -19,7 +19,7 @@ class PropertyType < ApplicationRecord
   validates :value_type, inclusion: { in: PropertyType.value_types.map{|t| t[0]}}
   
   def self.for_select_list
-    all.select(:ru_name, :id, :ru_measure).order("ru_name ASC")
+    all.select(:ru_name, :id, :ru_measure, :value_type).order("ru_name ASC")
   end
   
   def default_value

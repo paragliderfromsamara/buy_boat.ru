@@ -1,0 +1,4 @@
+<%shop = Shop.find(1)%>
+<br />
+<%= shop.name %>
+<%= shop.products(98).to_a.map {|s_product| {id: s_product.id, name: s_product.product.full_name, amount: s_product.amount, properties: s_product.product.prop_vals_for_shop, photos: s_product.product.photos.map{|ph| ph.hash_view}}} %>

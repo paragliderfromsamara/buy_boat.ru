@@ -117,7 +117,9 @@
         if $('[data-tabs]').length > 0 and requestHash.length>1 
             $('[data-tabs]').foundation('selectTab', $(requestHash))
     
-
+@NoPhoto = (type)->
+    type = if type is undefined then "square" else type
+    "/files/nophoto_#{type}.jpg"
 bbMiniAutosize = ()->
     w =  $(".bb-mini-block").width()
     h = if w is 400 then 300 else w*3 / 4 

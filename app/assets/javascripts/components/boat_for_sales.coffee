@@ -85,7 +85,7 @@ GroupSelectedOptions = (sOpts)->
         products_amount: 0
         selected_products: []
     sumAmount: ->
-        @props.bfs.amount + @state.products_amount
+        @props.b.bfs.amount + @state.products_amount
     updProductsAmount: (a)->
         @setState products_amount: a
     render: -> 
@@ -109,8 +109,8 @@ GroupSelectedOptions = (sOpts)->
                     React.DOM.div
                         style: {paddingTop: "0.25rem", paddingBottom: "0.25rem"}
                         className: "blue-bg",
-                        React.createElement ShopProductsMenu, bfs: @props.bfs, updAmount: @updProductsAmount
-                        React.createElement BFSSelectedOptionsDarkBlue, options: @props.bfs.selected_options, products: @state.selected_products
+                        React.createElement ShopProductsMenu, b: @props.b, updAmount: @updProductsAmount
+                        React.createElement BFSSelectedOptionsDarkBlue, options: @props.b.bfs.selected_options, products: @state.selected_products
     #toggleGroup: (g)->
     #    @props.updBfsListFunc(@props.groups.map (grp)-> if grp.name is g.name then g else grp)
     #render: ->
@@ -292,17 +292,17 @@ WideBlockParameterRow = React.createClass
                         className: "light-gray-bg"
                         React.DOM.div
                             className: "row tb-pad-xs small-up-2 medium-up-3"
-                            for i in [0..@props.prms.length-1]
+                            for i in [0..@props.b.parameters.length-1]
                                 if i > 5 then break
                                 React.DOM.div
                                     key: "parameter-#{i}"
                                     className: "column tb-pad-xs"
                                     React.DOM.p 
                                          className: "rc-param-name-b text-center"
-                                         @props.prms[i].name
+                                         @props.b.parameters[i].name
                                     React.DOM.div
                                          className: "stat text-center rc-param-val-b"
-                                         React.DOM.span null, @props.prms[i].value
+                                         React.DOM.span null, @props.b.parameters[i].value
                         React.DOM.div 
                             className: "row"
                             React.DOM.div
@@ -317,7 +317,7 @@ WideBlockParameterRow = React.createClass
                             style: {display: "none"}
                             React.DOM.div
                                 className: "small-12 columns"
-                                React.createElement BoatParameterValuesTableShow, key: "BoatParameterValuesTableShow", data: @props.prms
+                                React.createElement BoatParameterValuesTableShow, key: "BoatParameterValuesTableShow", data: @props.b.parameters
                                     
 
 
@@ -360,8 +360,8 @@ WideBlockParameterRow = React.createClass
         React.DOM.div 
             id: "boat_type_block"
             style: {display: "none"},
-            React.createElement BoatForSalePhotos, b: @state.type, prms: @state.parameters
-            React.createElement BoatForSaleShow, key: "bfs-#{@state.curBfs.id}", bfs: @state.curBfs   
+            React.createElement BoatForSalePhotos, b: @state.type
+            React.createElement BoatForSaleShow, key: "bfs-#{@state.curBfs.id}", b: @state.type 
 
 
 BFSManageTableRow = React.createClass

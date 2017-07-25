@@ -64,7 +64,7 @@ class ProductTypesController < ApplicationController
   end
   
   def product_type_params
-    params.require(:product_type).permit(:name, :plural_name, :number_on_boat, :is_active, :description, :tag, product_types_property_types_attributes:[:property_type_id, :order_number])
+    params.require(:product_type).permit(:name, :plural_name, :number_on_boat, :is_active, :description, :tag, product_types_property_types_attributes:[:property_type_id, :order_number, :more_than, :less_than, :equal])
   end
   
   def set_product_type

@@ -27,7 +27,7 @@
             <%= f.text_area :description %>
         </div>
     </div>
-    <%= react_component 'PropertyTypeSelectList', { all: PropertyType.for_select_list, selected: product_type.new_record? ? [] : product_type.properties_list, form_name: "product_type" } if !product_type.new_record? %>
+    <%= react_component 'PropertyTypeSelectList', { all: PropertyType.for_select_list, selected: product_type.new_record? ? [] : product_type.properties_list, form_name: "product_type", boat_property_types: BoatType.property_types } if !product_type.new_record? %>
     <div class = "row tb-pad-s">
         <div class = "small-12 medium-12 columns">
             <%= f.submit product_type.new_record? ? "Добавить" : "Сохранить изменения", class: "button success expanded" %>

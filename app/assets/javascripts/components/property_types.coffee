@@ -1,8 +1,14 @@
 # Place all the behaviors and hooks related to the matching controller here.
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/
-nameWithMeasure = (t)->
-    "#{t.ru_name}#{if t.ru_measure isnt '' then ", #{t.ru_measure}" else ''}"
+
+@PropNameWithMeasure = (t, locale)->
+    locale = if locale is undefined then "ru" else locale
+    if locale isnt "" then locale += "_"
+    m = t["#{locale}measure"]
+    n = t["#{locale}name"]
+    "#{n}#{if m isnt '' then ", #{m}" else ''}"
+    
 @PropertyTypeForm = React.createClass
     getInitialState: ->
         name: ""
@@ -213,6 +219,46 @@ PropTypesRow = React.createClass
                         React.createElement PropTypesRow, key: "property_type_#{pt.id}", pt: pt, delHandle: @delPT, is_edit: (pt.id is @state.curEdit), toggleHandle: @setEdit, updHandle: @updPT
 
 
+CriteriaSelList = React.createClass
+    bpListName: (bp)-> #название свойства лодки в списке для выбора критериев
+        name = if bp.ru_short_name is '' then bp.ru_name else bp.ru_short_name 
+        measure = if bp.ru_measure is '' then "" else ", #{bp.ru_measure}"
+        "#{name}#{measure}"
+    curCrit: ->
+        bProp = null
+        if @props.pt[@props.attr] isnt null and @props.pt[@props.attr] isnt undefined
+            for bp in @props.boat_props
+                if bp.id is @props.pt[@props.attr]
+                    bProp = bp
+                    break
+        bProp
+    render: ->
+        if @props.pt.value_type isnt "integer" and @props.pt.value_type isnt "float" and @props.attr isnt "equal"
+            null
+        else
+            React.DOM.select
+                name: "#{@props.form_name}[#{@props.form_name}s_property_types_attributes][#{@props.pt.order_number}][#{@props.attr}]"
+                if @curCrit() isnt null
+                    React.DOM.option
+                        key: "#{@props.attr}-#{@props.pt.id}-#{@curCrit().id}"
+                        value: @curCrit().id
+                        @bpListName(@curCrit())
+                else
+                    React.DOM.option
+                        key: "#{@props.attr}-#{@props.pt.id}-0"
+                        value: ''
+                        "-"
+                if @curCrit() isnt null
+                    React.DOM.option
+                        key: "#{@props.attr}-#{@props.pt.id}-0"
+                        value: ''
+                        "-"
+                for bp in @props.boat_props
+                    if bp.id isnt @props.pt[@props.attr]
+                        React.DOM.option
+                             key: "#{@props.attr}-#{@props.pt.id}-#{bp.id}"
+                             value: bp.id
+                             @bpListName(bp)
 PropertyTypeSelListItem = React.createClass
     rmItem: (e)->
         e.preventDefault()
@@ -224,6 +270,10 @@ PropertyTypeSelListItem = React.createClass
             ru_name: @props.pt.ru_name
             ru_measure: @props.pt.ru_measure
             order_number: @props.pt.order_number
+            value_type: @props.pt.value_type
+            more_than: @props.pt.more_than
+            less_than: @props.pt.less_than
+            equal: @props.pt.equal
         }
     mvUp: (e)->
         e.preventDefault()
@@ -235,7 +285,35 @@ PropertyTypeSelListItem = React.createClass
         pt = @clone()
         pt.order_number = pt.order_number+1
         @props.handleUpd(pt)
-    render: ->
+
+    
+    selectCritAttr: (critName)->
+        if @props.pt.value_type isnt "integer" and @props.pt.value_type isnt "float" and critName isnt "equal" then return null
+        React.DOM.select
+            name: "#{@props.form_name}[#{@props.form_name}s_property_types_attributes][#{@props.pt.order_number}][#{critName}]"
+            if @curCrit(critName) isnt null
+                React.DOM.option
+                    key: "#{critName}-#{@props.order_number}-#{@curCrit(critName).id}"
+                    value: @curCrit(critName).id
+                    @bpListName(@curCrit(critName))
+            else
+                React.DOM.option
+                    key: "#{critName}-#{@props.order_number}-0"
+                    value: ''
+                    "-"
+            if @curCrit(critName) isnt null
+                React.DOM.option
+                    key: "#{critName}-#{@props.order_number}-0"
+                    value: ''
+                    "-"
+            for bp in @props.boat_props
+                if bp.id isnt @props.pt["#{critName}"]
+                    React.DOM.option
+                         key: "#{critName}-#{@props.order_number}-#{bp.id}"
+                         value: bp.id
+                         @bpListName(bp)
+                                                  
+    withCriterias: ->
         React.DOM.tr null,
             React.DOM.td null, @props.pt.order_number
             React.DOM.td null, 
@@ -247,7 +325,44 @@ PropertyTypeSelListItem = React.createClass
                     type: "hidden"
                     name: "#{@props.form_name}[#{@props.form_name}s_property_types_attributes][#{@props.pt.order_number}][order_number]"
                     value: @props.pt.order_number  
-                nameWithMeasure(@props.pt)
+                PropNameWithMeasure(@props.pt)
+            React.DOM.td 
+                colSpan: 2,
+                React.DOM.a 
+                    onClick: @mvDwn
+                    React.createElement FIcon, fig: "arrow-down"
+                React.DOM.a 
+                    onClick: @mvUp
+                    React.createElement FIcon, fig: "arrow-up"
+            React.DOM.td
+                title: "Больше или равно"
+                React.createElement CriteriaSelList, form_name: @props.form_name, attr: "more_than", pt: @props.pt, boat_props: @props.boat_props
+            React.DOM.td 
+                title: "Меньше или равно"
+                React.createElement CriteriaSelList, form_name: @props.form_name, attr: "less_than", pt: @props.pt, boat_props: @props.boat_props
+            React.DOM.td
+                title: "Равно"
+                React.createElement CriteriaSelList, form_name: @props.form_name, attr: "equal", pt: @props.pt, boat_props: @props.boat_props
+            React.DOM.td
+                className: "text-right", 
+                React.DOM.a
+                    className: "button small secondary"
+                    onClick: @rmItem
+                    React.createElement FIcon, fig: "minus"
+    
+    withoutCriterias: ->
+        React.DOM.tr null,
+            React.DOM.td null, @props.pt.order_number
+            React.DOM.td null, 
+                React.DOM.input 
+                    type: "hidden"
+                    name: "#{@props.form_name}[#{@props.form_name}s_property_types_attributes][#{@props.pt.order_number}][property_type_id]"
+                    value: @props.pt.id
+                React.DOM.input 
+                    type: "hidden"
+                    name: "#{@props.form_name}[#{@props.form_name}s_property_types_attributes][#{@props.pt.order_number}][order_number]"
+                    value: @props.pt.order_number  
+                PropNameWithMeasure(@props.pt)
             React.DOM.td null, 
                 React.DOM.a 
                     onClick: @mvDwn
@@ -261,12 +376,15 @@ PropertyTypeSelListItem = React.createClass
                     className: "button small secondary"
                     onClick: @rmItem
                     React.createElement FIcon, fig: "minus"
+    render: ->
+        if @props.hasCrits then @withCriterias() else @withoutCriterias()
                     
 @PropertyTypeSelectList = React.createClass
     getInitialState: ->
         all: @props.all
         selected: if @props.selected is undefined then [] else @props.selected
         form_name: @props.form_name
+        boat_props: if @props.boat_property_types is undefined then [] else @props.boat_property_types
     getDefaultState: ->
         all: []
         selected: []
@@ -279,7 +397,17 @@ PropertyTypeSelListItem = React.createClass
         idx = IndexOfById(@state.all, parseInt @refs.selected_property.value)
         if idx is -1 then return
         s = @state.selected.slice()
-        s.push {id: @state.all[idx].id, is_required: false, order_number: s.length+1, ru_name: @state.all[idx].ru_name, ru_measure: @state.all[idx].ru_measure}
+        s.push {
+                id: @state.all[idx].id
+                is_required: false
+                order_number: s.length+1
+                ru_name: @state.all[idx].ru_name
+                ru_measure: @state.all[idx].ru_measure
+                value_type: @state.all[idx].value_type
+                more_than: null
+                less_than: null
+                equal: null
+               }
         @setState selected: s
         #console.log @refs.selected_property.value
         #@props.handleChange(@valForInput(s))
@@ -327,6 +455,31 @@ PropertyTypeSelListItem = React.createClass
         else
             s[idx] = i
         @setState selected: s
+    colsNumb: -> if @hasCrits() then 7 else 3
+    notBtTableTitle: -> #заголовок таблицы с критериями
+        React.DOM.tr null,
+            React.DOM.th null,
+                "#"
+            React.DOM.th null,
+                "Название свойства" 
+            React.DOM.th
+                 colSpan: 2
+                 null
+            React.DOM.th null, ">="
+            React.DOM.th null, "=<"
+            React.DOM.th null, "=="
+            React.DOM.th null, null
+    btTableTitle: -> #заголовок таблицы без критериев
+        React.DOM.tr null,
+            React.DOM.th null,
+                "#"
+            React.DOM.th null,
+                "Название свойства"
+            React.DOM.th
+                 colSpan: 2
+                 null
+    hasCrits: -> #проверяем критерии для отрисовки критериев
+        @state.form_name isnt "boat"# and @state.boat_props.length > 0
     render: ->
         React.DOM.div 
             className: "tb-pad-s",
@@ -338,21 +491,14 @@ PropertyTypeSelListItem = React.createClass
             React.DOM.div
                 className: "row"
                 React.DOM.div 
-                    className: "small-12 medium-8 end columns"
+                    className: "small-12 medium-12 end columns"
                     React.DOM.table null,
                         React.DOM.thead null,
-                            React.DOM.tr null,
-                                React.DOM.th null,
-                                    "#"
-                                React.DOM.th null,
-                                    "Название свойства"
-                                React.DOM.th
-                                     colSpan: 2
-                                     null
+                            if @hasCrits() then @notBtTableTitle() else @btTableTitle()
                         React.DOM.tbody null,
                             React.DOM.tr null,
                                 React.DOM.td
-                                    colSpan: 3
+                                    colSpan: @colsNumb()
                                     React.DOM.select
                                         onChange: @onCng
                                         ref: "selected_property"
@@ -361,7 +507,7 @@ PropertyTypeSelListItem = React.createClass
                                                 React.DOM.option
                                                     key: t.id
                                                     value: t.id
-                                                    nameWithMeasure(t)
+                                                    PropNameWithMeasure(t)
                                 React.DOM.td
                                     style: {verticalAlign: "middle"}
                                     className: 'text-right'
@@ -374,14 +520,14 @@ PropertyTypeSelListItem = React.createClass
                             if @state.selected.length is 0 
                                 React.DOM.tr null, 
                                     React.DOM.td
-                                        colSpan: 4
+                                        colSpan: @colsNumb() + 1
                                         React.DOM.input
                                             type: "hidden"
                                             name: "#{@state.form_name}[#{@state.form_name}s_property_types_attributes][]"
                                         React.DOM.p null, "Список характеристик пуст"
                             else
                                 for s in @state.selected
-                                    React.createElement PropertyTypeSelListItem, key: s.id, pt: s, handleRemove: @rmvItem, form_name: @state.form_name, handleUpd: @updItem
+                                    React.createElement PropertyTypeSelListItem, key: s.id, pt: s, handleRemove: @rmvItem, form_name: @state.form_name, handleUpd: @updItem, boat_props: @state.boat_props, hasCrits: @hasCrits() 
 
                     
                                 

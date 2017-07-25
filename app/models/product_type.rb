@@ -40,7 +40,11 @@ class ProductType < ApplicationRecord
               "property_types.id AS id, 
                property_types.ru_name AS ru_name,
                property_types.ru_measure AS ru_measure, 
+               property_types.value_type AS value_type, 
                product_types_property_types.is_required AS is_required, 
+               product_types_property_types.less_than AS less_than,
+               product_types_property_types.more_than AS more_than,
+               product_types_property_types.equal AS equal,
                product_types_property_types.order_number AS order_number").order("product_types_property_types.order_number ASC").distinct
   end
   

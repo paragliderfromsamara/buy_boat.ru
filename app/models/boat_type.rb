@@ -44,9 +44,10 @@ class BoatType < ApplicationRecord
                                                     ).order("boat_property_types.order_number ASC")
   end
   
-  def property_values(locale = "ru")
+  def property_values(locale = "ru") 
     entity_property_values.includes(property_type: :boat_property_type).order("boat_property_types.order_number ASC").to_a.map {|epv| {
       id: epv.id,
+      property_type_id: epv.property_type_id,
       name: epv.property_type["#{locale}_name".to_sym],
       short_name: epv.property_type["#{locale}_short_name".to_sym],
       measure: epv.property_type["#{locale}_measure".to_sym],
