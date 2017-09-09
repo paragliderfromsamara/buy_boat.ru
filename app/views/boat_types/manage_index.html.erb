@@ -6,119 +6,14 @@
         
         <% if @boat_types.not_active.size > 0 %>
         <h3>Не активные <span data-tooltip aria-haspopup="true" class="has-tip top subheader" data-disable-hover="false" tabindex="2" title="Не активные типы лодок скрыты в списке 'Типы лодок' и в разделе 'Готовые лодки'">?</span></h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Марка</th>
-                  <th>Серия</th>
-                  <th>Тип корпуса</th>
-                  <th>Название</th>
-                  <th>Базовая стоимость</th>
-                  <th>Создал</th>
-                  <th>Обновил</th>
-                  <th colspan="3"></th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <% @boat_types.not_active.each do |boat_type| %>
-                  <tr>
-                    <td><%= link_to boat_type.trademark.name, boat_type.trademark %></td>
-                    <td><%= boat_type.boat_series.name if !boat_type.boat_series.nil? %></td>
-                    <td><%= boat_type.body_type %></td>
-                    <td><%= boat_type.name %></td>
-                    <td><%= boat_type.base_cost %></td>
-                    <td><%= boat_type.creator.email %></td>
-                    <td><%= boat_type.modifier.email %></td>
-                    <td><%= link_to "<i class = 'fi-arrow-right'></i>".html_safe, boat_type %></td>
-                    <td><%= link_to "<i class = 'fi-pencil'></i>".html_safe, edit_boat_type_path(boat_type), "data-turbolinks"=> false %></td>
-                    <td><%= link_to "<i class = 'fi-x'></i>".html_safe, boat_type, method: :delete, data: { confirm: 'Вы уверены, что хотите удалить данный тип лодки?' } %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
+        <%= render "boat_types_table", boat_types: @boat_types.not_active %>
         <%end%>
         <hr>
         <h3>Активные <span data-tooltip aria-haspopup="true" class="has-tip top subheader" data-disable-hover="false" tabindex="2" title="Лодки данного списка отображаются во всех разделах">?</span></h3>
-        <% if @boat_types.active.size == 0 %>
-            <p>
-                Нет ни одного типа лодки в списке доступном для показа на сайте
-            </p>
-        <%else%>
-            <table>
-              <thead>
-                <tr>
-                  <th>Марка</th>
-                  <th>Серия</th>
-                  <th>Тип корпуса</th>
-                  <th>Название</th>
-                  <th>Базовая стоимость</th>
-                  <th>Создал</th>
-                  <th>Обновил</th>
-                  <th colspan="3"></th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <% @boat_types.active.each do |boat_type| %>
-                  <tr>
-                    <td><%= link_to boat_type.trademark.name, boat_type.trademark %></td>
-                    <td><%= boat_type.boat_series.name if !boat_type.boat_series.nil? %></td>
-                    <td><%= boat_type.body_type %></td>
-                    <td><%= boat_type.name %></td>
-                    <td><%= boat_type.base_cost %></td>
-                    <td><%= boat_type.creator.email %></td>
-                    <td><%= boat_type.modifier.email %></td>
-                    <td><%= link_to "<i class = 'fi-arrow-right'></i>".html_safe, boat_type %></td>
-                    <td><%= link_to "<i class = 'fi-pencil'></i>".html_safe, edit_boat_type_path(boat_type), "data-turbolinks"=> false %></td>
-                    <td><%= link_to "<i class = 'fi-x'></i>".html_safe, boat_type, method: :delete, data: { confirm: 'Вы уверены, что хотите удалить данный тип лодки?' } %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-        <%end%>
+        <%= render "boat_types_table", boat_types: @boat_types.active %>
         <hr>
         <h3>Сняты с производства <span data-tooltip aria-haspopup="true" class="has-tip top subheader" data-disable-hover="false" tabindex="2" title="Лодки данного списка подразумеваются как устаревшие, отсутствую в разделе 'Типы лодок', но если есть в наличие готовые, то отображаются в разделе 'Готовые лодки'">?</span></h3>
-        <% if @boat_types.deprecated.size == 0 %>
-            <p>
-                Нет ни одного типа лодки в списке устаревших моделей
-            </p>
-        <%else%>
-            <table>
-              <thead>
-                <tr>
-                  <th>Марка</th>
-                  <th>Серия</th>
-                  <th>Тип корпуса</th>
-                  <th>Название</th>
-                  <th>Базовая стоимость</th>
-                  <th>Создал</th>
-                  <th>Обновил</th>
-                  <th colspan="3"></th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <% @boat_types.deprecated.each do |boat_type| %>
-                  <tr>
-                    <td><%= link_to boat_type.trademark.name, boat_type.trademark %></td>
-                    <td><%= boat_type.boat_series.name if !boat_type.boat_series.nil? %></td>
-                    <td><%= boat_type.body_type %></td>
-                    <td><%= boat_type.name %></td>
-                    <td><%= boat_type.base_cost %></td>
-                    <td><%= boat_type.creator.email %></td>
-                    <td><%= boat_type.modifier.email %></td>
-                    <td><%= link_to "<i class = 'fi-arrow-right'></i>".html_safe, boat_type %></td>
-                    <td><%= link_to "<i class = 'fi-pencil'></i>".html_safe, edit_boat_type_path(boat_type), "data-turbolinks"=> false %></td>
-                    <td><%= link_to "<i class = 'fi-x'></i>".html_safe, boat_type, method: :delete, data: { confirm: 'Вы уверены, что хотите удалить данный тип лодки?' } %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-        <%end%>
-        
-
-        
+        <%= render "boat_types_table", boat_types: @boat_types.deprecated %>
     </div>
 </div>
 

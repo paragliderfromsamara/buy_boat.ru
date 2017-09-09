@@ -1,11 +1,15 @@
 module SessionsHelper
 
+  def domains_list
+    %w( .myapps.ru .myapps.com .salut-boats.ru .realcraftboats.com .realcraftboats.ru .control.myapps.ru control.myapps.com )
+  end 
+  
   def sign_in(user)
-    cookies.permanent.signed[:remember_token] = [user.id, user.salt]
+    cookies.permanent.signed[:remember_token] = {value: [user.id, user.salt], expires: 1.year.from_now, domain: domains_list}
     self.current_user = user
     return true
   end
-  
+
   def current_user=(user)
     @current_user = user
   end
@@ -15,11 +19,7 @@ module SessionsHelper
   end
   
   def user_type
-  	if !current_user.nil?
-  		@current_user.user_type
-  	else
-  		user_type = "guest"
-  	end
+    @user_type ||= current_user.nil? ? "guest" : current_user.user_type
   end
   #управление ключем session_id необходимым для хранения данных в времменных хранилищах
   def get_session_id
@@ -28,7 +28,7 @@ module SessionsHelper
   
   def set_session_id(ses_id = nil)
     ses_id = make_session_id if ses_id.blank?
-    cookies.permanent.signed[:session_id] = ses_id if ses_id != get_session_id
+    cookies.permanent.signed[:session_id] = {value: ses_id, expires: 1.year.from_now, domain: domains_list} if ses_id != get_session_id
   end
   
   def check_session_id
@@ -36,7 +36,7 @@ module SessionsHelper
       if signed_in?
         set_session_id
       else
-        set_session_id(u.get_session_id(make_session_id))
+        set_session_id(make_session_id)
       end
     else
       if signed_in?
@@ -63,8 +63,9 @@ module SessionsHelper
     end
     
   	def sign_out
-      cookies.delete(:remember_token)
+      cookies.delete(:remember_token, domain: domains_list)
       self.current_user = nil
+      
     end
 	
     def signed_in?

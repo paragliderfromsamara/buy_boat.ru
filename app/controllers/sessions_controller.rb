@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  
+  before_action :check_signed, only: [:new, :create]
   def current_user_page
     redirect_to(signin_path) and return if !signed_in?
     @user = current_user
@@ -8,13 +8,11 @@ class SessionsController < ApplicationController
   end
   
   def new
-   redirect_to my_path and return if signed_in? 
 	 @title = @header = 'Вход на сайт'
    render layout: false if params[:nolayout] == "true" 
   end
 
   def create
-    redirect_to my_path if signed_in? 
 	  @title = @header = 'Вход на сайт'
     @user = User.authenticate(params[:session][:email],
                              params[:session][:password])
@@ -25,7 +23,7 @@ class SessionsController < ApplicationController
       else
         sign_in @user
         format.html {redirect_to my_path}
-        format.js {render js: "$('#reveal_form_window').foundation('close');Turbolinks.visit('/cabinet');"}
+        format.js {render js: "Turbolinks.visit('/cabinet');"}
       end
     end
   end
@@ -36,5 +34,17 @@ class SessionsController < ApplicationController
       format.js {render js: "Turbolinks.visit('#{root_path}');"}
       format.html {redirect_to root_path}
     end
+  end
+  
+  private
+  
+  def check_signed
+    if is_shop?
+      #redirect_to my_path if signed_in?
+    elsif is_control?
+      #redirect_to root_path if signed_in?
+    else
+      redirect_to '/404'
+    end    
   end
 end

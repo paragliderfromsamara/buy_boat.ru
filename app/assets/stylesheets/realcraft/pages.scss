@@ -1,0 +1,46 @@
+// Place all the styles related to the Pages controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+@import "application";
+
+.pages-index-boat-item
+{
+    //background-image: url("/files/pattern_map_white.png");
+    //@extend .rc-map-pattern;
+    z-index: 10;
+    position: relative;
+    p, h1, h2, h3, h4
+    {
+        color: $rc-primary-dark-blue;
+    }
+    .odd-wrapper, .even-wrapper {position: absolute; top: 0; left: 0; height: 100%; width: 100%;z-index: 11;}
+    .odd-wrapper
+    {
+        background-color: darken($white, 4%);;
+        //@include my_opacity(0.76);
+    }
+    .even-wrapper
+    {
+        background-color: darken($white, 7%);
+        
+       // @include my_opacity(0.76);
+    }
+    .content
+    {
+        position: relative;
+        z-index: 13;
+    }
+
+        @include breakpoint(small only)
+        {
+            .params-list
+            {
+                margin-top: 1rem;
+            }
+            .tb-pad-s
+            {
+                padding: 1rem 0 1rem 0;
+            }
+
+    }
+}

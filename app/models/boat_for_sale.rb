@@ -101,7 +101,7 @@ class BoatForSale < Configurator
   end
   
   def self.active
-    all
+    where(shop_id: Shop.opened.ids)
   end
   
   def selected_options_for_show

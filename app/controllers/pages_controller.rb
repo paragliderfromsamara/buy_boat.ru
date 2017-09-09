@@ -1,6 +1,21 @@
 class PagesController < ApplicationController
+  before_action :get_on_tm_site_boat_types
+  
+  
   def index
-    
+  
+  end
+  
+  def about
+  end
+  
+  def contacts
+  end
+  
+  def boats
+  end
+  
+  def boat
   end
   
   def test_page
@@ -14,5 +29,12 @@ class PagesController < ApplicationController
     #end
     
   end
-
+  
+  
+  private 
+  
+  def get_on_tm_site_boat_types 
+    @boat_types = BoatType.on_tm_site_boats(current_site)
+  end
+  
 end

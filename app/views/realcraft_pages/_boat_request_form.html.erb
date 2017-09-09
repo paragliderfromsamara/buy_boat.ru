@@ -1,0 +1,64 @@
+    <div class="reveal" data-reveal id = "boat-form-container">
+        <div class = "tb-pad-s">
+            <div class = "row">
+                <div class = "small-10 small-centered columns">
+                    <h4>
+                        <%= t(:boat_request) %>
+                    </h4>
+                </div>
+            </div>
+            <div style = "display: none;" id = 'success-request' class = "row">
+                <div class = "small-10 small-centered columns">
+                    <div class = 'callout success'>
+                    <p>
+                        <i class = 'fi-check'></i> <%= t(:successfull_boat_request) %>
+                    </p>
+                   </div>
+                </div>
+            </div>
+            <%= form_for(:boat_request, url: realcraft_send_boat_request_path, html: {"data-abide"=> "", novalidate: "", remote: true}) do |f| %>
+                <div class = "row">
+                    <div class = "small-10 small-centered columns">
+                        <div class = "row">
+                            <div class = "small-12 medium-6 columns">
+                                <%= f.label :email, "E-mail" %>
+                                <%= f.email_field :email, placeholder: "name@domain.com", required: true  %>
+                                <span class="form-error">
+                                    <%= t(:fail_mail_msg)%>
+                                </span>
+                            </div>
+                            <div class = "small-12 medium-6 columns">
+                                <%= f.label :name, t(:mail_name) %>
+                                <%= f.text_field :name, placeholder: t(:name_example), required: true  %>
+                                <span class="form-error">
+                                    <%= t(:mail_name_error)%>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class = "row">
+                    <div class = "small-10 small-centered columns">
+                        <%= f.label :boat_name, t(:mail_boat) %>
+                        <%= f.select :boat_name, boats_for_request_form if is_boat_page != true %>
+                        <%= f.text_field :boat_name, readonly: '' if is_boat_page == true %>
+                    </div>
+                </div>
+                <div class = "row">
+                    <div class = "small-10 small-centered columns">
+                        <%= f.label :comment, t(:mail_comment) %>
+                        <%= f.text_area :comment, rows: 4 %>
+                    </div>
+                </div>
+                <div class = 'row'>
+                    <div class = "small-10 small-centered columns">
+                        <%= f.submit t(:send_request_mail), class: "button success" %>
+                    </div>
+                </div>
+            <% end %>
+        </div>
+        <button class="close-button" data-close type="button">
+           <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+

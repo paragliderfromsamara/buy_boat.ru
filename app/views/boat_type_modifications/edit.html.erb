@@ -1,42 +1,71 @@
 <%= form_for(@boat_type_modification) do |f| %>
 <div class = "row">
-    <div class = 'small-12 medium-6 end columns'>
-        <%= f.label :name, "Название модификации"%>
-        <%= f.text_field :name %>
+    <div class = 'small-12 columns tb-pad-s'>
+        <h3>Текстовое описание</h3>
     </div>
 </div>
 <div class = "row">
-    <div class = 'small-12 medium-6 end columns'>
-        <%= f.label :description, "Описание модификации"%>
-        <%= f.text_area :description %>
+    <div class = 'small-12 medium-6 columns'>
+        <%= f.label :ru_name, "Название модификации (на русском)"%>
+        <%= f.text_field :ru_name %>
+    </div>
+    <div class = 'small-12 medium-6 columns'>
+        <%= f.label :com_name, "Название модификации (на английском, для английской версии сайта)"%>
+        <%= f.text_field :com_name %>
     </div>
 </div>
 <div class = "row">
-    <div class = 'small-12 medium-6 end columns tb-pad-s'>
+    <div class = 'small-12 medium-6 columns'>
+        <%= f.label :ru_description, "Описание модификации (на русском)"%>
+        <%= f.text_area :ru_description %>
+    </div>
+    <div class = 'small-12 medium-6 columns'>
+        <%= f.label :com_description, "Описание модификации (на английском, для английской версии сайта)"%>
+        <%= f.text_area :com_description %>
+    </div>
+</div>
+<div class = "row">
+    <div class = 'small-12 columns tb-pad-s'>
+        <h3>Модельный вид</h3>
+    </div>
+</div>
+<div class = "row">
+    <div class = 'small-12 medium-4 columns tb-pad-s'>
         <label>Вид спереди</label>
         <%= image_tag @boat_type_modification.aft_view.small if !@boat_type_modification.aft_view.nil? %>
         <%= f.file_field :aft_view %>
     </div>
-</div>
-<div class = "row">
-    <div class = 'small-12 medium-6 end columns tb-pad-s'>
+    <div class = 'small-12 medium-4 columns tb-pad-s'>
         <label>Вид сзади</label>
         <%= image_tag @boat_type_modification.bow_view.small if !@boat_type_modification.bow_view.nil? %>
         <%= f.file_field :bow_view %>
     </div>
-</div>
-<div class = "row">
-    <div class = 'small-12 medium-6 end columns tb-pad-s'>
+    <div class = 'small-12 medium-4 columns tb-pad-s'>
         <label>Вид сверху</label>
         <%= image_tag @boat_type_modification.top_view.small if !@boat_type_modification.top_view.nil? %>
         <%= f.file_field :top_view %>
     </div>
 </div>
 <div class = "row">
-    <div class = 'small-12 medium-6 end columns tb-pad-s'>
-        <label>Схема размещения пассажиров</label>
-        <%= image_tag @boat_type_modification.accomodation_view.small if !@boat_type_modification.accomodation_view.nil? %>
-        <%= f.file_field :accomodation_view %>
+    <div class = 'small-12 columns tb-pad-s'>
+        <h3>Схемы размещения пассажиров</h3>
+    </div>
+</div>
+<div class = "row">
+    <div class = 'small-12 medium-4 columns tb-pad-s'>
+        <label>Схема размещения пассажиров 1</label>
+        <%= image_tag @boat_type_modification.accomodation_view_1.small if !@boat_type_modification.accomodation_view_1.nil? %>
+        <%= f.file_field :accomodation_view_1 %>
+    </div>
+    <div class = 'small-12 medium-4 columns tb-pad-s'>
+        <label>Схема размещения пассажиров 2</label>
+        <%= image_tag @boat_type_modification.accomodation_view_2.small if !@boat_type_modification.accomodation_view_2.nil? %>
+        <%= f.file_field :accomodation_view_2 %>
+    </div>
+    <div class = 'small-12 medium-4 columns tb-pad-s'>
+        <label>Схема размещения пассажиров 3</label>
+        <%= image_tag @boat_type_modification.accomodation_view_3.small if !@boat_type_modification.accomodation_view_3.nil? %>
+        <%= f.file_field :accomodation_view_3 %>
     </div>
 </div>
 <div class = "row">

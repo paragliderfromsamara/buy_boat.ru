@@ -1,0 +1,71 @@
+<% 
+    if @boat.nil? 
+        canDrawTable = false
+    else
+        canDrawTable = !@boat[:boat_parameters].blank?
+    end
+%>
+<%if canDrawTable %>
+<% 
+    mdfs = @boat[:modifications] 
+%>
+<div class = "row tb-pad-s">
+    <div class = "small-12 columns">
+        <h3 class = 'tb-pad-s'>
+            <%= t :parameters_table %>
+        </h3>
+        <table class="hover">
+            <thead>
+            <tr>
+                <th>
+                    <%= t :parameter_name %>
+                </th>
+                <% mdfs.each do |m| %>
+                    <th id = "modification">
+                        <%= "#{@boat[:name]} #{m[:name] }"%>
+                    </th>
+                <% end %>
+            </tr>
+            </thead>
+            <tr>
+                <td>
+                    <%= t :design_category %>
+                </td>
+                <td align = "center" colspan = "<%= mdfs.length %>">
+                    <%= @boat[:design_category]%>
+                </td>
+            </tr>
+            <% @boat[:boat_parameters].each do |p| %>
+            <tr>
+                <td>
+                    <% if !p[:notice].blank? %> 
+                        <span data-tooltip aria-haspopup="true" class="has-tip top" data-disable-hover="false" tabindex="2" title="<%= p[:notice] %>">
+                            <%= p[:title] %> 
+                        </span> 
+                    <%else%>
+                        <%= p[:title] %> 
+                    <%end%>
+                </td>
+                <% if p[:value].class.name == "Array" %>
+                    <% 0.upto(mdfs.length-1) do |i| %>
+                        <td align = "center" >
+                            <% if i < p[:value].length %>
+                                <%= p[:value][i] %><%= p[:unit] %>
+                            <% else %>
+                                -
+                            <%end%>
+                        </td>
+                    <%end%>
+                <%else%>
+                    <td align = "center" colspan = <%= mdfs.length %>>
+                        <%= p[:value] %><%= p[:unit] %>
+                    </td>
+                <%end%>
+            </tr>
+            <%end%>
+        </table>
+    </div>
+</div>
+<%end%>
+
+

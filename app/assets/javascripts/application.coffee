@@ -1,24 +1,21 @@
-# This is a manifest file that'll be compiled into application.js, which will include all the files
-# listed below.
-#
-# Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
-# or any plugin's vendor/assets/javascripts directory can be referenced here using a relative path.
-#
-# It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
-# compiled file. JavaScript code in this file should be added after the last require_* statement.
-#
-# Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
-# about supported directives.
-#
-#= require turbolinks
+# Place all the behaviors and hooks related to the matching controller here.
+# All this logic will automatically be available in application.js.
+# You can use CoffeeScript in this file: http://coffeescript.org/
 #= require jquery
 #= require jquery_ujs
 #= require motion-ui
 #= require foundation-sites
+#= require turbolinks
 #= require react
 #= require react_ujs
-#= require components
-#= require_tree .
+#= require ./general_components
+#= require ./photo_viewer
+
+@GetReqHash = -> 
+    window.location.hash
+    
+@FoInit = ->
+    $(document).foundation()
 
 #для выводит мультилокальную строку в виде записи 'ru {com}'
 @MultLocStr = (ru, com)-> "#{ru}#{if com is '' then '' else " {#{com}}"}"
@@ -120,32 +117,11 @@
 @NoPhoto = (type)->
     type = if type is undefined then "square" else type
     "/files/nophoto_#{type}.jpg"
-bbMiniAutosize = ()->
-    w =  $(".bb-mini-block").width()
-    h = if w is 400 then 300 else w*3 / 4 
-    $(".bb-mini-block").height h
 
 
+#AppReadyFunc = ->
+    #Тут вносятся общие функции активируемые при загрузке страницы
+    #$(document).foundation()
+    #InitViewer() #инициализация просмотрщика фотографий, описание функции в photo_viewer.coffee
 
-rFunc = ->
-    #ReactOnRails.reactOnRailsPageLoaded();
-    InitViewer()
-    $(document).foundation()
-    #bbMiniAutosize()
-    initTabs()
-    #$(window).resize ()-> bbMiniAutosize()
-    #InitViewer() #find in photo_wiewer.coffee
-
-#$(document).ready rFunc
-rendFunc = -> 
-    #if $("[data-react-class]").length > 0
-    #ReactRailsUJS.unmountComponents()
-    #else
-    #    ReactRailsUJS.unmountComponents()
-    
-befRendFunc = -> 
-    ReactRailsUJS.unmountComponents() 
-    
-document.addEventListener "turbolinks:load", rFunc
-document.addEventListener "Turbolinks.pagesCached", rendFunc    
-document.addEventListener "turbolinks:before-visit", befRendFunc 
+#document.addEventListener "turbolinks:load", AppReadyFunc

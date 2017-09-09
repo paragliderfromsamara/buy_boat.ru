@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= @title.nil? ? "Меню" : @title %></title>
+    <%= csrf_meta_tags %>
+
+    <%= stylesheet_link_tag    'control/application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'control/application', 'data-turbolinks-track': 'reload' %>
+    <% if !@additionScript.nil? %><script src="<%= @additionScript %>" type="text/javascript"></script><%end%>
+  </head>
+
+  <body>
+      <div id = "top">
+          <div class = "top-bar">
+                <div class = "row">
+                          <div class = "medium-3 columns">
+                              <ul class = 'menu'>
+                                 <li class = "logo-field">
+                                     <%= link_to "Меню", root_path %>
+                                 </li>
+                              </ul>
+                          </div>
+                          <div class = "medium-9 columns">
+                              <ul class = 'menu float-right'>
+                                  <% if could_see_users_list? %>
+                                      <li>
+                                          <%= link_to "Пользователи", users_path %>
+                                      </li>
+                                  <% end %>
+                                  <% if could_manage_all_shops? %>
+                                      <li>
+                                          <%= link_to "Магазины", manage_shops_path %>
+                                      </li>
+                                  <% end %>
+                              </ul>
+                          </div>
+                </div>
+          </div>
+          <div class = 'row'>
+              <div class = 'small-12 columns'>
+                  
+              </div>
+          </div>
+      </div>
+      <div id = "middle">
+          <%if !@header.blank? %>
+              <div class = "row tb-pad-s">
+                  <div class = "small-12 columns">
+                      <h1>
+                          <%= @header %>
+                      </h1>
+                  </div>
+              </div>
+          <%end%>
+          <div id = "content">
+              <%= yield %>
+          </div>
+      </div>
+      <div id = "footer">
+      </div>
+  </body>
+</html>

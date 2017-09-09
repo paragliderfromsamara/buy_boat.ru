@@ -34,11 +34,9 @@
 <div class = "row">
     <div class = "small-4 columns field">
         <%= image_tag trademark.logo.medium if !trademark.logo.nil? %>
-
     </div>
     <div class = "small-4 columns field">
         <%= image_tag trademark.vertical_logo.medium if !trademark.vertical_logo.nil? %>
-
     </div>
     <div class = "small-4 columns field" style = "position: relative">
         <div class = "rc-fog black-bg medium-fog"></div>
@@ -58,13 +56,17 @@
     </div>
 </div>
 <div class = "row">
-    <div class = "small-6 columns field">
+    <div class = "small-12 medium-4 columns field">
         <%= f.label :email, "email" %>
         <%= f.text_field :email %>
     </div>
-    <div class = "small-6 columns field">
+    <div class = "small-12 medium-4 columns field">
         <%= f.label :phone, "Контактный номер" %>
         <%= f.text_field :phone %>
+    </div>
+    <div class = "small-12 medium-4 columns field">
+        <%= f.label :site_tag, "Метка производителя" %>
+        <%= f.text_field :site_tag, title: "Чтобы тип лодки отображался на сайте производителя, необходимо указать этот параметр" %>
     </div>
 </div>
 <div class = "row">

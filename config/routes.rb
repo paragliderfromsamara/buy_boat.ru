@@ -1,5 +1,12 @@
 Rails.application.routes.draw do
-  
+
+
+  get 'shop_pages/index'
+
+  get 'shop_pages/boats'
+
+  get 'shop_pages/shops'
+
   get 'photo/show'
 
   get 'photo/destroy'
@@ -56,6 +63,8 @@ Rails.application.routes.draw do
   delete "/photos/:id/:entity/:entity_id", to: "photos#destroy_on_entity" #удаляем ссылки на фотографию от boat_type или product (удаление фотографии)
   #end
   get "/test_page", to: "pages#test_page"
+  get "/about", to: "pages#about", as: :about
+  get "/boats/:id", to: "pages#boat", as: :tm_site_boat
   
   resources :boat_series
   resources :trademarks
@@ -88,6 +97,17 @@ Rails.application.routes.draw do
   resources :users
   
   resources :boat_property_types, only: [:index, :create] 
+  
+  #Realcraft Part--------------------------------------------------------------------------------------
+  #get 'about', to: 'realcraft#about', as: :about
+  #get "prices", to: "pages#prices", as: :prices
+  get "dealers", to: "realcraft_pages#dealers", as: :realcraft_dealers
+  get 'realcraft190', to: 'realcraft_pages#realcraft_190', as: :realcraft_190
+  get 'realcraft200', to: 'realcraft_pages#realcraft_200', as: :realcraft_200
+  get "wait", to: 'realcraft_pages#please_wait', as: :realcraft_wait
+  get "about_realcraft", to: 'realcraft_pages#about', as: :realcraft_about
+  post "send_boat_request", to: 'realcraft_pages#send_boat_request', as: :realcraft_send_boat_request
+  post "send_dealer_request", to: 'realcraft_pages#send_dealer_request', as: :realcraft_send_dealer_request
   
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

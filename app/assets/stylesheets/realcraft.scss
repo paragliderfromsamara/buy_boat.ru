@@ -1,222 +1,165 @@
-// Place all the styles related to the Pages controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
-@import "foundation-sites";
 
-@mixin my_opacity($t){opacity: $t;filter: alpha(opacity=$t*100);-moz-opacity: $t;}
-@mixin animation($t)
-	{
-	-webkit-transition-duration: $t;
-    -o-transition-duration: $t;
-    -moz-transition-duration: $t;
-    transition-duration: $t;
-	}
-//-------RealCraft Colors
-$rc-primary-blue: #0047bb;
-$rc-primary-dark-blue: #28334a;
-$rc-secondary-dark-blue: #464e7e;
-$rc-dark-blue: #28334a;
-$rc-gray: #7c878e;
-$rc-red: #ce0037;
-$rc-blue: #005aff;
-//-----------------------
+ // This is a manifest file that'll be compiled into application.css, which will include all the files
+ // listed below.
+ //
+ // Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ // or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ //
+ // You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ // compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ // files in this directory. Styles in this file should be added after the last require_* statement.
+ // It is generally better to create a new file per style scope.
+ //= require_self
+ //= require_tree ./realcraft
+
+ @import "application";
+ 
 
 
-.rc-bold
-{
-    font-family: "clear_sans_bold";
-}
-//------------------------------------
-.rc-fog
-{
-    position:absolute;
-    top:0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
-.red-bg
-{
-    background-color: $rc-red;
-    p, h1, h2, h3, h4, h5, h6 
-    {
-        color: $white;
-    }
-}
-.light-blue-bg
-{
-    background-color: $rc-primary-blue;
-    p, h1, h2, h3, h4, h5, h6 
-    {
-        color: $rc-primary-dark-blue;
-    }
-}
-.light-gray-bg
-{
-    background-color: $light-gray;
-    p, h1, h2, h3, h4, h5, h6 
-    {
-        color: $rc-primary-dark-blue;
-    }
-}
-.blue-bg
-{
-    background-color: smart-scale($rc-primary-dark-blue, 20%);
-    p, h1, h2, h3, h4, h5, h6 
-    {
-        color: $white;
-    }
-}
-.dark-blue-bg
-{
-    background-color: $rc-primary-dark-blue;
-    p, h1, h2, h3, h4, h5, h6 
-    {
-        color: $white;
-    }
+ //@import "foundation-sites";
+ @import "motion-ui";
+ @import "realcraft/_settings";
+ @include foundation-visibility-classes;
+ @include foundation-float-classes;
+ @include foundation-grid;
+ @include foundation-typography;
+ @include foundation-menu;
+ @include foundation-top-bar;
+ @include foundation-title-bar;
+ @include foundation-tabs;
+ @include foundation-menu-icon;
+ @include foundation-sticky;
+ @include foundation-dropdown-menu;
+ @include foundation-orbit;
+ @include foundation-flex-video;
+ @include foundation-reveal;
+ @include foundation-close-button;
+ @include foundation-table;
+ @include foundation-tooltip;
+ @include foundation-button;
+ @include foundation-forms;
+ @include foundation-form-error;
+ @include foundation-callout;
 
-}
-.white-bg
-{
-   background-color: $white; 
-   p, h1, h2, h3, h4 
-   {
-       color: $rc-primary-dark-blue;
-   }
-}
-.black-bg
-{
-   background-color: #171e2d; 
-}
-.lightest-fog
-{
-    @include my_opacity(0.25);
-}
-.light-fog
-{
-    @include my_opacity(0.35);
-}
-.medium-fog
-{
-    @include my_opacity(0.5);
-}
-.hard-fog
-{
-    @include my_opacity(0.75);
-}
-.hardest-fog
-{
-    @include my_opacity(0.90);
-}
-//--------------------------------------
-//
+ .tb-pad-xs
+ {
+  padding-top: 1rem;   
+   padding-bottom: 1rem;  
+ }
 
-div#rc-header
-{
-    //padding-top: 3rem;
-    //padding-bottom: 3rem;
+ .tb-pad-s
+ {
+  padding-top: 2rem;   
+   padding-bottom: 2rem;  
+ }
+ .tb-pad-m
+ {
+  padding-top: 4rem;   
+   padding-bottom: 4rem;  
+ }
+ .tb-pad-l
+ {
+  padding-top: 8rem;   
+   padding-bottom: 8rem;  
+ }
+
+ .large-font
+ {
+     a, p
+     {
+         @include breakpoint(small) {font-size: 1.35rem;}
+         @include breakpoint(medium) {font-size: 1.5rem;}
+         @include breakpoint(large) {font-size: 2.0rem;}
+     }
+ }
+ .c-box
+ {
+     position: relative;
+     width: 100%;
+     background-repeat: no-repeat;
+     background-size: cover;
+     background-position: center;
+     z-index:1;
+ }
+ //
+
+ .degree
+ {
+      vertical-align: top; 
+      font-size: 1.3rem;
+ }
+ .orbit
+ {
+     @include breakpoint(small) {height: 150px;}
+     @include breakpoint(medium) {height: 250px;}
+     @include breakpoint(large) {height: 400px;}
+     @include breakpoint(xlarge) {height: 500px;}
+     #rc-boat-slogan
+     {
+         @include breakpoint(small) {font-size: 1.0rem;}
+         @include breakpoint(medium) {font-size: 1.2rem;}
+         @include breakpoint(large) {font-size: 1.5rem;}
+     }
+     .rc-slide
+     {
+         position: relative;
+         width: 100%;
+         background-repeat: no-repeat;
+         background-size: cover;
+         -webkit-background-size:cover;
+         -o-background-size:cover;
+          -moz-background-size:cover;
+          background-position: center;
+          @include breakpoint(small) {height: 150px;}
+          @include breakpoint(medium) {height: 250px;}
+          @include breakpoint(large) {height: 400px;}
+          @include breakpoint(xlarge) {height: 500px;}
+     }
+
     
-    h3
-    {
-        font-size: 0.7rem;
-        padding: 0;
-        margin:0;
-        font-weight: bolder;
-    }
-    h1
-    {
-        font-size: 2.5rem;
-        padding: 0;
-        margin:0;
-        font-weight: bolder;
-    }
-    h4
-    {
-        font-size: 0.6rem;
-        padding: 0;
-        margin:0;
-        font-weight: bolder;
-    }
-}
-.rc-map-pattern
-{
-    
-    background-image: url("/files/pattern_map.png");
-}
-div.rc-param-val-b
-{
-    @include breakpoint(large)
-    {
-        font-size: 2.5rem;
-    }
-    @include breakpoint(medium)
-    {
-        font-size: 2.0rem;
-    }
-    @include breakpoint(small)
-    {
-        font-size: 1.5rem;
-    }
-}
-div.rc-param-val-s
-{
-    
-    font-size: 1.5rem;
-}
-.rc-param-name-b
-{
-    @include breakpoint(medium)
-    {
-        font-size: 0.9rem;
-    }
-    @include breakpoint(small)
-    {
-        font-size: 0.8rem;
-    }
-    
-}
-.rc-param-name-s
-{
-    font-size: 0.8rem;
-}
-div#rc-parameters
-{
-    position: relative;
-    width: 100%;
-    @extend .rc-map-pattern;
-    p, h1, h2, h3, h4, .stat
-    {
-        color: $white;
-    }
+     #slogan
+     {
+         img#slogan-img
+         {
+             @include breakpoint(small) 
+             {
+                height: 5rem;
+              }
+             @include breakpoint(medium) 
+             {
+                height: 9rem;
+              }
+              @include breakpoint(large) 
+              {
+                 height: 13rem;
+               }
+               @include breakpoint(xlarge) 
+               {
+                  
+                  height: 14rem;
+                }
+         }
+         position: absolute;
+         //top: 2rem;
+         width: 100%;
+        
+         z-index: 100;
+         p
+         {
+             font-weight: bolder;
+         }
+         p.slogan-small
+         {
+             font-size: 1rem;
+         }
+         p.slogan-big
+         {
+             font-size: 2rem;
+         }
+     }
+ }
 
-}
-
-.light-gray-block
-{
-    background-color: $light-gray;
-}
-
-.blue-block
-{
-    background-color: $rc-primary-dark-blue;
-    p, h1, h2, h3, h4 
-    {
-        color: $white;
-    }
-}
-.light-blue-block
-{
-    background-color: #3b4559;
-    p, h1, h2, h3, h4, a 
-    {
-        color: $white;
-    }
-    a:hover
-    {
-        color: $light-gray;
-    }
-}
-
-
-
+ #header
+ {
+     z-index: 99999;
+ }

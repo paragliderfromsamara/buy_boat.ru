@@ -26,6 +26,10 @@ class BoatType < ApplicationRecord
   has_many :configurator_entities, dependent: :destroy
   accepts_nested_attributes_for :configurator_entities
 
+  def self.on_tm_site_boats(site_tag) # выдает список лодок, в соответстивии с сайтом производителя
+    tm = Trademark.find_by(site_tag: site_tag)
+    return tm.nil? ? [] : tm.boat_types
+  end
   
   def self.property_types
     PropertyType.all.joins(:boat_property_type).select(
@@ -255,7 +259,7 @@ class BoatType < ApplicationRecord
   def add_modifications_by_option_type_ids(option_type_ids)
     o_types = BoatOptionType.where(id: option_type_ids)
     mdfs = []
-    o_types.each{|t| mdfs.push({boat_option_type_id: t.id, name: t.name, description: t.description}) }
+    o_types.each{|t| mdfs.push({boat_option_type_id: t.id, ru_name: t.name, ru_description: t.description}) }
     self.boat_type_modifications.create(mdfs)
   end
   

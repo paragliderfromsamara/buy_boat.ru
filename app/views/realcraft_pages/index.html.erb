@@ -1,0 +1,114 @@
+<div class="orbit" role="region" aria-label="RealCraft Motor Boats" data-orbit data-options="animInFromLeft:fade-in; animInFromRight:fade-in; animOutToLeft:fade-out; animOutToRight:fade-out;">
+  <div id = "slogan">
+      <div class = 'row tb-pad-s' style = " position: relative;margin-left: auto; margin-right: auto;">
+         <div class = "small-12 columns">
+             <img id = "slogan-img" src = "/realcraft_files/files/main_slogan.png">
+         </div>
+      </div>
+  </div>
+    <div class="orbit-container">
+      <%= slider_imgs(main_page_slider_imgs).html_safe  %>
+    </div>
+</div> 
+<div class = "light-gray-block">
+    <div class = 'row'>
+        <div class = 'small-12 columns tb-pad-s'>
+            <a href = "/realcraft_files/files/Realcraft.pdf" target = '_blank' class = 'button rc-blue expanded' style = "margin: 0 0 0 0;"><i class = 'fi-download'></i> <%= t(:download_brochure).mb_chars.upcase %></a>
+        </div>
+    </div>
+</div>  
+<!--boats list-->
+<% if !hash_boats_list.blank?%>
+    <%j=0%>
+    <% hash_boats_list.each do |b|%>
+    <%j+=1%>
+    <div class = "pages-index-boat-item ">
+        <div class = "<%= j.odd? ? "odd" : "even"  %>-wrapper"></div>
+        <div class = "content tb-pad-s">
+            <div class = "row tb-pad-s">
+                <div class = "small-12 medium-5 columns">
+                    <%= rc_header(b[:name], t(:model), "#{t :design_category} #{b[:design_category]}") %>
+                </div>
+                <div class = "small-12 medium-7 columns">
+                    <% if !b[:index_page_parameters].blank?%>
+                        <div class = "row">
+                        <% b[:index_page_parameters].each do |i|%>
+                            <div class = "small-4 columns params-list">
+                                <p class = "rc-param-name-s text-center">
+                                    <%= b[:boat_parameters][i][:title] %>
+                                </p>
+                                <div class="stat text-center rc-param-val-s">
+                                    <%= b[:boat_parameters][i][:value] %><%= b[:boat_parameters][i][:unit] %>
+                                </div>
+                            </div>
+                        <%end %>
+                        </div>
+                    <%end %>
+                </div>
+            </div>
+            <div class = "row">
+                <div class = "small-12 columns text-center">
+                    <p >
+                        <%= b["slogan_#{cur_locale}".to_sym] %>
+                    </p>
+                </div>
+            </div>
+            <div class = "row tb-pad-s">
+                <div class = "small-12 columns">
+                    <%= image_tag b[:slider_images].first, "data-interchange".to_sym => make_photos_interchange(b[:slider_images].first), style: "padding:0; margin:0;", vspace: "0" %>
+                    <div class = "tb-pad-s">
+                    <%= link_to ("<i class = \"fi-arrow-right\"></i> #{t(:go_to_item, item: b[:name])}").html_safe, b[:url], class: "rc-primary-blue button expanded large" %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+    </div>
+    <%end%>
+<%end%>
+<!--boats list end-->
+<div class = "light-blue-block">
+    <div class = "tb-pad-m">
+        <div class = "row">
+            <div class = "small-12 columns text-center">
+                <%= rc_header(t(:we_are), t(:who)) %>
+            </div>
+        </div>
+        <div class = "row">
+            <div class = "small-12 medium-4 columns">
+                <p class = "stat text-center">
+                     15,000 <%= t :m_short %><span class = "degree">2</span>
+                 </p>
+                 <p class = "rc-param-name-b text-center">
+                     <%= t :land_for_production %>
+                 </p>
+                 <a><%= image_tag production_photos("6")[:url], class: "kra-ph-box", "rc-box-phs".to_sym => production_photos("6")[:list], "rc-box-collection".to_sym => "production"  %></a>
+            </div>
+            <div class = "small-12 medium-4 columns tb-pad-s">
+                    <a><%= image_tag production_photos("2")[:url], class: "kra-ph-box tb-pad-s", "rc-box-phs".to_sym => production_photos("2")[:list], "rc-box-collection".to_sym => "production"  %></a>
+                    <p class = "stat text-center">
+                         <%= Time.now.year.to_i - 2004 %> <%= t :years %>
+                     </p>
+                     <p class = "rc-param-name-b text-center">
+                         <%= t :experience_of_shipbuilding %>
+                     </p>
+                     <p class = "text-center">
+                         <%= link_to "#{t(:more).mb_chars.capitalize}...", about_path %>
+                     </p>
+            </div>
+            <div class = "small-12 medium-4 columns">
+                <p class = "stat text-center">
+                     3,800 <%= t :m_short %><span class = "degree">2</span>
+                 </p>
+                 <p class = "rc-param-name-b text-center">
+                     <%= t :production_and_warehouse_space %>
+                 </p>
+                 <a><%= image_tag production_photos("1")[:url], class: "kra-ph-box", "rc-box-phs".to_sym => production_photos("1")[:list], "rc-box-collection".to_sym => "production"  %></a>
+            </div>    
+        </div>
+    </div>
+
+</div>
+
+

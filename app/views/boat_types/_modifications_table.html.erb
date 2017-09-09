@@ -28,10 +28,10 @@
                 <% modifications.each do |mdf| %>
                     <tr>
                         <td>
-                            <%= mdf.name %>
+                            <%= mdf.ru_name %>
                         </td>
                         <td>
-                            <%= mdf.description %>
+                            <%= mdf.ru_description %>
                         </td>
                         <td>
                             <%= image_tag mdf.aft_view.small if !mdf.aft_view.nil? %>
@@ -43,7 +43,9 @@
                             <%= image_tag mdf.top_view.small if !mdf.top_view.nil? %>
                         </td>
                         <td>
-                            <%= image_tag mdf.accomodation_view.small if !mdf.accomodation_view.nil? %>
+                            <% mdf.accomodation_views.each do |view| %>
+                                <%= image_tag view[:small] %>
+                            <%end%>
                         </td>
                         <td>
                             <%= link_to "<i class = 'fi-pencil'></i> Редактировать".html_safe, edit_boat_type_modification_path(mdf) %>

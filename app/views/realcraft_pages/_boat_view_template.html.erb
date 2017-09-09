@@ -1,0 +1,238 @@
+<div class="orbit" role="region" aria-label="RealCraft Motor Boats" data-orbit data-options="animInFromLeft:fade-in; animInFromRight:fade-in; animOutToLeft:fade-out; animOutToRight:fade-out;">
+     <div class = "rc-fog medium-fog white-bg"><!-- Белая пелена над фотографией--></div> 
+      <div id = "slogan">
+            <div class = "row">
+                <div class = "small-12 medium-6 large-5 columns">
+                    <div class = " tb-pad-s"><%= rc_header(@boat[:name], t(:model), "#{t :design_category} #{@boat[:design_category]}")  %></div>
+                    <p class = "show-for-large" title = "<%= @boat["header_description_#{cur_locale}".to_sym] %>">
+                <%= truncate @boat["header_description_#{cur_locale}".to_sym], length: 380 %>
+                    </p>
+                </div>
+                <div class = "medium-5 large-5 medium-offset-1 large-offset-2 columns hide-for-small-only">
+                    <p id = "rc-boat-slogan" class = "text-center tb-pad-m hide-for-small">
+                        <%= @boat["slogan_#{cur_locale}".to_sym] %>
+                    </p>
+                </div>
+                <div class = "medium-1 columns hide-for-small-only">
+                </div>
+            </div>
+      </div>
+    <ul class="orbit-container">
+        <%= slider_imgs(@boat[:slider_images]).html_safe  %>
+    </ul>
+</div> 
+
+<div class = "c-box hide-for-large dark-blue-bg">
+    <div class = "row tb-pad-s">
+        <div class = "small-12 columns">
+            <p>
+                <%= @boat["header_description_#{cur_locale}".to_sym] %>
+                
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div id="rc-parameters" class = "white-text ">
+    <div class = "tb-pad-m">
+        <div class = "row">
+            <div class = "small-12 columns">
+                <h3 class = "text-center">
+                    <%= t(:technical_information) %>
+                </h3>
+            </div>
+        </div>
+        <div class = "row row tb-pad-s">
+            <% if !@boat[:main_params_big].blank?%>
+                <% @boat[:main_params_big].each do |i|%>
+                    <div class = "small-4 columns">
+                        <p class = "rc-param-name-b text-center">
+                            <%= @boat[:boat_parameters][i][:title] %>
+                        </p>
+                        <div class="stat text-center rc-param-val-b">
+                            <%= @boat[:boat_parameters][i][:value] %><%= @boat[:boat_parameters][i][:unit] %>
+                        </div>
+                    </div>
+                <%end %>
+            <%end %>
+        </div>
+        <div class = "row">
+            <% if !@boat[:main_params_small].blank?%>
+                <% @boat[:main_params_small].each do |i|%>
+                    <div class = "small-6 medium-4 large-2 columns tb-pad-s">
+                        <p class = "rc-param-name-s text-center">
+                            <%= @boat[:boat_parameters][i][:title] %>
+                        </p>
+                        <div class="stat text-center rc-param-val-s">
+                            <%v = @boat[:boat_parameters][i][:value]%>
+                            <%= v.class.name == "Array" ? "#{v.sort.first}-#{v.sort.last}" : v %><%= @boat[:boat_parameters][i][:unit] %>
+                        </div>
+                    </div>
+                <%end %>
+            <%end %>
+        </div>
+    </div>
+</div>
+
+<ul id = "rc-data-tabs" class="tabs" data-tabs data-deep-link="false" data-turbolinks="false" >
+  <div class = "row">
+          <li class="tabs-title small-6 medium-3 columns text-center is-active"><a class = 'no-style'  href="#modifications" aria-selected="true"><%= t(:modifications).mb_chars.upcase%></a></li>
+          <li class="tabs-title small-6 medium-3 columns text-center"><a class = 'no-style' href="#engeneering"><%= t(:engeneering).mb_chars.upcase %></a></li>
+          <li class="tabs-title small-6 medium-3 columns text-center"><a class = 'no-style' href="#photos"><%= t(:photos).mb_chars.upcase %></a></li>
+          <li class="tabs-title small-6 medium-3 columns text-center"><a class = 'no-style' href="#videos"><%= t(:videos).mb_chars.upcase %></a></li>
+  </div>
+</ul>
+<div class="tabs-content" data-tabs-content="rc-data-tabs">
+  <div class="tabs-panel is-active" id="modifications">
+    <div class="row tb-pad-s">
+        <div class = "small-12 columns">
+                <%= rc_header(t(:modifications), @boat[:name])  %>
+        </div>
+    </div>
+    <div class="row tb-pad-s">
+        <div class = "small-12 columns">
+            <%= @boat["modifications_present_text_#{cur_locale}".to_sym ]%>
+        </div>
+    </div>
+    <% if !@boat[:modifications].blank?  %>
+        <%mCounter = 0%>
+       <% @boat[:modifications].each do |m| %>
+       <%mCounter += 1%>
+                  <hr/>   
+       <div class = "rc-modification-box tb-pad-s">
+           <div class="row">
+               <div class = "large-6 show-for-large end columns">
+                   <h3><%= m[:name] %></h3>
+                       <p>
+                           <%= m["description_#{cur_locale}".to_sym] %>
+                       </p>
+               </div>
+               <div class = "small-12 large-6 columns text-right">
+                   <a data-open-boat-form = "<%= @boat[:name] %> <%= m[:name] %>" class = "button rc-primary-blue">
+                       <%= t(:buy).mb_chars.upcase %>
+                   </a>
+               </div>
+           </div>
+           <div class = "row tb-pad-s">
+               <div class = "small-12 medium-6 hide-for-large columns">
+                   <h3><%= m[:name] %></h3>
+                       <p>
+                           <%= m["description_#{cur_locale}".to_sym] %>
+                       </p>
+               </div>
+               <% m[:model_view_imgs].each do |i|%>
+                   <div class = "small-12 medium-6 large-4 columns">
+                       
+                       <div style = "position: relative;"><div style = "position: absolute; top: 10px; right: 10px; z-index:200;"><h7><%= i[:title] %></h7></div></div>
+                       <a><%= image_tag i[:url], class: "kra-ph-box", "data-image-versions".to_sym => "[#{i[:url]}, small]", "data-collection".to_sym => "boat-views-#{mCounter}", "rc-box-title".to_sym => "#{@boat[:name]} #{m[:name]}: #{i[:title]}"  %></a>
+                   </div>
+               <%end%>
+           </div>
+           <div class = "row">
+               <div class = "small-12 columns">
+               <h5>
+                   <%= t(:crew_accomodation).mb_chars.upcase %>
+               </h5>
+           </div>
+           </div>
+           <div class = "row tb-pad-s">
+               <div class = "medium-12 large-2 columns">
+                   <%=  t(:crew_accomodation_txt, modification: "<b>#{m[:name]}</b>", crew_limit: searchRCParamValByTitle(t(:crew_limit))[:value].to_i.to_s).html_safe  %>
+               </div>
+               <% j=0 %>
+               <% m[:acc_views_imgs].each do |i|%>
+                   <%j+=1%>
+                   <div class = "small-12 medium-6 large-5 columns">
+                       <h7><%= t(:scheme) %> <%= j.to_s %></h7>
+                       <%= image_tag i %>
+                       
+                   </div>
+               <%end%>
+           </div>
+           </div>
+ 
+       <%end%> 
+    <%end%>
+
+
+  </div>
+
+  <div class="tabs-panel" id="engeneering">
+    <div class = "tb-pad-s">
+        <div class = "row">
+            <div class = "small-12 columns">
+                <%= rc_header(t(:engeneering), @boat[:name])  %>
+            </div>
+        </div>
+        <div class = "row">
+            <div class = "small-12 medium-5 columns tb-pad-s">
+                <p>
+                    <%= @boat["engeneering_text_#{cur_locale}".to_sym] %>
+                </p>
+            </div>
+            <div class = "small-12 medium-7 columns tb-pad-s">
+                <%= image_tag @boat[:engeneering_img] %>            
+            </div>
+        </div>
+        <%= render "boat_params_table" %>
+    </div>
+  </div>
+  <div class="tabs-panel" id="photos">
+    <div class = "tb-pad-s">
+        <div class = "row">
+            <div class = "small-12 columns">
+                <%= rc_header(t(:photos), @boat[:name])  %>
+            </div>
+        </div>
+        
+            <% if @boat[:photos].blank? %>
+            <div class = "row tb-pad-m">
+                <div class = "small-12 columns">
+                    <p>
+                        <%= t(:no_photos_msg) %>
+                    </p>
+                </div>
+            </div>
+            <% else %>
+            <div class="row small-up-2 medium-up-2 large-up-3">
+                <% @boat[:photos].each do |p| %>
+                  <div class="column column-block tb-pad-s">
+                        <a><%= image_tag p[:thumbnail], class: "float-center kra-ph-box", "rc-box-phs".to_sym => "[#{p[:small]}, small], [#{p[:medium]}, medium], [#{p[:large]}, large], [#{p[:xlarge]}, xlarge]", "rc-box-collection".to_sym => "boat-photos" %></a>
+                  </div>
+                <%end%>
+            </div>
+            <%end%>
+        
+    </div>
+  </div>
+  <div class="tabs-panel" id="videos">
+    <div class = "tb-pad-s">
+        <div class = "row">
+            <div class = "small-12 columns">
+                <%= rc_header(t(:videos), @boat[:name])  %>
+            </div>
+        </div>
+        <div class = "row tb-pad-m">
+            <% if @boat[:videos].blank? %>
+                <div class = "small-12 columns">
+                    <p>
+                        <%= t(:no_videos_msg) %>
+                    </p>
+                </div>
+            <%else%>
+                <% @boat[:videos].each do |v|%>
+                <div class = "small-12 medium-8 large-7 small-centered columns">
+                    <div class="flex-video widescreen">
+                      <%= v.html_safe %>
+                    </div>
+                </div>
+                <%end%>
+            <%end%>
+
+        </div>
+    </div>
+  </div>
+</div>
+
+<%= render "boat_request_form", is_boat_page: true %>

@@ -1,0 +1,137 @@
+      <div id = "top">
+          
+          <div class = "top-bar">
+                <div class = "row">
+                          <div class = "medium-3 columns">
+                              <ul class = 'menu'>
+                                 <li class = "logo-field">
+                                     <%= link_to "КупитьЛодку.рф", root_path %>
+                                 </li>
+                              </ul>
+                          </div>
+                          <div class = "medium-9 columns">
+                              <ul class = 'menu float-right'>
+                                  <li>
+                                      <%= link_to "ЛОДКИ В НАЛИЧИИ", boat_for_sales_path, "data-turbolinks" => false %>
+                                  </li>
+                                  <% if signed_in? %>
+                                      <%if is_producer? || is_admin? || is_manager? %>
+                                      <li>
+                                          <%= link_to "УПРАВЛЕНИЕ", domain_url("control"), "data-turbolinks" => false%>
+                                      </li>
+                                      <%end%>
+                                      <li>
+                                          <%= link_to "МОИ ЛОДКИ(0)", my_boats_path %>
+                                      </li>
+                                      <li>
+                                          <%= link_to "ЛИЧНЫЙ КАБИНЕТ", my_path %>
+                                      </li>
+                                     <li>
+                                         <%= link_to "ВЫХОД", signout_path, remote: true %>
+                                     </li>
+                                  <%else%>
+                                      <li>
+                                          <%= link_to "<i class = 'fi-anchor'></i>РЕГИСТРАЦИЯ".html_safe, signup_path %>
+                                      </li>
+                                      <li>
+                                          <%= link_to "<i class = 'fi-key'></i>ВХОД".html_safe, signin_path %>
+                                      </li>
+                                  <%end%>
+                              </ul>
+                          </div>
+                </div>
+          </div>
+          <% if is_producer? %>
+          <div style = 'display: none;' id = "manage_menu" class = 'row' data-turbolinks-permanent>
+              <div class = 'small-12 columns'>
+                  <div class="tb-pad-s">
+                      <ul class = "menu dropdown" data-dropdown-menu>
+                          <% if could_see_users_list? %>
+                              <li>
+                                  <%= link_to "Пользователи", users_path %>
+                              </li>
+                          <%end%>
+                          <% if could_manage_all_shops?  %>
+                              <li>
+                                  <%= link_to "Магазины", manage_shops_path%>
+                              </li>
+                              <li>
+                                 <%= link_to "Скомпанованные лодки", manage_boat_for_sales_path %>
+                              </li>
+                          <%end%>
+                          <%if could_manage_boat_parameter_types? || could_manage_boat_types? || could_manage_boat_series? || could_manage_trademarks? %>
+                          <li>
+                              <a href = "#">Управление типами лодок</a>
+                              <ul class = 'menu'>
+                                  <%if could_manage_boat_types?%>
+                                      <li>
+                                          <%= link_to "Типы лодок", manage_boat_types_path %>
+                                      </li>
+                                  <%end%>
+                                  <%if could_manage_boat_series?%>
+                                      <li>
+                                          <%= link_to "Серии лодок", boat_series_index_path %>
+                                      </li>
+                                  <%end%>
+                                  <%if could_manage_trademarks? %>
+                                      <li>
+                                          <%= link_to "Торговые марки", trademarks_path %>
+                                      </li>
+                                  <%end%>
+                                  <%if could_manage_boat_parameter_types?%>
+                                      <li>
+                                          <%= link_to "Характеристики", boat_property_types_path %>
+                                      </li>
+                                  <%end%>
+                                  <%if could_manage_boat_types?%>
+                                      <li>
+                                          <%= link_to "Типы опций", boat_option_types_path %>
+                                      </li>
+                                  <%end%>
+                              </ul>
+                              
+                          </li>
+                          
+                          <%end%>
+                          <li>
+                              <%if is_producer?%>
+                                  <li>
+                                      <%= link_to "Товары", manage_product_types_path %>
+                                  </li>
+                              <%end%>
+                          </li> 
+                          <%if is_producer?%>
+                              <li>
+                                  <%= link_to "Типы характеристик", property_types_path %>
+                              </li>
+                          <%end%>
+                          <%if is_admin?%>
+                              <li>
+                                  <%= link_to "Страны", "/add_country" %>
+                              </li>
+                          <%end%>
+                      </ul>
+
+                  </div>
+              </div>
+          </div>
+          <%end%>
+
+      </div>
+      <%= render "layouts/top_image" if show_top_image? %>
+      <div id = "middle">
+          <%if !@header.blank? %>
+              <div class = "row tb-pad-s">
+                  <div class = "small-12 columns">
+                      <h1>
+                          <%= @header %>
+                      </h1>
+                  </div>
+              </div>
+          <%end%>
+          <div id = "content">
+              <%= yield %>
+          </div>
+      </div>
+      <div id = "footer">
+      </div>

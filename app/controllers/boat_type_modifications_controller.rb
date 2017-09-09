@@ -18,7 +18,7 @@ class BoatTypeModificationsController < ApplicationController
   private
   
   def boat_type_modification_params
-    params.require(:boat_type_modification).permit(:name, :description, :aft_view, :bow_view, :top_view, :accomodation_view)
+    params.require(:boat_type_modification).permit(:ru_name, :ru_description, :com_name, :com_description, :aft_view, :bow_view, :top_view, :accomodation_view_1, :accomodation_view_2, :accomodation_view_3)
   end
   
   def set_boat_type_modification
@@ -28,6 +28,6 @@ class BoatTypeModificationsController < ApplicationController
   end
   
   def check_grants
-    redirect_to "/404" if !is_producer?
+    redirect_to "/404" if !is_producer? && !is_admin?
   end
 end

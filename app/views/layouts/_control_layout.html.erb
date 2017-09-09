@@ -1,0 +1,68 @@
+<div id = "top">
+  <div class = "top-bar">
+        <div class = "row">
+                  <div class = "medium-3 columns">
+                      <ul class = 'menu'>
+                         <li class = "logo-field">
+                             <%= link_to "Меню", root_path %>
+                         </li>
+                      </ul>
+                  </div>
+                  <div class = "medium-9 columns">
+                      <ul class = 'menu float-right'>
+                          <% if could_see_users_list? %>
+                              <li>
+                                  <%= link_to "Пользователи", users_path %>
+                              </li>
+                          <%end%>
+                          <%if could_manage_boat_types?%>
+                              <li>
+                                  <%= link_to "Типы лодок", manage_boat_types_path %>
+                              </li>
+                          <%end%>
+                          <%if could_manage_boat_series?%>
+                              <li>
+                                  <%= link_to "Серии лодок", boat_series_index_path %>
+                              </li>
+                          <%end%>
+                          <%if could_manage_trademarks? %>
+                              <li>
+                                  <%= link_to "Торговые марки", trademarks_path %>
+                              </li>
+                          <%end%>
+                          <%if could_manage_boat_parameter_types?%>
+                              <li>
+                                  <%= link_to "Характеристики", boat_property_types_path %>
+                              </li>
+                          <%end%>
+                          <%if could_manage_boat_types?%>
+                              <li>
+                                  <%= link_to "Типы опций", boat_option_types_path %>
+                              </li>
+                          <%end%>
+                      </ul>
+                  </div>
+        </div>
+  </div>
+  <div class = 'row'>
+      <div class = 'small-12 columns'>
+          
+      </div>
+  </div>
+</div>
+<div id = "middle">
+  <%if !@header.blank? %>
+      <div class = "row tb-pad-s">
+          <div class = "small-12 columns">
+              <h1>
+                  <%= @header %>
+              </h1>
+          </div>
+      </div>
+  <%end%>
+  <div id = "content">
+      <%= yield %>
+  </div>
+</div>
+<div id = "footer">
+</div>

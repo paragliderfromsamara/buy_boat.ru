@@ -1,0 +1,166 @@
+
+<div class = "row">
+    <div class = "small-12 columns tb-pad-m">
+        <%= rc_header(t(:production), t(:about)) %>
+    </div>
+</div>
+
+<div class = "row">
+    <div class = "small-12 medium-5 columns tb-pad-s">
+        <a><%= image_tag production_photos("6")[:url], class: "kra-ph-box", "rc-box-phs".to_sym => production_photos("6")[:list], "rc-box-collection".to_sym => "production"  %></a>
+    </div>
+    <div class = "small-12 medium-6 columns tb-pad-s end">
+       <% if cur_locale == :en %>
+       <p >
+            We produce our boats in the modern 
+            factory buildings, specially built by us for 
+            these purposes. They are located in the 
+            nearest suburb of Samara city - one of the 
+            biggest cities on the great river Volga. 
+        </p>
+        <p>
+            At all stages of production using modern 
+            technologies and materials - from the design 
+            study and construction of 3D-CAD-model to 
+            the finish color in the professional coloring 
+            and drying chamber. Sawing is made on CNC 
+            machines, the assembly of the boat ona rigid 
+            jig specifying the exact geometry of the body.
+        </p>
+        <%else%>
+        <p >
+             Мы производим наши лодки в современных
+             цехах специально построенных для этих целей.
+             Они находятся в пригороде города Самара - одного 
+             из крупнейших индустриальных центров Поволжья.  
+         </p>
+         <p>
+             На всех этапах производства используются современные 
+             технологии и материалы - начиная со стадии разработки
+             и моделирования 3D-CAD-модели, заканчивая покраской в 
+             профессионально покрасочно-сушильной камере. 
+             Резка производится на оборудовании с программным управлением. 
+             Сборка происходит на жестком стапеле обеспечивающем точную геометрию корпуса.
+         </p>
+        <%end%>
+    </div>    
+</div>
+<div class = "blue-block">
+    <div class = "row">
+        <div class = "small-12 medium-6 columns tb-pad-s">
+            <p class = "stat text-center">
+                 15,000 <%= t :m_short %><span class = "degree">2</span>
+             </p>
+             <p class = "rc-param-name-b text-center">
+                 <%= t :own_land_for_production %>
+             </p>
+        </div>
+        <div class = "small-12 medium-6 columns end tb-pad-s">
+            <p class = "stat text-center">
+                 3,800 <%= t :m_short %><span class = "degree">2</span>
+             </p>
+             <p class = "rc-param-name-b text-center">
+                 <%= t :own_production_and_warehouse_space %>
+             </p>
+        </div>    
+    </div>
+</div>
+<div class = "row">
+    <div class = "small-12 columns tb-pad-m">
+        <%= rc_header(t(:today), "realcraft") %>
+    </div>
+</div>
+<div class = "row">
+    <div class = "small-12 medium-6 columns end">
+        <div class = "row">
+            <div class = "small-12 medium-4 columns">
+                 <p>
+                     <%if cur_locale == :en%>
+                         Modern equipment of an industrial class
+                     <%else%>
+                         Современное высокоточное оборудование индустриального класса
+                     <%end%>
+                 </p>
+            </div>
+            <div class = "small-12 medium-8 columns">
+                 <a><%= image_tag production_photos("2")[:url], class: "kra-ph-box", "rc-box-phs".to_sym => production_photos("2")[:list], "rc-box-collection".to_sym => "production"  %></a>
+            </div>
+        </div>
+        <div class = "row tb-pad-s">
+            <div class = "small-12 medium-12 columns">
+                <h3>
+                    <%if cur_locale == :en%>
+                        Many years of large-scale production experience
+                    <%else%>
+                        Многолетний опыт крупносерийного производства
+                    <%end%>
+                </h3>
+            </div>
+        </div>
+        <div class = "row">
+            <div class = "small-12 medium-7 columns">
+                <a><%= image_tag production_photos("3")[:url], class: "kra-ph-box", "rc-box-phs".to_sym => production_photos("3")[:list], "rc-box-collection".to_sym => "production"  %></a>
+            </div>
+            <div class = "small-12 medium-5 columns">
+                 <p>
+                     <%if cur_locale == :en%>
+                         A large staff of top notch professionals
+                     <%else%>
+                         Большой коллектив специалистов своего дела
+                     <%end%>
+                 </p>
+            </div>
+        </div>
+    </div>
+    <div class = "small-12 medium-5 medium-offset-1 columns end">
+        <div class = "row">
+            <div class = "small-12 medium-5 columns">
+                 <p>
+                     <%if cur_locale == :en%>
+                         Advanced methods of engineering and quality control
+                     <%else%>
+                         Прогрессивные методы проектирования и контроля качества
+                     <%end%>
+                 </p>
+            </div>
+            <div class = "small-12 medium-7 columns end">
+                 <a><%= image_tag production_photos("4")[:url], class: "kra-ph-box", "rc-box-phs".to_sym => production_photos("4")[:list], "rc-box-collection".to_sym => "production"  %></a>
+            </div>
+        </div>
+        <div class = "row tb-pad-s">
+            <div class = "small-12  medium-7 columns">
+                <a><%= image_tag production_photos("1")[:url], class: "kra-ph-box", "rc-box-phs".to_sym => production_photos("1")[:list], "rc-box-collection".to_sym => "production"  %></a>
+            </div>
+            <div class = "small-12 medium-5 columns">
+                 <p>
+                     <%if cur_locale == :en%>
+                         Spacious, well-lit workshops especially equipped for crafting boats
+                     <%else%>
+                         Просторные, светлые цеха, построенные специально для производства лодок
+                     <%end%>
+                 </p>
+                 <h3>
+                     <%if cur_locale == :en%>
+                         Every detail is important
+                     <%else%>
+                         Каждая деталь важна
+                     <%end%>
+                 </h3>
+            </div>
+        </div>
+        <div class = "row tb-pad-m">
+            <div class = "small-12 medium-5 columns">
+                 <p>
+                     <%if cur_locale == :en %>
+                         Many hours of workshop testing for each new model
+                     <%else%>
+                         Десятки часов заводских испытаний каждой новой модели.
+                     <%end%>
+                 </p>
+            </div>
+            <div class = "small-12 medium-7 columns">
+                <a><%= image_tag production_photos("5")[:url], class: "kra-ph-box", "rc-box-phs".to_sym => production_photos("5")[:list], "rc-box-collection".to_sym => "production"  %></a>
+            </div>
+        </div>
+    </div>
+</div>

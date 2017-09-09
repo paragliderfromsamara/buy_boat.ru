@@ -77,6 +77,6 @@ class TrademarksController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def trademark_params
-      params.require(:trademark).permit(:name, :www, :email, :phone, :logo, :vertical_logo, :white_logo, :creator_id, :updater_id)
+      params.require(:trademark).permit(:name, :www, :email, :phone, :logo, :vertical_logo, :white_logo, :creator_id, :updater_id, :site_tag)
     end
 end

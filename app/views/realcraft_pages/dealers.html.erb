@@ -1,0 +1,14 @@
+
+<div class = "tb-pad-s">
+    <div class = "row">
+        <div class = "small-12 columns">
+            <%= rc_header(t(:dealers))  %>
+        </div>
+    </div>
+</div>
+
+<%= render "simple_pages_content", content: dealers_page_content %>
+
+<div id = "boat-request-form" style = 'display: none;'>
+    <%= render "dealer_request_form" %>
+</div>

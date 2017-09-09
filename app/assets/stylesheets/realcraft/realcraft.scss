@@ -1,0 +1,215 @@
+// Place all the styles related to the Pages controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+@import "foundation-sites";
+
+@mixin my_opacity($t){opacity: $t;filter: alpha(opacity=$t*100);-moz-opacity: $t;}
+@mixin animation($t)
+	{
+	-webkit-transition-duration: $t;
+    -o-transition-duration: $t;
+    -moz-transition-duration: $t;
+    transition-duration: $t;
+	}
+//-------RealCraft Colors
+$rc-primary-blue: #0047bb;
+$rc-primary-dark-blue: #28334a;
+$rc-secondary-dark-blue: #464e7e;
+$rc-dark-blue: #28334a;
+$rc-gray: #7c878e;
+$rc-red: #ce0037;
+$rc-blue: #489fdf;
+//-----------------------
+.white-font
+{
+    p, h1, h2, h3, h4, .stat
+    {
+        color: $white;
+    }
+    a
+    {   
+        color: smart-scale($rc-primary-blue, 70%);
+        &:hover {color: smart-scale($rc-primary-blue, 50%);}
+    }
+    /*a
+    {
+        color: smart-scale($rc-primary-blue, 90%);
+        &:hover {color: smart-scale($rc-primary-blue, 70%);}
+        text-decoration: underline;
+    }*/
+}
+.medium-font
+{
+    a, p
+    {
+        @include breakpoint(small) {font-size: 1.1rem;}
+        @include breakpoint(medium) {font-size: 1.2rem;}
+        @include breakpoint(large) {font-size: 1.3rem;}
+    }
+}
+
+.large-font
+{
+    a, p
+    {
+        @include breakpoint(small) {font-size: 1.35rem;}
+        @include breakpoint(medium) {font-size: 1.5rem;}
+        @include breakpoint(large) {font-size: 2.0rem;}
+    }
+}
+
+.rc-bold
+{
+    font-family: "clear_sans_bold";
+}
+//------------------------------------
+.rc-fog
+{
+    position:absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+.red-bg
+{
+    background-color: $rc-red;
+    @extend .white-font;
+}
+.light-blue-bg
+{
+    background-color: $rc-primary-blue;
+    p, h1, h2, h3, h4 
+    {
+        color: $rc-primary-dark-blue;
+    }
+}
+.blue-bg
+{
+    background-color: $rc-blue;
+    @extend .white-font;
+}
+.dark-blue-bg
+{
+    background-color: $rc-primary-dark-blue;
+    @extend .white-font;
+}
+.white-bg
+{
+   background-color: $white; 
+   p, h1, h2, h3, h4 
+   {
+       color: $rc-primary-dark-blue;
+   }
+}
+.light-fog
+{
+    @include my_opacity(0.3);
+}
+.medium-fog
+{
+    @include my_opacity(0.5);
+}
+.hard-fog
+{
+    @include my_opacity(0.75);
+}
+//--------------------------------------
+//
+
+div#rc-header
+{
+    //padding-top: 3rem;
+    //padding-bottom: 3rem;
+    
+    h3
+    {
+        font-size: 0.7rem;
+        padding: 0;
+        margin:0;
+        font-weight: bolder;
+    }
+    h1
+    {
+        font-size: 2.5rem;
+        padding: 0;
+        margin:0;
+        font-weight: bolder;
+    }
+    h4
+    {
+        font-size: 0.6rem;
+        padding: 0;
+        margin:0;
+        font-weight: bolder;
+    }
+}
+.rc-map-pattern
+{
+    
+    background-image: url("/files/pattern_map.png");
+}
+div.rc-param-val-b
+{
+    @include breakpoint(large)
+    {
+        font-size: 2.5rem;
+    }
+    @include breakpoint(medium)
+    {
+        font-size: 2.0rem;
+    }
+    @include breakpoint(small)
+    {
+        font-size: 1.5rem;
+    }
+}
+div.rc-param-val-s
+{
+    
+    font-size: 1.5rem;
+}
+.rc-param-name-b
+{
+    @include breakpoint(medium)
+    {
+        font-size: 0.9rem;
+    }
+    @include breakpoint(small)
+    {
+        font-size: 0.8rem;
+    }
+    
+}
+.rc-param-name-s
+{
+    font-size: 0.8rem;
+}
+div#rc-parameters
+{
+    position: relative;
+    width: 100%;
+    @extend .rc-map-pattern;
+    @extend .white-font;
+
+}
+
+.light-gray-block
+{
+    background-color: $light-gray;
+}
+
+.blue-block
+{
+    background-color: $rc-primary-dark-blue;
+    @extend .white-font;
+}
+.light-blue-block
+{
+    background-color: #3b4559;
+    @extend .white-font;
+}
+
+
+

@@ -1,6 +1,6 @@
 <div class = 'row'>
     <div class = 'small-12 medium-5 columns'>
-        <%= form_for(:session, url: sessions_path, html: {id: "session_form"}) do |f|  %>
+        <%= form_for(:session, url: sessions_path, html: {id: "session_form"}, remote: true) do |f|  %>
             <p id = "session_callback"></p>
             <%= f.text_field :email, :placeholder => 'E-mail' %>
             <%= f.password_field :password, :placeholder => 'Пароль' %>

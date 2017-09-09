@@ -1,0 +1,222 @@
+// Place all the styles related to the Pages controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+@import "foundation-sites";
+
+@mixin my_opacity($t){opacity: $t;filter: alpha(opacity=$t*100);-moz-opacity: $t;}
+@mixin animation($t)
+	{
+	-webkit-transition-duration: $t;
+    -o-transition-duration: $t;
+    -moz-transition-duration: $t;
+    transition-duration: $t;
+	}
+//-------RealCraft Colors
+$rc-primary-blue: #0047bb;
+$rc-primary-dark-blue: #28334a;
+$rc-secondary-dark-blue: #464e7e;
+$rc-dark-blue: #28334a;
+$rc-gray: #7c878e;
+$rc-red: #ce0037;
+$rc-blue: #005aff;
+//-----------------------
+
+
+.rc-bold
+{
+    font-family: "clear_sans_bold";
+}
+//------------------------------------
+.rc-fog
+{
+    position:absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+.red-bg
+{
+    background-color: $rc-red;
+    p, h1, h2, h3, h4, h5, h6 
+    {
+        color: $white;
+    }
+}
+.light-blue-bg
+{
+    background-color: $rc-primary-blue;
+    p, h1, h2, h3, h4, h5, h6 
+    {
+        color: $rc-primary-dark-blue;
+    }
+}
+.light-gray-bg
+{
+    background-color: $light-gray;
+    p, h1, h2, h3, h4, h5, h6 
+    {
+        color: $rc-primary-dark-blue;
+    }
+}
+.blue-bg
+{
+    background-color: smart-scale($rc-primary-dark-blue, 20%);
+    p, h1, h2, h3, h4, h5, h6 
+    {
+        color: $white;
+    }
+}
+.dark-blue-bg
+{
+    background-color: $rc-primary-dark-blue;
+    p, h1, h2, h3, h4, h5, h6 
+    {
+        color: $white;
+    }
+
+}
+.white-bg
+{
+   background-color: $white; 
+   p, h1, h2, h3, h4 
+   {
+       color: $rc-primary-dark-blue;
+   }
+}
+.black-bg
+{
+   background-color: #171e2d; 
+}
+.lightest-fog
+{
+    @include my_opacity(0.25);
+}
+.light-fog
+{
+    @include my_opacity(0.35);
+}
+.medium-fog
+{
+    @include my_opacity(0.5);
+}
+.hard-fog
+{
+    @include my_opacity(0.75);
+}
+.hardest-fog
+{
+    @include my_opacity(0.90);
+}
+//--------------------------------------
+//
+
+div#rc-header
+{
+    //padding-top: 3rem;
+    //padding-bottom: 3rem;
+    
+    h3
+    {
+        font-size: 0.7rem;
+        padding: 0;
+        margin:0;
+        font-weight: bolder;
+    }
+    h1
+    {
+        font-size: 2.5rem;
+        padding: 0;
+        margin:0;
+        font-weight: bolder;
+    }
+    h4
+    {
+        font-size: 0.6rem;
+        padding: 0;
+        margin:0;
+        font-weight: bolder;
+    }
+}
+.rc-map-pattern
+{
+    
+    background-image: url("/files/pattern_map.png");
+}
+div.rc-param-val-b
+{
+    @include breakpoint(large)
+    {
+        font-size: 2.5rem;
+    }
+    @include breakpoint(medium)
+    {
+        font-size: 2.0rem;
+    }
+    @include breakpoint(small)
+    {
+        font-size: 1.5rem;
+    }
+}
+div.rc-param-val-s
+{
+    
+    font-size: 1.5rem;
+}
+.rc-param-name-b
+{
+    @include breakpoint(medium)
+    {
+        font-size: 0.9rem;
+    }
+    @include breakpoint(small)
+    {
+        font-size: 0.8rem;
+    }
+    
+}
+.rc-param-name-s
+{
+    font-size: 0.8rem;
+}
+div#rc-parameters
+{
+    position: relative;
+    width: 100%;
+    @extend .rc-map-pattern;
+    p, h1, h2, h3, h4, .stat
+    {
+        color: $white;
+    }
+
+}
+
+.light-gray-block
+{
+    background-color: $light-gray;
+}
+
+.blue-block
+{
+    background-color: $rc-primary-dark-blue;
+    p, h1, h2, h3, h4 
+    {
+        color: $white;
+    }
+}
+.light-blue-block
+{
+    background-color: #3b4559;
+    p, h1, h2, h3, h4, a 
+    {
+        color: $white;
+    }
+    a:hover
+    {
+        color: $light-gray;
+    }
+}
+
+
+

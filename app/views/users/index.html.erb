@@ -1,8 +1,13 @@
-<%# компонент лежит app/assets/javascript/components/users.coffee %>
+<%# компонент лежит app/assets/javascript/control/components/users.coffee %>
 
 
 <%= react_component 'Users', { data: @users } %>
 
 
-<%= link_to 'Добавить пользователя', new_user_path if could_add_user? %>
+<div class = "row">
+   <div class = "small-12 columns">
+        <%= link_to 'Добавить пользователя', new_user_path , class: "button" if could_add_user? %>  
+   </div> 
+</div>
+
 

@@ -92,19 +92,19 @@ class UsersController < ApplicationController
       case action_name
       when "index"
         @title = @header = "Список пользователей" 
-        f = could_see_users_list?
+        f = could_see_users_list? && is_control?
       when "show"
         @title = @header = is_admin? && current_user != @user ? "Личный кабинет пользователя #{@user.email}"  : "Личный кабинет" 
         f = could_see_user?
       when "new", "create"
         @title = @header = "Регистрация на сайте" 
-        f = could_add_user?
+        f = could_add_user? 
         url = my_path 
         @show_passwords = @show_email = @show_secondary = true
         @show_control_password = false 
       when "destroy"
         @title = @header = "Удаление пользователя"
-        f = could_destroy_user?
+        f = could_destroy_user? 
       when "edit", "update"
         f = could_modify_user?
         @update_type = params[:user].nil?  ? params[:update_type] : params[:user][:update_type]

@@ -32,6 +32,6 @@ class BoatOptionTypesController < ApplicationController
   end
   
   def check_grants
-    redirect_to "/404" if !is_manager?
+    redirect_to "/404" if !is_admin? and !is_producer? and !is_manager? and !is_control?
   end
 end

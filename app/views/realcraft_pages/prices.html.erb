@@ -1,0 +1,12 @@
+<div class = "tb-pad-s">
+    <div class = "row">
+        <div class = "small-12 columns">
+            <%= rc_header(t(:prices))  %>
+        </div>
+    </div>
+</div>
+
+<%= render "simple_pages_content", content: prices_page_content %>
+<div id = "boat-request-form" style = 'display: none;'>
+    <%= render "boat_request_form", is_boat_page: false %>
+</div>

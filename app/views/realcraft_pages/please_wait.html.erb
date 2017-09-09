@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= t(:default_title)%></title>
+    <%= csrf_meta_tags %>
+
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+      <div class = "row tb-pad-s">
+          <div class = "small-12 small-centered columns">
+              <%= image_tag "logo_vertical_colored.png", style: "height: 150px;", class: "float-center" %>
+          </div>
+          
+      </div>
+      <div class = "row tb-pad-s">
+          <div class = "small-12 medium-offset-1 medium-5 columns">
+              <div class="flex-video widescreen">
+              <iframe width="496" height="279" src="https://www.youtube.com/embed/fxN92HTzx4U" frameborder="0" allowfullscreen></iframe>
+              </div>
+          </div>
+          <div class = "small-12 medium-5 end columns">
+              <div class="flex-video widescreen">
+              <iframe width="496" height="279" src="https://www.youtube.com/embed/J0JQXQbo01M" frameborder="0" allowfullscreen></iframe>
+              </div>
+          </div>
+      </div>
+      <div class = "row">
+          <div class = "small-11 small-centered columns text-center">
+             <h4 class = "float-center"><%= t(:coming_soon) %>...</h4>
+          </div>
+      </div>
+  </body>
+</html>

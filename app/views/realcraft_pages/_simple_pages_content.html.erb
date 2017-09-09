@@ -1,0 +1,22 @@
+<%if !content.blank? %>
+    <% content.each do |row| %>
+        <div <%= row[:is_hidden] == true ? "style=display:none;" : "" %> <%= row[:wrapper_bg_image].blank? ? "" : "data-interchange = '#{make_photos_interchange(wrapper_bg_image(row[:wrapper_bg_image]))}' style = 'background-image: url(\"#{wrapper_bg_image(row[:wrapper_bg_image])}\");'".html_safe %> class = "c-box <%= row[:wrapper_class].blank? ? "" : "#{row[:wrapper_class]}" %>">
+            <% if !row[:fog_class].blank? %>
+                <div class = "rc-fog <%= row[:fog_class] %>">
+                </div>
+            <% end %>
+            <div style = 'position: relative; z-index:  500;' class = "row <%= row[:row_class].nil? ? "" : row[:row_class] %>">
+                <%if !row[:columns].empty?%>
+                    <%row[:columns].each do |c|%>
+                        <div class = "<%= c[:col_class].blank? ? "small-12" : c[:col_class] %> columns">
+                            <p>
+                                <%= c["#{cur_locale}_content".to_sym].html_safe if !c["#{cur_locale}_content".to_sym].blank? %>
+                                <%= c[:content].html_safe if !c[:content].blank? %>
+                            </p>
+                        </div>
+                    <%end%>
+                <%end%>
+            </div>
+        </div>
+    <%end%>
+<%end%>

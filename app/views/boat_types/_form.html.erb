@@ -17,10 +17,14 @@
           <% if !boat_type.new_record? %>
           <div class = "row">
               <div class="small-2 columns field">
+                <%= f.label :design_category, "Класс лодки" %>
+                <%= f.text_field :design_category %>
+              </div>
+              <div class="small-2 columns field">
                 <%= f.label :is_deprecated, "Устаревшая модель" %>
                 <%= f.check_box :is_deprecated %>
               </div>
-          
+              
               <div class="small-2 columns end field">
                 <%= f.label :is_active, "Показывать в каталоге" %>
                 <%= f.check_box :is_active %>
