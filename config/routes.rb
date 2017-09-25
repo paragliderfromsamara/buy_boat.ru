@@ -59,7 +59,9 @@ Rails.application.routes.draw do
   #end
   #photos
   resources :photos, only: [:show, :destroy]
+  post '/upload_photo/:entity/:entity_id', to: 'photos#upload'
   get "/entity_photos/:entity/:entity_id", to: 'photos#entity_photos'
+  put "/photos/:id/:entity/:entity_id", to: 'photos#update_entity_photo'
   delete "/photos/:id/:entity/:entity_id", to: "photos#destroy_on_entity" #удаляем ссылки на фотографию от boat_type или product (удаление фотографии)
   #end
   get "/test_page", to: "pages#test_page"
@@ -93,7 +95,6 @@ Rails.application.routes.draw do
   get "/manage_boat_types", to: "boat_types#manage_index", as: :manage_boat_types
   get '/boat_types/:id/photos', to: "boat_types#photos", as: :boat_photos
   get '/boat_types/:id/photos/:photo_id', to: "boat_types#photo", as: :boat_photo
-  #delete '/boat_types/:id/photos/:photo_id', to: "boat_types#delete_photo"
   resources :users
   
   resources :boat_property_types, only: [:index, :create] 

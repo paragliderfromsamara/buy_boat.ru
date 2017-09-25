@@ -1,8 +1,6 @@
 <div class = "row">
     <div class = "small-12 columns">
         <%= form_for(boat_type) do |f| %>
-          <%= f.hidden_field :creator_id, value: current_user.id if boat_type.new_record? %>
-          <%= f.hidden_field :modifier_id, value: current_user.id %>
           <% if boat_type.errors.any? %>
             <div id="error_explanation">
               <h2><%= pluralize(boat_type.errors.count, "error") %> prohibited this boat_type from being saved:</h2>
@@ -64,17 +62,7 @@
             <%= f.label :cnf_data_file_url, "Ссылка на файл конфигуратора" %>
             <%= f.text_field :cnf_data_file_url %>
           </div>
-          
-          <div class="field">
-            <%= f.label :description, "Текстовое описание" %>
-            <%= f.text_area :description, rows: 10 %>
-          </div>
-          <!--
-          <div class="field">
-            <%= f.label :base_cost, "Базовая стоимость" %>
-            <%= f.text_field :base_cost %>
-          </div>
-              -->
+
           <%else%>
               <div class = 'row'>      
                   <div class="small-4 columns field tb-pad-s">
@@ -89,6 +77,9 @@
                       <% if boat_type.entity_property_values.count > 0 %>
                           <%= render "property_types/property_values_table", form: f, property_values: boat_type.entity_property_values %>
                       <% else %>
+                         <p>
+                             Для лодок нет ни одной характеристики
+                         </p>
                       <% end %>
                   </div>
               </div>

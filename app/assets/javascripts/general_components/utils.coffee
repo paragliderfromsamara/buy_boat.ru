@@ -7,11 +7,23 @@
 
 #загружаем удаленную форму в reveal контейнер
 
+@YesNoIcon = React.createClass
+    render: ->
+        React.createElement FIcon, fig: if @props.value then 'check' else 'x'
+
 @FIcon = React.createClass
     render: ->
         React.DOM.i
+            title: if @props.title isnt undefined then @props.title else null
             className: "fi-#{@props.fig}",
             " "
+@FIconBadge = React.createClass
+    getInitialState: ->
+        addClass: if @props.color is undefined then "primary" else @props.color
+    render: ->
+        React.DOM.span
+            className: "badge #{@state.addClass}"
+            React.createElement FIcon, fig: @props.fig, title: @props.title
             
 @IconWithText = React.createClass
     render: ->

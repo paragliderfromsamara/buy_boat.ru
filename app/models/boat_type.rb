@@ -2,9 +2,6 @@ class BoatType < ApplicationRecord
   attr_accessor :copy_params_table_from_id
   after_create :make_boat_parameter_values
   
-  belongs_to :creator, class_name: "User" #кто создал
-  belongs_to :modifier, class_name: "User" #кто изменил
-  
   has_many :boat_type_modifications, dependent: :destroy
   
   has_many :entity_property_values, as: :entity, dependent: :delete_all
@@ -99,10 +96,6 @@ class BoatType < ApplicationRecord
     active.includes(:boat_for_sales)
   end
   
-  def self.admin
-    all
-  end
-  
   def self.active #лодки которые показываются в каталоге
     where(is_deprecated: false, is_active: true)
   end
@@ -189,23 +182,29 @@ class BoatType < ApplicationRecord
     end
   end
   
+  def description(locale='ru')
+    attr_by_locale('description', locale)
+  end
+  
+  def slogan(locale='ru')
+    attr_by_locale('slogan', locale)
+  end
+  
+
   #подготавливает тип лодки для отрисовки React.js, в boat_types/show
-  def hash_view(locale = "ru")
-    {
-      id: self.id,
-      trademark: self.trademark.hash_view,
-      modifications: self.boat_type_modifications.map{|mdf| mdf.hash_view},
-      name: self.catalog_name,
-      description: self.description,
-      photo: self.photos_hash_view(true).first, 
-      parameters: self.property_values(locale), #self.boat_parameters_for_react,
-      photos: self.photos_hash_view,
-      boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
-    }
+  def hash_view(locale = "ru", site = 'shop')
+    case site
+    when 'shop', 'salut', 'realcraft'
+      return default_hash(locale)
+    when 'control'
+      return control_hash
+    else
+      return default_hash(locale)
+    end
   end
   
   def catalog_name #название типа лодки с наименованием производителя, серией и типом корпуса
-    %{#{self.trademark.name}#{%{ #{self.boat_series.name}} if !self.boat_series.nil?} #{self.body_type} #{%{ #{self.name}} if !self.name.blank?}}
+    %{#{self.trademark.name} #{%{ #{self.name}} if !self.name.blank?}}
   #  %{#{self.trademark_name}#{%{ #{self.series_name}} if !self.series_name.nil?} #{self.body_type} #{%{ #{self.name}} if !self.name.blank?}}
   end
   
@@ -249,6 +248,39 @@ class BoatType < ApplicationRecord
     boat_type_modifications.where(is_active: false)
   end
   private
+  
+  def default_hash(locale)
+    {
+      id: self.id,
+      body_type: self.body_type,
+      trademark: self.trademark.hash_view,
+      modifications: self.boat_type_modifications.map{|mdf| mdf.hash_view(locale)},
+      name: self.catalog_name,
+      description: description(locale),
+      slogan: slogan(locale),
+      photo: self.photos_hash_view(true).first, 
+      parameters: self.property_values(locale), #self.boat_parameters_for_react,
+      photos: self.photos_hash_view#,
+      #boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
+    }
+  end
+  
+  def control_hash
+    {
+       id: self.id,
+       name: self.name,
+       trademark_id: self.trademark_id,
+       ru_description: self.ru_description,
+       com_description: self.com_description,
+       ru_slogan: self.ru_slogan,
+       com_slogan: self.com_slogan,
+       design_category: self.design_category,
+       photos: self.entity_photos.to_a.map{|ep| ep.hash_view},
+       ru_properties: self.property_values('ru'),
+       com_properties: self.property_values('ru')
+    }
+  end
+  
   
   #Достаёт свойства по тэгам 
   def get_property_values_by_tags(tags)

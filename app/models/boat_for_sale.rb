@@ -37,7 +37,7 @@ class BoatForSale < Configurator
         title: "Мощность ПМ, л.с.",
         type: "range",
         name: "hp",
-        values: [hps.minimum("entity_property_values.integer_value"), hps.maximum("entity_property_values.integer_value")],
+        values: [hps.minimum("entity_property_values.ru_integer_value"), hps.maximum("entity_property_values.ru_integer_value")],
         default: prms[:hp]
       },
       {

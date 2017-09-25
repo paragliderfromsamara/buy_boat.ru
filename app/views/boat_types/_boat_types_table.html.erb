@@ -21,7 +21,7 @@
             <td><%= boat_type.boat_series.name if !boat_type.boat_series.nil? %></td>
             <td><%= boat_type.body_type %></td>
             <td><%= boat_type.name %></td>
-            <td><%= link_to "<i class = 'fi-pencil'></i>".html_safe, edit_boat_type_path(boat_type), "data-turbolinks"=> false %></td>
+            <td><%= link_to "<i class = 'fi-arrow-right'></i>".html_safe, boat_type_path(boat_type) %></td>
             <td><%= link_to "<i class = 'fi-x'></i>".html_safe, boat_type, method: :delete, data: { confirm: 'Вы уверены, что хотите удалить данный тип лодки?' } %></td>
           </tr>
         <% end %>

@@ -1,10 +1,10 @@
 class BoatTypesController < ApplicationController
   before_action :check_grants, only: [:new, :create, :edit, :update, :destroy, :manage_index]
-  before_action :set_boat_type, only: [:photo, :delete_photo, :photos, :show, :edit, :update, :destroy, :add_configurator_entity]
+  before_action :set_boat_type, only: [:show, :edit, :update, :destroy, :add_configurator_entity]
+  before_action :set_control_options, only: [:new, :manage_index, :show]
 
   def manage_index
-    @boat_types = BoatType.admin
-    @title = @header = "Управление типами лодок"
+
   end
   
   # GET /boat_types
@@ -27,15 +27,9 @@ class BoatTypesController < ApplicationController
   # GET /boat_types/1.json
   def show
     @title = @boat_type.catalog_name
+    @boat_type = @boat_type.hash_view(cur_locale.to_s, current_site)
   end
 
-  def photos
-    @photos = @boat_type.photos
-    respond_to do |format|
-      format.html
-      format.json {render json: @photos}
-    end
-  end
   
   def configurator
     
@@ -43,7 +37,6 @@ class BoatTypesController < ApplicationController
   
   # GET /boat_types/new
   def new
-    @title = @header = "Новый тип лодки"
     @boat_type = BoatType.new
   end
 
@@ -82,11 +75,6 @@ class BoatTypesController < ApplicationController
     end
   end
   
-  # get /boat_types/:boat_type_id/photos/:id
-  def photo
-    @photo = @boat_type.photos.find_by(id: params[:photo_id])
-  end
-  
   # PATCH/PUT /boat_types/1
   # PATCH/PUT /boat_types/1.json
   def update
@@ -119,12 +107,12 @@ class BoatTypesController < ApplicationController
     end 
     # Use callbacks to share common setup or constraints between actions.
     def set_boat_type
-      @boat_type = BoatType.show_page_scope.find(params[:id])
+      @boat_type = BoatType.find(params[:id])
     end
     
     # Never trust parameters from the scary internet, only allow the white list through.
     def boat_type_params
-      params.require(:boat_type).permit(:name, :design_category, :copy_params_table_from_id, :boat_series_id, :body_type, :description, :cnf_data_file_url, :base_cost, :is_deprecated, :is_active, :creator_id, :modifier_id, :trademark_id, entity_property_values_attributes: [:property_type_id, :is_binded, :set_value], photos_attributes:[:link, :uploader_id])
+      params.require(:boat_type).permit(:name, :design_category, :copy_params_table_from_id, :boat_series_id, :body_type, :ru_description, :com_description, :ru_slogan, :com_slogan, :cnf_data_file_url, :base_cost, :is_deprecated, :is_active, :trademark_id, :use_on_ru, :use_on_com, entity_property_values_attributes: [:property_type_id, :is_binded, :set_ru_value, :set_com_value], photos_attributes:[:link, :uploader_id])
     end
     
     def configurator_entities_params
@@ -158,5 +146,14 @@ class BoatTypesController < ApplicationController
         :dis_if_n, 
         :price, 
         :amount])
+    end
+    
+    def set_control_options
+      return unless is_control?
+      @title = "Управление типами лодок"
+      @boat_types = BoatType.all
+      @trademarks = Trademark.all
+      @boat_series = BoatSeries.all
+      @mode = self.action_name
     end
 end

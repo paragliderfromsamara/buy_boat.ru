@@ -41,7 +41,7 @@ class ProductsController < ApplicationController
   private
   
   def check_grants
-    redirect_to "/404" if !is_producer?
+    redirect_to "/404" if !is_producer? and !is_admin? and !is_control?
   end
   
   def set_product
@@ -50,6 +50,6 @@ class ProductsController < ApplicationController
   end
   
   def product_params
-    params.require(:product).permit(:name, :description, :manufacturer, entity_property_values_attributes:[:property_type_id, :is_binded, :set_value, :tag], photos_attributes:[:link, :uploader_id])
+    params.require(:product).permit(:name, :description, :manufacturer, entity_property_values_attributes:[:property_type_id, :is_binded, :set_ru_value, :set_com_value, :tag], photos_attributes:[:link, :uploader_id])
   end
 end

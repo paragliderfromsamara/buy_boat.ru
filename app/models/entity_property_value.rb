@@ -1,12 +1,12 @@
 class EntityPropertyValue < ApplicationRecord
-  attr_accessor :set_value
+  attr_accessor :set_ru_value, :set_com_value
   
   belongs_to :property_type
   belongs_to :entity, polymorphic: true #product или boat_type
   before_validation :select_value_type
   
-  def get_value 
-    return self["#{get_value_type}_value".to_sym] if get_value_type != "option"
+  def get_value(locale='ru') 
+    return self["#{locale}_#{get_value_type}_value".to_sym] if get_value_type != "option"
     #раскоментировать после присоединения к этой таблице типов лодок
     return "-" if property_type.tag.blank? || entity_type != "BoatType"
     ce = entity.configurator_entities.where(boat_option_type_id: BoatOptionType.select(:id).where(tag: property_type.tag))
@@ -25,31 +25,37 @@ class EntityPropertyValue < ApplicationRecord
   private
   
   def select_value_type 
-    self.set_value = "" if set_value.nil?
+    return if get_value_type == 'option'
+    self["ru_#{get_value_type}_value".to_sym] = identify_value 
+    self["com_#{get_value_type}_value".to_sym] = identify_value('com')
+  end
+  
+  def identify_value(locale='ru')
+    set_value = locale == 'com' ? self.set_com_value : self.set_ru_value
     case get_value_type
     when "string"
-      self.string_value = set_value.to_s
+      return set_value.to_s
     when "bool"
       if set_value.class.name == "FalseClass" || set_value.class.name == "TrueClass"
-        self.bool_value = set_value
+        return set_value
       elsif set_value.to_i > 0
-        self.bool_value = true
+        return true
       elsif set_value.class.name == "String"
-        self.bool_value = set_value.index("false").nil? && !set_value.blank? 
+        return set_value.index("false").nil? && !set_value.blank? 
       else
-        self.bool_value = false
+        return false
       end
     when "integer"
       if set_value == false || set_value == true
-        self.integer_value = set_value ? 1 : 0
+        return set_value ? 1 : 0
       else
-        self.integer_value = set_value.to_i
+        return set_value.to_i
       end
     when "float"    
       if set_value == false || set_value == true
-        self.float_value = set_value ? 1.0 : 0.0
+        return set_value ? 1.0 : 0.0
       else
-        self.float_value = set_value.to_f
+        return set_value.to_f
       end
     end
   end

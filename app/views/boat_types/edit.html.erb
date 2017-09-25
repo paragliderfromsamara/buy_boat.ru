@@ -31,7 +31,6 @@
         <div class = "row tb-pad-s">
           <div class="small-12 columns">
               <%= form_for(@boat_type, html: {class: "dropzone"}) do |f| %>
-                  <%= f.hidden_field :modifier_id, value: current_user.id %>
                   <%= f.fields_for :photos_attributes do |ph| %>
                       <%= ph.hidden_field :uploader_id, value: current_user.id %>
                   <%end%>
@@ -183,7 +182,7 @@
                         Нет активных модификаций.
                     </p>
                 <%else%>
-                    <%= render "modifications_table", modifications: @boat_type.active_modifications %>
+                    <%# render "modifications_table", modifications: @boat_type.active_modifications %>
                 <%end%>
                 
             </div>
@@ -194,7 +193,7 @@
                     <h3>
                         Не активные модификации
                     </h3>
-                    <%= render "modifications_table", modifications: @boat_type.not_active_modifications %>
+                    <%#render "modifications_table", modifications: @boat_type.not_active_modifications %>
                 </div>
             </div>
         <%end%>

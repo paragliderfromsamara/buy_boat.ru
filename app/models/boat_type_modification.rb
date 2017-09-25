@@ -14,11 +14,11 @@ class BoatTypeModification < ApplicationRecord
     self.update_attribute(:is_active, f) if self.is_active == !f
   end
   
-  def hash_view
+  def hash_view(locale='ru')
     {
       id: id,
-      name: name,
-      description: description,
+      name: self["#{locale}_name".to_sym],
+      description: self["#{locale}_description".to_sym],
       boat_option_type_id: boat_option_type.id,
       is_active: is_active,
       views: { 

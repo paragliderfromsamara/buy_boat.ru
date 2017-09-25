@@ -11,6 +11,9 @@
                 Значение
             </th>
             <th>
+                Значение (для .com)
+            </th>
+            <th>
                 Используется
             </th>
         </tr>
@@ -20,22 +23,36 @@
             <tr>
                 <td>
                     <%= ep.hidden_field :property_type_id %>
-                    <%= ep.label :set_value, ep.object.property_type.name_and_measure %>
+                    <%= ep.label :set_ru_value, ep.object.property_type.name_and_measure %>
                 </td>
-                <td>
-                    <%if ep.object.property_type.value_type == "integer" %>
-                        <%= ep.number_field :set_value, value: ep.object.get_value %>
-                    <%elsif ep.object.property_type.value_type == "bool" %>
-                        <%= ep.check_box :set_value, value: ep.object.get_value %>
-                    <%elsif ep.object.property_type.value_type == "float" %>
-                        <%= ep.text_field :set_value, placeholder: "0.0", value: ep.object.get_value %>
-                    <%elsif ep.object.property_type.value_type == "option" %>
-                        <p>
-                            <%= ep.object.get_value %>(Определяется набором возможных опций с указанным тэгом)
-                        </p>
-                        <%= ep.hidden_field :set_value, value: ""%>
-                    <%end%>
+                <% if ep.object.property_type.value_type == "option" %>
+                <td colspan=2>
+                    <p>
+                        <%= ep.object.get_value %>(Определяется набором возможных опций с указанным тэгом)
+                    </p>
+                    <%= ep.hidden_field :set_com_value, value: "" %>
                 </td>
+                <% else %>
+                    <td>
+                        <%if ep.object.property_type.value_type == "integer" %>
+                            <%= ep.number_field :set_ru_value, value: ep.object.get_value %>
+                        <%elsif ep.object.property_type.value_type == "bool" %>
+                            <%= ep.check_box :set_ru_value, value: ep.object.get_value %>
+                        <%elsif ep.object.property_type.value_type == "float" %>
+                            <%= ep.text_field :set_ru_value, placeholder: "0.0", value: ep.object.get_value %>
+                        <%end%>
+                    </td>
+                    <td>
+                        <%if ep.object.property_type.value_type == "integer" %>
+                            <%= ep.number_field :set_com_value, value: ep.object.get_value('com') %>
+                        <%elsif ep.object.property_type.value_type == "bool" %>
+                            <%= ep.check_box :set_com_value, value: ep.object.get_value('com') %>
+                        <%elsif ep.object.property_type.value_type == "float" %>
+                            <%= ep.text_field :set_com_value, placeholder: "0.0", value: ep.object.get_value('com') %>
+                        <%end%>
+                    </td>
+
+                <% end %>
                 <td>
                     <%= ep.check_box :is_binded %>
                 </td>

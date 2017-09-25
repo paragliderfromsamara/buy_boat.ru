@@ -11,12 +11,20 @@
 #= require ./general_components
 #= require ./photo_viewer
 
+@XHRErrMsg = (jqXHR)-> #Выдаёт сообщение ошибки при отклике error от сервера. Важно чтобы текст сообщения был указан под меткой :message
+    if jqXHR is undefined then return
+    if jqXHR.responseJSON is undefined then return
+    console.log jqXHR
+    alert if jqXHR.responseJSON.message is undefined then jqXHR.statusText else jqXHR.responseJSON.message 
+
 @GetReqHash = -> 
     window.location.hash
     
 @FoInit = ->
     $(document).foundation()
-
+@AlterText = (text, alter)-> #возвращает альтернативное значение строки 
+    alter = if alter is undefined then '' else alter
+    if text is null || text is undefined then alter else text
 #для выводит мультилокальную строку в виде записи 'ru {com}'
 @MultLocStr = (ru, com)-> "#{ru}#{if com is '' then '' else " {#{com}}"}"
 
@@ -63,6 +71,15 @@
         if l is '"' then s += '\\'
         s+=l
     return s
+
+@GetEntityById = (entities, id)->
+    if entities is undefined
+        entities = []
+        console.log 'Список для GetEntityById пуст'
+    if id is null || id is undefined then return null
+    for e in entities
+        if e.id.toString() is id.toString() then return e
+    return null
 
 @SelOptAmount = (n)->
     if n is undefined then return ''

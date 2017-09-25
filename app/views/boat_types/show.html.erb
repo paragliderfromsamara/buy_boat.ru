@@ -1,5 +1,5 @@
-
-<%= react_component 'BoatTypeShow', { data: @boat_type.hash_view } %>
+<%= react_component 'BoatTypeShow', { data: @boat_type.hash_view(cur_locale) } unless is_control? %>
+<%= render 'control' if is_control? %>
 
 <!--
 
@@ -12,7 +12,7 @@
             </li>
 
             <li class = 'tabs-title '>
-               <a href="#photos" onclick = "getPhotos(<%= @boat_type.id %>);">Фото</a>
+               <a href="#photos" onclick = "getPhotos(<%# @boat_type.id %>);">Фото</a>
             </li>
         </ul>
     </div>

@@ -9,35 +9,69 @@
                       </ul>
                   </div>
                   <div class = "medium-9 columns">
-                      <ul class = 'menu float-right'>
+                      <ul class = "menu dropdown float-right" data-dropdown-menu>
                           <% if could_see_users_list? %>
                               <li>
                                   <%= link_to "Пользователи", users_path %>
                               </li>
                           <%end%>
-                          <%if could_manage_boat_types?%>
+                          <% if could_manage_all_shops?  %>
                               <li>
-                                  <%= link_to "Типы лодок", manage_boat_types_path %>
+                                  <%= link_to "Магазины", manage_shops_path%>
+                              </li>
+                              <li>
+                                 <%= link_to "Скомпанованные лодки", manage_boat_for_sales_path %>
                               </li>
                           <%end%>
-                          <%if could_manage_boat_series?%>
+                          <%if could_manage_boat_parameter_types? || could_manage_boat_types? || could_manage_boat_series? || could_manage_trademarks? %>
+                          <li>
+                              <a href = "#">Управление типами лодок</a>
+                              <ul class = 'menu'>
+                                  <%if could_manage_boat_types?%>
+                                      <li>
+                                          <%= link_to "Типы лодок", manage_boat_types_path %>
+                                      </li>
+                                  <%end%>
+                                  <%if could_manage_boat_series?%>
+                                      <li>
+                                          <%= link_to "Серии лодок", boat_series_index_path %>
+                                      </li>
+                                  <%end%>
+                                  <%if could_manage_trademarks? %>
+                                      <li>
+                                          <%= link_to "Торговые марки", trademarks_path %>
+                                      </li>
+                                  <%end%>
+                                  <%if could_manage_boat_parameter_types?%>
+                                      <li>
+                                          <%= link_to "Характеристики", boat_property_types_path %>
+                                      </li>
+                                  <%end%>
+                                  <%if could_manage_boat_types?%>
+                                      <li>
+                                          <%= link_to "Типы опций", boat_option_types_path %>
+                                      </li>
+                                  <%end%>
+                              </ul>
+                              
+                          </li>
+                          
+                          <%end%>
+                          <li>
+                              <%if is_producer? || is_admin? %>
+                                  <li>
+                                      <%= link_to "Товары", manage_product_types_path %>
+                                  </li>
+                              <%end%>
+                          </li> 
+                          <%if is_producer?%>
                               <li>
-                                  <%= link_to "Серии лодок", boat_series_index_path %>
+                                  <%= link_to "Типы характеристик", property_types_path %>
                               </li>
                           <%end%>
-                          <%if could_manage_trademarks? %>
+                          <%if is_admin?%>
                               <li>
-                                  <%= link_to "Торговые марки", trademarks_path %>
-                              </li>
-                          <%end%>
-                          <%if could_manage_boat_parameter_types?%>
-                              <li>
-                                  <%= link_to "Характеристики", boat_property_types_path %>
-                              </li>
-                          <%end%>
-                          <%if could_manage_boat_types?%>
-                              <li>
-                                  <%= link_to "Типы опций", boat_option_types_path %>
+                                  <%= link_to "Страны", "/add_country" %>
                               </li>
                           <%end%>
                       </ul>
