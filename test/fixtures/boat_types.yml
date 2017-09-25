@@ -1,38 +1,37 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+
+
 one:
   name: MyString
   boat_series: one
   trademark: one
   body_type: "430"
-  description: MyString
+  ru_description: MyString
+  com_description: MyString
   is_deprecated: false
   is_active: true
-  creator: admin
-  modifier: admin
 
 two:
   name: "480"
   boat_series: one
   trademark: one
   body_type: "480"
-  description: MyString
+  ru_description: MyString
+  com_description: MyString
   is_deprecated: false
   is_active: true
-  creator: admin
-  modifier: admin
-
+  
 for_photos:
   id: 1005500
   name: "480"
   boat_series: one
   trademark: one
   body_type: "480"
-  description: MyString
-  is_deprecated: 
-  is_active: 
-  creator: admin
-  modifier: admin
+  ru_description: MyString
+  com_description: MyString
+  is_deprecated: false
+  is_active: true
 
 <% 100.times do |b| %>
 active_boat_<%= b %>:
@@ -40,11 +39,10 @@ active_boat_<%= b %>:
   boat_series: one
   trademark: one
   body_type: MyString
-  description: MyString
+  ru_description: MyString
+  com_description: MyString
   is_deprecated: false 
   is_active: true
-  creator: admin
-  modifier: admin
 <%end%>
 
 <% 100.times do |b| %>
@@ -53,14 +51,8 @@ disabled_boat_<%= b %>:
   boat_series: one
   trademark: one
   body_type: MyString
-  description: MyString
-  base_cost: 1.5
-  min_hp: 1
-  max_hp: 1
-  hull_width: 1.5
-  hull_length: 1.5
+  ru_description: MyString
+  com_description: MyString
   is_deprecated: false 
   is_active: true
-  creator: admin
-  modifier: admin
 <%end%>

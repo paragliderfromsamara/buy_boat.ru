@@ -1,21 +1,21 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  entity_class: MyString
+  entity_type: MyString
   entity_id: 1
   property_type_id: MyString
-  integer_value: 1
-  float_value: 1.5
-  string_value: MyString
-  bool_value: false
+  ru_integer_value: 1
+  ru_float_value: 1.5
+  ru_string_value: MyString
+  ru_bool_value: false
   is_binded: false
 
 two:
-  entity_class: MyString
+  entity_type: MyString
   entity_id: 1
   property_type_id: MyString
-  integer_value: 1
-  float_value: 1.5
-  string_value: MyString
-  bool_value: false
+  ru_integer_value: 1
+  ru_float_value: 1.5
+  ru_string_value: MyString
+  ru_bool_value: false
   is_binded: false

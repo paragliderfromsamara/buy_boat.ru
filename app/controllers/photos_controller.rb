@@ -1,7 +1,8 @@
 class PhotosController < ApplicationController
   before_action :set_photo, only: [:show, :destroy]
   before_action :check_grants, only: [:destroy, :destroy_on_entity, :upload, :update_entity_photo]
-  before_action :set_entity, only: [:destroy_on_entity, :entity_photos, :upload, :update_entity_photo]
+  before_action :set_entity_photo, only: [:update_entity_photo, :destroy_entity_photo]
+  before_action :set_entity, only: [:entity_photos, :upload]
   def show
   end
   
@@ -16,12 +17,18 @@ class PhotosController < ApplicationController
       end
     end
   end
+   
+  def entity_photos
+    photos = @entity.nil? ? [] : @entity.entity_photos.map {|ep| ep.hash_view}
+    render json: photos
+  end
   
-  def update_entity_photo
-    @entity_photo = @entity.entity_photos.find_by(photo_id: params[:id])
+  def update_entity_photo #/entity_photos/:id :PUT
     respond_to do |format|
       if !@entity_photo.nil?
         @entity_photo.update_attributes(entity_photo_params)
+        @entity = @entity_photo.entity
+        @entity.entity_photos.reload
         format.json { render :entity_photos }
       else
         format.json { render json: {message: "Фотография не найдена"}, status: :unprocessable_entity }
@@ -29,19 +36,14 @@ class PhotosController < ApplicationController
     end
   end
   
-  def entity_photos
-    photos = @entity.nil? ? [] : @entity.entity_photos.map {|ep| ep.hash_view}
-    render json: photos
-  end
-  
-  def destroy_on_entity
-    @entity_photo = @entity.entity_photos.find_by(photo_id: params[:id])
+  def destroy_entity_photo # /entity_photos/:id :DELETE
     respond_to do |format|
       if !@entity_photo.nil?
+        @entity = @entity_photo.entity
         @entity_photo.destroy
-        format.json { head :no_content }
+        format.json { render :entity_photos }
       else
-        format.json { render json: {message: "Фотография не найдена"}, status: :unprocessable_entity }
+        format.json { render json: {message: "Фотография не найдена #{params[:id]}"}, status: :unprocessable_entity }
       end
     end
   end
@@ -62,6 +64,10 @@ class PhotosController < ApplicationController
    
   def set_photo
     @photo = Photo.find(params[:photo])
+  end
+  
+  def set_entity_photo
+    @entity_photo = EntityPhoto.find(params[:id])
   end
   
   def set_entity

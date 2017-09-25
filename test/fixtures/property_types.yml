@@ -2,12 +2,12 @@
 
 one:
   ru_name: MyString
-  en_name: MyString
+  com_name: MyString
   ru_measure: MyString
-  en_measure: MyString
+  com_measure: MyString
 
 two:
   ru_name: MyString
-  en_name: MyString
+  com_name: MyString
   ru_measure: MyString
-  en_measure: MyString
+  com_measure: MyString

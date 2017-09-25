@@ -61,8 +61,8 @@ Rails.application.routes.draw do
   resources :photos, only: [:show, :destroy]
   post '/upload_photo/:entity/:entity_id', to: 'photos#upload'
   get "/entity_photos/:entity/:entity_id", to: 'photos#entity_photos'
-  put "/photos/:id/:entity/:entity_id", to: 'photos#update_entity_photo'
-  delete "/photos/:id/:entity/:entity_id", to: "photos#destroy_on_entity" #удаляем ссылки на фотографию от boat_type или product (удаление фотографии)
+  put "/entity_photos/:id", to: 'photos#update_entity_photo'
+  delete "/entity_photos/:id", to: "photos#destroy_entity_photo" #удаляем ссылки на фотографию от boat_type или product (удаление фотографии)
   #end
   get "/test_page", to: "pages#test_page"
   get "/about", to: "pages#about", as: :about

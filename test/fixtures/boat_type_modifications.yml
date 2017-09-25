@@ -3,19 +3,19 @@
 one:
   boat_type_id: 1
   boat_option_type_id: 1
-  name: MyString
-  description: MyString
+  ru_name: MyString
+  ru_description: MyString
   bow_view: MyString
   aft_view: MyString
   top_view: MyString
-  accomodation_view: MyString
+  accomodation_view_1: MyString
 
 two:
   boat_type_id: 1
   boat_option_type_id: 1
-  name: MyString
-  description: MyString
+  ru_name: MyString
+  ru_description: MyString
   bow_view: MyString
   aft_view: MyString
   top_view: MyString
-  accomodation_view: MyString
+  accomodation_view_1: MyString

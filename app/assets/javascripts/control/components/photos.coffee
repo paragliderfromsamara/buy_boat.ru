@@ -2,75 +2,56 @@ photoControlItem = React.createClass
     getInitialState: ->
         is_main: @props.photo.is_main
         is_slider: @props.photo.is_slider
-    isChanged: ->
-        (@props.photo.is_main isnt @state.is_main) or (@props.photo.is_slider isnt @state.is_slider)
     rmvHandle: (e)->
         e.preventDefault()
         toRmv = confirm("Вы действительно хотите удалить фотографию?")
         if toRmv 
             $.ajax 
-                url: "/photos/#{@props.photo.id}/#{@props.entity}/#{@props.entityId}"
+                url: "/entity_photos/#{@props.photo.entity_photo_id}"
                 type: 'DELETE'
                 dataType: 'json'
-                success: (data)=>
-                    @props.removePhoto(@props.photo)
-                error: (jqXHR, textStatus, errorThrown)->
-                    XHRErrMsg(jqXHR)
-    changeInputHandle: (e)->
-        name = e.target.name
-        value = e.target.value
-        @setState "#{ name }": value
-    openEditForm: (e)->
-        e.preventDefault()
-        $("#edit-ph-#{@props.photo.id}").foundation('open')
-    componentDidMount: ->
-        $("#edit-ph-#{@props.photo.id}").foundation()
-        $("#edit-ph-#{@props.photo.id}").on('closed.zf.reveal', ()=> @updEntityPhoto())
-    updEntityPhoto: ->
-        if @isChanged()
-            $.ajax 
-                url: "/photos/#{@props.photo.id}/#{@props.entity}/#{@props.entityId}"
-                type: 'PUT'
-                dataType: 'json'
-                data: {entity_photo: @state}
                 success: (data)=>
                     @props.updPhotosList(data)
                 error: (jqXHR, textStatus, errorThrown)->
                     XHRErrMsg(jqXHR)
-    boatTypeInputs: ->
-        React.DOM.div
-            className: 'row tb-pad-s'
-            React.DOM.div
-                className: 'small-12 medium-6 columns'
-                React.createElement YesNowDropdownList, key: 'is_main', inputName: 'is_main', value: @state.is_main, label: 'Использовать как главное', changeEvent: @changeInputHandle
-            React.DOM.div
-                className: 'small-12 medium-6 columns'
-                React.createElement YesNowDropdownList, key: 'is_slider', inputName: 'is_slider', value: @state.is_slider, label: 'Показывать в слайдере', changeEvent: @changeInputHandle
-    defaultInputs: ->
-        React.DOM.div
-            className: 'row tb-pad-s'
-            React.DOM.div
-                className: 'small-12 medium-6 end columns'
-                React.createElement YesNowDropdownList, key: 'is_main', inputName: 'is_main', value: @state.is_main, label: 'Использовать как главное', changeEvent: @changeInputHandle
-    editForm: ->
-        React.DOM.div
-            className: 'reveal'
-            'data-reveal': true
-            id: "edit-ph-#{@props.photo.id}"
-            React.DOM.img
-                src: @props.photo.medium
-            if @props.entity is 'boat_type' then @boatTypeInputs() else @defaultInputs()
-
+    updEntityPhoto: (attrs)->
+        #if @isChanged()
+        $.ajax 
+            url: "/entity_photos/#{@props.photo.entity_photo_id}"
+            type: 'PUT'
+            dataType: 'json'
+            data: {entity_photo: attrs}
+            success: (data)=>
+                console.log data
+                @props.updPhotosList(data)
+            error: (jqXHR, textStatus, errorThrown)->
+                XHRErrMsg(jqXHR)
+    switchIsMainFlag: (e)->
+        e.preventDefault()
+        attrs = {is_slider: @state.is_slider, is_main: !@state.is_main}
+        @updEntityPhoto(attrs)
+    switchIsSliderFlag: (e)->
+        e.preventDefault()
+        attrs = {is_slider: !@state.is_slider, is_main: @state.is_main}
+        @updEntityPhoto(attrs)
+        
+    mainFlagBadge: ->
+        React.DOM.a
+            onClick: @switchIsMainFlag
+            React.createElement FIconBadge, fig: 'star', color: (if @state.is_main then 'alert' else 'secondary'), title: (if @state.is_main then 'Не использовать как главное' else 'Использовать как главное')
+    sliderFlagBadge: ->
+        React.DOM.a
+            onClick: @switchIsSliderFlag     
+            React.createElement FIconBadge, fig: 'layout', color: (if @state.is_slider then 'success' else 'secondary'), title: (if @state.is_slider then 'Не использовать в слайдере' else 'Использовать в слайдере') 
     render: ->
         React.DOM.div
             className: 'column column-block tb-pad-s'
-            @editForm()
             React.DOM.div
                 style: {width: '100%', height: '100%', position: 'relative'}
                 React.DOM.div
                     style: {width: '100%', position: 'absolute', top: '10px', left: '10px'}
-                    if @props.photo.is_main then React.createElement FIconBadge, fig: 'star', color: 'alert', title: 'Используется как главное'
-                    if @props.photo.is_slider then React.createElement FIconBadge, fig: 'layout', color: 'success', title: 'Используется в слайдере' 
+                    @mainFlagBadge()
+                    if @props.entity is 'boat_type' then @sliderFlagBadge()
                 React.DOM.div
                     style: {width: '100%', position: 'absolute', bottom: '0px'}
                     React.DOM.div
@@ -79,10 +60,6 @@ photoControlItem = React.createClass
                             onClick: @rmvHandle 
                             className: 'button alert tiny'
                             React.createElement IconWithText, fig: 'trash', txt: 'Удалить'
-                        React.DOM.a
-                            onClick: @openEditForm
-                            className: 'button tiny'
-                            React.createElement IconWithText, txt: 'Изменить', fig: 'pencil'
                 React.DOM.img
                     src: @props.photo.small
             
@@ -118,20 +95,17 @@ photoControlItem = React.createClass
             className: 'row'
             React.DOM.div 
                 className: 'small-12 columns'
-                React.DOM.p null, "Нет ни одной фотографии"
-    removePhotoFromList: (photo)->
-        phs = []
-        for ph in @state.photos
-            if ph.id isnt photo.id then phs.push(ph)
-        @setState photos: phs
+                React.DOM.p className: 'tb-pad-s', "Нет ни одной фотографии"
+                
     photosList: ->
         React.DOM.div
             className: 'row small-up-1 medium-up-3 large-up-4 '
             for p in @state.photos
-                React.createElement photoControlItem, key: "photo-#{p.id}", photo: p, removePhoto: @removePhotoFromList, entity: @state.entity, entityId: @state.entityId, updPhotosList: @updPhotosList
+                React.createElement photoControlItem, key: "photo-#{p.entity_photo_id}", photo: p, entity: @state.entity, entityId: @state.entityId, updPhotosList: @updPhotosList
             
-    updPhotosList: (photos)->
-        @setState photos: photos
+    updPhotosList: (phs)->
+        @setState photos: [] 
+        @setState photos: phs
     photoUploader: ->
         React.DOM.div
             className: 'row'

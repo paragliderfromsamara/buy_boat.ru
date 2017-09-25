@@ -27,12 +27,10 @@ class BoatTypeTest < ActiveSupport::TestCase
   test "Должен позволять добавлять новые типы лодки" do
     boat_type = BoatType.new(
                               name: default_string,
-                              description: default_string,
+                              ru_description: default_string,
                               boat_series_id: BoatSeries.first.id,
                               trademark_id: Trademark.first.id,
-                              body_type: "480",
-                              modifier_id: users(:admin).id,
-                              creator_id: users(:admin).id
+                              body_type: "480"
                             )
     assert boat_type.save, "Не удалось добавить новый тип лодки #{boat_type.errors.messages.first}"
   end
