@@ -8,9 +8,33 @@
 #загружаем удаленную форму в reveal контейнер
 
 @YesNoIcon = React.createClass
+    getInitialState: ->
+        tFig: if @props.figs is undefined then 'check' else @props.figs[0] 
+        fFig: if @props.figs is undefined then 'x' else @props.figs[1]
     render: ->
-        React.createElement FIcon, fig: if @props.value then 'check' else 'x'
+        React.createElement FIcon, fig: if @props.value then @state.tFig else @state.fFig
 
+
+@YesNoIconWithText = React.createClass
+    getInitialState: ->
+        tText: if @props.txts is undefined then 'Да' else @props.txts[0]
+        fText: if @props.txts is undefined then 'Нет' else @props.txts[1]
+        tFig: if @props.figs is undefined then 'check' else @props.figs[0] 
+        fFig: if @props.figs is undefined then 'x' else @props.figs[1]
+    val: ->
+        if @props.value
+            {
+                fig: @state.tFig
+                txt: @state.tText
+            }
+        else
+            {
+                fig: @state.fFig
+                txt: @state.fText
+            }
+    render: ->
+        React.createElement IconWithText, @val() 
+        
 @FIcon = React.createClass
     render: ->
         React.DOM.i

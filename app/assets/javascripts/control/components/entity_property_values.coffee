@@ -1,6 +1,143 @@
 #@BoatParameterType = React.createClass
 #    render: ->
 
+boatPropertyValuesManageTableRow = React.createClass
+    value: (locale)->
+        React.DOM.p null,
+            if @props.p.is_binded
+                if @props.p.property_type is 'bool'
+                    React.createElement YesNoIcon, value: @props.p["#{locale}_value"]
+                else
+                    "#{@props.p["#{locale}_value"]}, #{@props.p["#{locale}_measure"]}"
+            else
+                React.createElement FIcon, fig: 'minus', title: 'Не используется'
+    updValueHandle: (e)->
+        console.log @props.p.value_type
+        attr = e.target.name
+        @props.updValListFunc(@props.p.id, attr, e.target.value)
+    editCol: (locale)->
+        if @props.p.value_type is "bool"
+            React.createElement YesNowDropdownList, inputName: "#{locale}_value", value: @props.p["#{locale}_value"], changeEvent: @updValueHandle
+        else
+            React.DOM.input
+                type: if @props.p.value_type is "integer" then "number" else "text"
+                name: "#{locale}_value"
+                onChange: @updValueHandle
+                value: @props.p["#{locale}_value"]
+    bindCol: ->
+        if @props.editMode
+            React.createElement YesNowDropdownList, value: @props.p.is_binded, trueName: 'Используется', falseName: 'Не используется', inputName: 'is_binded', changeEvent: @updValueHandle
+        else
+            React.createElement YesNoIcon, value: @props.p.is_binded, figs: ['link', 'unlink']
+    valCol: (locale)->
+        if @props.editMode && @props.p.value_type && @props.p.is_binded && @props.p.value_type isnt 'option'
+            @editCol(locale)
+        else
+            @value(locale)
+    render: ->
+        React.DOM.tr null,
+            React.DOM.td null,
+                React.DOM.p null, "#{@props.p.ru_name}"
+                React.DOM.p null, "#{@props.p.com_name}"
+            React.DOM.td null, @valCol('ru')
+            React.DOM.td null, @valCol('com')
+            React.DOM.td null, @bindCol()
+                
+                
+@BoatPropertyValuesManageTable = React.createClass
+    getInitialState: ->
+        properties: @props.properties
+        editMode: false
+        onlyBinded: true
+    emptyList: ->
+        React.DOM.p
+            className: 'tb-pad-s'
+            "У данного типа лодки нет ни одного параметра"
+    hasUnbinded: ->
+        for p in @state.properties
+            if !p.is_binded then return true
+        false
+    propertyHash: (p)->
+        {
+            is_binded: p.is_binded
+            property_type_id: p.property_type_id
+            set_com_value: p.com_value
+            set_ru_value: p.ru_value
+        }
+    makePropertyValuesParams: ->
+        val = {}
+        i = 0
+        for p in @state.properties
+            #if !p.is_binded then continue
+            val["#{i}"] = @propertyHash(p)
+            i++
+        {entity_property_values_attributes: val}
+    updateList: (id, attr, val)->
+        
+        vals = @state.properties.slice()
+        vals = vals.map (e)->
+            if id isnt e.id then return e
+            e["#{attr}"] = val
+            return e
+        @setState properties: vals
+    updateVals: (e)->
+        e.preventDefault()
+        $.ajax 
+            url: "/boat_types/#{@props.boatType.id}/property_values"
+            type: 'PUT'
+            dataType: 'JSON'
+            data: {boat_type: @makePropertyValuesParams()}
+            success: (data)=>
+                @setState properties: data
+                @switchEditMode()
+            error: (jqXHR)->
+                XHRErrMsg(jqXHR)
+                
+    switchEditMode: (e)->
+        if e isnt undefined then e.preventDefault()
+        @setState editMode: !@state.editMode
+    switchOnlyBinded: (e)->
+        e.preventDefault()
+        @setState onlyBinded: !@state.onlyBinded
+    notEmptyList: ->
+        React.DOM.div null,
+            React.DOM.div 
+                className: 'row'
+                React.DOM.div 
+                    className: 'small-12 columns'
+                    React.DOM.div
+                        className: 'button-group'
+                        React.DOM.a
+                            className: 'button'
+                            onClick: if !@state.editMode then @switchEditMode else @updateVals
+                            React.createElement YesNoIconWithText, txts: ['Изменить', 'Сохранить'], figs: ['pencil', 'save'], value: !@state.editMode 
+                        if @hasUnbinded()
+                            React.DOM.a
+                                className: 'button secondary'
+                                onClick: @switchOnlyBinded
+                                React.createElement YesNoIconWithText, txts: ['Показать только используемые', 'Показать все'], figs: ['link', 'unlink'], value: !@state.onlyBinded
+            React.DOM.table null,
+                React.DOM.thead null,
+                    React.DOM.tr null,
+                        React.DOM.th null, "Параметр"
+                        React.DOM.th null, "Значение, мера (рус.)"
+                        React.DOM.th null, "Значение, мера (анг.)"
+                        React.DOM.th null, "Используется"
+                React.DOM.tbody null,
+                    for p in @state.properties
+                        if !p.is_binded && @state.onlyBinded then continue
+                        React.createElement boatPropertyValuesManageTableRow, key: "pv-#{p.id}", p: p, editMode: @state.editMode, updValListFunc: @updateList
+                    
+    render: ->
+        React.DOM.div
+            className: 'row'
+            React.DOM.div
+                className: 'small-12 columns'
+                if @state.properties.length is 0 then @emptyList() else @notEmptyList()
+                
+
+#------- все что ниже, можно удалить-----------------
+
 @BoatParameterValueRow = React.createClass
     valueCol: ->
         if @props.val.is_binded
@@ -44,10 +181,6 @@
                    else
                        for val in @state.vals
                           if val.is_binded then React.createElement(BoatParameterValueRow, key: numb++, val: val, number: numb)
-
-
-
-
 
 
 @BoatParameterValueRowEditable = React.createClass

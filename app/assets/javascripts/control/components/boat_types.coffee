@@ -218,7 +218,7 @@ NewBoatTypeForm = React.createClass
         React.DOM.div null,
             React.createElement BoatMainInfo, boat_type: @state.boat_type, boat_series: @state.boat_series, trademarks: @state.trademarks
             React.createElement BoatTypePhotos, boat_type: @state.boat_type, form_token: @props.form_token
-
+            React.createElement BoatTypeProperties, properties: @state.boat_type.properties, boat_type: @state.boat_type
 @BoatMainInfo = React.createClass
     getInitialState: ->
         use_on_ru: @props.boat_type.use_on_ru
@@ -465,4 +465,17 @@ NewBoatTypeForm = React.createClass
                     className: 'small-12 columns'
                     React.DOM.h3 null, 'Фотографии'
             React.createElement PhotosControl, photos: @state.photos, entity: 'boat_type', entity_id: @state.boatType.id, form_token: @props.form_token
-                    
+
+@BoatTypeProperties = React.createClass
+    getInitialState: ->
+        boatType: @props.boat_type
+        properties: if @props.properties is undefined then [] else @props.properties    
+    render: ->
+        React.DOM.div null,
+            React.DOM.div 
+                className: 'row'
+                React.DOM.div
+                    className: 'small-12 columns'
+                    React.DOM.h3 null, 'Технические характеристики'
+            React.createElement BoatPropertyValuesManageTable, properties: @state.properties, boatType: @state.boatType 
+    

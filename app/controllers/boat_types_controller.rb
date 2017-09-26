@@ -1,6 +1,6 @@
 class BoatTypesController < ApplicationController
-  before_action :check_grants, only: [:new, :create, :edit, :update, :destroy, :manage_index]
-  before_action :set_boat_type, only: [:show, :edit, :update, :destroy, :add_configurator_entity]
+  before_action :check_grants, only: [:new, :create, :edit, :update, :destroy, :manage_index, :update_property_values]
+  before_action :set_boat_type, only: [:show, :edit, :update, :destroy, :add_configurator_entity, :update_property_values, :property_values]
   before_action :set_control_options, only: [:new, :manage_index, :show]
 
   def manage_index
@@ -27,7 +27,7 @@ class BoatTypesController < ApplicationController
   # GET /boat_types/1.json
   def show
     @title = @boat_type.catalog_name
-    @boat_type = @boat_type.hash_view(cur_locale.to_s, current_site)
+    @boat_type = @boat_type.hash_view(current_site, cur_locale.to_s)
   end
 
   
@@ -88,7 +88,22 @@ class BoatTypesController < ApplicationController
       end
     end
   end
-
+  
+  def property_values
+      render json: @boat_type.property_values_hash(cur_locale.to_s) if !is_control?
+      render json: @boat_type.property_values_hash if is_control?
+  end
+  
+  # PATCH/PUT /boat_types/1/property_values
+  def update_property_values
+    respond_to do |format|
+      if @boat_type.update(boat_properties_params)
+        format.json {render json: @boat_type.property_values_hash}
+      else
+        format.json {render json: {message: 'Не удалось обновить таблицу характеристик'}, status: :unprocessable_entity }
+      end
+    end
+  end
   # DELETE /boat_types/1
   # DELETE /boat_types/1.json
   def destroy
@@ -99,8 +114,6 @@ class BoatTypesController < ApplicationController
     end
   end
 
-
-  
   private
     def check_grants
       redirect_to "/404" if !could_manage_boat_types?
@@ -112,7 +125,11 @@ class BoatTypesController < ApplicationController
     
     # Never trust parameters from the scary internet, only allow the white list through.
     def boat_type_params
-      params.require(:boat_type).permit(:name, :design_category, :copy_params_table_from_id, :boat_series_id, :body_type, :ru_description, :com_description, :ru_slogan, :com_slogan, :cnf_data_file_url, :base_cost, :is_deprecated, :is_active, :trademark_id, :use_on_ru, :use_on_com, entity_property_values_attributes: [:property_type_id, :is_binded, :set_ru_value, :set_com_value], photos_attributes:[:link, :uploader_id])
+      params.require(:boat_type).permit(:name, :design_category, :copy_params_table_from_id, :boat_series_id, :body_type, :ru_description, :com_description, :ru_slogan, :com_slogan, :cnf_data_file_url, :base_cost, :is_deprecated, :is_active, :trademark_id, :use_on_ru, :use_on_com, entity_property_values_attributes: [:property_type_id, :is_binded, :set_ru_value, :set_com_value])
+    end
+    
+    def boat_properties_params
+      params.require(:boat_type).permit(entity_property_values_attributes: [:property_type_id, :is_binded, :set_ru_value, :set_com_value])
     end
     
     def configurator_entities_params

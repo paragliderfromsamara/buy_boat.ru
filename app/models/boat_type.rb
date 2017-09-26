@@ -14,11 +14,7 @@ class BoatType < ApplicationRecord
   belongs_to :boat_series, optional: true, validate: false
   belongs_to :trademark
   
-  
   has_many :boat_for_sales, dependent: :destroy
-  
-  
-  accepts_nested_attributes_for :photos
   
   has_many :configurator_entities, dependent: :destroy
   accepts_nested_attributes_for :configurator_entities
@@ -45,20 +41,14 @@ class BoatType < ApplicationRecord
                                                     ).order("boat_property_types.order_number ASC")
   end
   
-  def property_values(locale = "ru") 
-    entity_property_values.includes(property_type: :boat_property_type).order("boat_property_types.order_number ASC").to_a.map {|epv| {
-      id: epv.id,
-      property_type_id: epv.property_type_id,
-      name: epv.property_type["#{locale}_name".to_sym],
-      short_name: epv.property_type["#{locale}_short_name".to_sym],
-      measure: epv.property_type["#{locale}_measure".to_sym],
-      value: epv.get_value,
-      is_binded: epv.is_binded, 
-      order_number: epv.property_type.boat_property_type.nil? ? 0 : epv.property_type.boat_property_type.order_number
-     }
-    }
+  def property_values(locale = nil)
+    #вытаскивает список характеристик типа лодки
+    EntityPropertyValue.boat_type_property_values(self, locale)
   end
   
+  def property_values_hash(locale = nil)
+    EntityPropertyValue.boat_type_property_values_hash(self, locale)
+  end
 
   
   def length
@@ -192,9 +182,10 @@ class BoatType < ApplicationRecord
   
 
   #подготавливает тип лодки для отрисовки React.js, в boat_types/show
-  def hash_view(locale = "ru", site = 'shop')
+  def hash_view(site = 'shop', locale = nil)
     case site
     when 'shop', 'salut', 'realcraft'
+      locale = 'ru' if locale.nil?
       return default_hash(locale)
     when 'control'
       return control_hash
@@ -259,7 +250,7 @@ class BoatType < ApplicationRecord
       description: description(locale),
       slogan: slogan(locale),
       photo: self.photos_hash_view(true).first, 
-      parameters: self.property_values(locale), #self.boat_parameters_for_react,
+      properties: self.property_values_hash(locale),
       photos: self.photos_hash_view#,
       #boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
     }
@@ -275,12 +266,10 @@ class BoatType < ApplicationRecord
        ru_slogan: self.ru_slogan,
        com_slogan: self.com_slogan,
        design_category: self.design_category,
-       photos: self.entity_photos.to_a.map{|ep| ep.hash_view},
-       ru_properties: self.property_values('ru'),
-       com_properties: self.property_values('ru')
+       photos: self.entity_photos.includes(:photo).to_a.map{|ep| ep.hash_view},
+       properties: self.property_values_hash
     }
   end
-  
   
   #Достаёт свойства по тэгам 
   def get_property_values_by_tags(tags)
@@ -329,6 +318,7 @@ class BoatType < ApplicationRecord
     "boatOptions_#{self.id}.js"
   end
   
+
   
 
 end

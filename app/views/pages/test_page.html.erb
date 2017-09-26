@@ -1,4 +1,10 @@
-<%shop = Shop.find(1)%>
-<br />
-<%= shop.name %>
-<%= shop.products(98).to_a.map {|s_product| {id: s_product.id, name: s_product.product.full_name, amount: s_product.amount, properties: s_product.product.prop_vals_for_shop, photos: s_product.product.photos.map{|ph| ph.hash_view}}} %>
+<% 
+    boat_type = BoatType.find(4)
+    values = boat_type.hash_view('shop')[:properties]
+
+
+ %>
+ 'INNER JOIN property_types ON entity_property_values.property_type_id = property_types.id'
+ <% values.each do |v| %>
+     <p><%= v[:name] %><%= v[:value] %></p>
+<% end %> 

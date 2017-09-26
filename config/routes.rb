@@ -95,6 +95,8 @@ Rails.application.routes.draw do
   get "/manage_boat_types", to: "boat_types#manage_index", as: :manage_boat_types
   get '/boat_types/:id/photos', to: "boat_types#photos", as: :boat_photos
   get '/boat_types/:id/photos/:photo_id', to: "boat_types#photo", as: :boat_photo
+  get '/boat_types/:id/property_values', to: 'boat_types#property_values'
+  put '/boat_types/:id/property_values', to: 'boat_types#update_property_values'
   resources :users
   
   resources :boat_property_types, only: [:index, :create] 
