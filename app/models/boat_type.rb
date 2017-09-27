@@ -1,8 +1,12 @@
 class BoatType < ApplicationRecord
   attr_accessor :copy_params_table_from_id
+    
   after_create :make_boat_parameter_values
   
-  has_many :boat_type_modifications, dependent: :destroy
+  #связи для отношения boat_type <- modifications  
+  has_many :modifications, class_name: 'BoatType', foreign_key: 'boat_type_id', dependent: :destroy
+  belongs_to :boat_type, class_name: 'BoatType', validate: false, optional: true
+  #связи для отношения boat_type <- modifications  end
   
   has_many :entity_property_values, as: :entity, dependent: :delete_all
   accepts_nested_attributes_for :entity_property_values
@@ -18,6 +22,13 @@ class BoatType < ApplicationRecord
   
   has_many :configurator_entities, dependent: :destroy
   accepts_nested_attributes_for :configurator_entities
+
+  mount_uploader :aft_view, ModificationViewsUploader
+  mount_uploader :bow_view, ModificationViewsUploader
+  mount_uploader :top_view, ModificationViewsUploader
+  mount_uploader :accomodation_view_1, ModificationViewsUploader
+  mount_uploader :accomodation_view_2, ModificationViewsUploader
+  mount_uploader :accomodation_view_3, ModificationViewsUploader
 
   def self.on_tm_site_boats(site_tag) # выдает список лодок, в соответстивии с сайтом производителя
     tm = Trademark.find_by(site_tag: site_tag)
@@ -67,16 +78,7 @@ class BoatType < ApplicationRecord
     end 
     return {max: max, min: min}
   end
-  
-  def alter_photo
-    photos.first
-  end
-  
-  #Перенесено в ApplicationRecord
-  #def photos_hash_view(is_wide=false)
-  #  return "" if photos.blank?
-  #  photos.map {|ph| ph.hash_view(is_wide)}
-  #end
+
   
   def self.show_page_scope
     joins(:trademark).includes(:photos)#.active
@@ -132,7 +134,7 @@ class BoatType < ApplicationRecord
       end  
       self.configurator_entities.create(attrs.values)
       self.reload
-      self.check_modifications #ищем в загруженном файле стандарты и вносим их в список модификаций
+      #self.check_modifications #ищем в загруженном файле стандарты и вносим их в список модификаций
       #attrs.each {|a| self.configurator_entities.create(attrs.values)}
       #attrs.each {|ph| self.photos.create(link: ph[:link], uploader_id: self.modifier_id)}
     end
@@ -194,6 +196,10 @@ class BoatType < ApplicationRecord
     end
   end
   
+  def is_modification?
+    !boat_type_id.nil?
+  end
+  
   def catalog_name #название типа лодки с наименованием производителя, серией и типом корпуса
     %{#{self.trademark.name} #{%{ #{self.name}} if !self.name.blank?}}
   #  %{#{self.trademark_name}#{%{ #{self.series_name}} if !self.series_name.nil?} #{self.body_type} #{%{ #{self.name}} if !self.name.blank?}}
@@ -232,28 +238,70 @@ class BoatType < ApplicationRecord
   end
   
   def active_modifications
-    boat_type_modifications.where(is_active: true)
+    modifications.where(is_active: true)
   end
   
   def not_active_modifications
-    boat_type_modifications.where(is_active: false)
+    modifications.where(is_active: false)
   end
+  
+  #Ищет основное фото на сущности
+  def main_photo
+    if is_modification? 
+      ph = EntityPhoto.main_photo(self)
+      return ph.nil? ? EntityPhoto.main_photo(boat_type) : ph
+    else
+      EntityPhoto.main_photo(self)
+    end
+  end
+  
+  #Ищет основное фото на сущности и возвращает в виде хэша
+  def main_photo_hash_view
+    ph = main_photo
+    return nil if ph.nil? 
+    ph.hash_view  
+  end
+  
+  #Перенесено в ApplicationRecord
+  #def photos_hash_view(is_wide=false)
+  #  return "" if photos.blank?
+  #  photos.map {|ph| ph.hash_view(is_wide)}
+  #end
+  
   private
   
+
+  
   def default_hash(locale)
+    if is_modification?
     {
       id: self.id,
-      body_type: self.body_type,
-      trademark: self.trademark.hash_view,
-      modifications: self.boat_type_modifications.map{|mdf| mdf.hash_view(locale)},
-      name: self.catalog_name,
-      description: description(locale),
-      slogan: slogan(locale),
-      photo: self.photos_hash_view(true).first, 
+      name: boat_type.name,
+      description: boat_type.description(locale),
+      slogan: boat_type.slogan(locale),
+      body_type: self.boat_type.body_type,
+      modification_name: name,
+      modification_description: description(locale),
+      photo: main_photo_hash_view, 
       properties: self.property_values_hash(locale),
       photos: self.photos_hash_view#,
       #boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
     }
+    else
+      {
+        id: self.id,
+        body_type: self.body_type,
+        trademark: self.trademark.hash_view,
+        modifications: self.modifications.map{|mdf| mdf.default_hash(locale)},
+        name: self.catalog_name,
+        description: description(locale),
+        slogan: slogan(locale),
+        photo: main_photo_hash_view, 
+        properties: self.property_values_hash(locale),
+        photos: self.photos_hash_view#,
+        #boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
+      }
+    end
   end
   
   def control_hash
@@ -262,9 +310,9 @@ class BoatType < ApplicationRecord
        name: self.name,
        trademark_id: self.trademark_id,
        ru_description: self.ru_description,
-       com_description: self.com_description,
+       en_description: self.en_description,
        ru_slogan: self.ru_slogan,
-       com_slogan: self.com_slogan,
+       en_slogan: self.en_slogan,
        design_category: self.design_category,
        photos: self.entity_photos.includes(:photo).to_a.map{|ep| ep.hash_view},
        properties: self.property_values_hash
@@ -278,10 +326,11 @@ class BoatType < ApplicationRecord
   
   #Добавляет новые модификации по ключам таблицы boat_option_type
   def add_modifications_by_option_type_ids(option_type_ids)
-    o_types = BoatOptionType.where(id: option_type_ids)
-    mdfs = []
-    o_types.each{|t| mdfs.push({boat_option_type_id: t.id, ru_name: t.name, ru_description: t.description}) }
-    self.boat_type_modifications.create(mdfs)
+    return
+    #o_types = BoatOptionType.where(id: option_type_ids)
+    #mdfs = []
+    #o_types.each{|t| mdfs.push({boat_option_type_id: t.id, ru_name: t.name, ru_description: t.description}) }
+    #self.boat_type_modifications.create(mdfs)
   end
   
   def make_boat_parameter_values #создаёт таблицу значений параметров лодки 
@@ -297,15 +346,16 @@ class BoatType < ApplicationRecord
   def clone_parameter_values(input_vals)
     vals = []
     input_vals.each do |v|
-      vals[vals.length] = {set_value: v.get_value, property_type_id: v.property_type_id, is_binded: v.is_binded}
+      vals[vals.length] = {set_en_value: v.get_value('en'), set_ru_value: v.get_value('ru'), property_type_id: v.property_type_id, is_binded: v.is_binded}
     end
     make_clear_parameter_values if vals.blank?          #если список не сформировался - хуярим пустой список
     entity_property_values.create(vals) if !vals.blank?  #если список сформировался - создаем
   end
+  
   def make_clear_parameter_values #создает новую таблицу параметров
     vals = []
     PropertyType.where(id: BoatPropertyType.all.pluck(:property_type_id)).each do |t|
-      vals[vals.length] = {set_value: t.default_value, property_type_id: t.id, is_binded: true}
+      vals[vals.length] = {set_en_value: t.default_value, set_ru_value: t.default_value, property_type_id: t.id, is_binded: true}
     end
     entity_property_values.create vals
   end

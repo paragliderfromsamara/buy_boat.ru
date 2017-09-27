@@ -125,11 +125,11 @@ class BoatTypesController < ApplicationController
     
     # Never trust parameters from the scary internet, only allow the white list through.
     def boat_type_params
-      params.require(:boat_type).permit(:name, :design_category, :copy_params_table_from_id, :boat_series_id, :body_type, :ru_description, :com_description, :ru_slogan, :com_slogan, :cnf_data_file_url, :base_cost, :is_deprecated, :is_active, :trademark_id, :use_on_ru, :use_on_com, entity_property_values_attributes: [:property_type_id, :is_binded, :set_ru_value, :set_com_value])
+      params.require(:boat_type).permit(:name, :design_category, :copy_params_table_from_id, :boat_series_id, :body_type, :ru_description, :en_description, :ru_slogan, :en_slogan, :cnf_data_file_url, :base_cost, :is_deprecated, :is_active, :trademark_id, :use_on_ru, :use_on_en)
     end
     
     def boat_properties_params
-      params.require(:boat_type).permit(entity_property_values_attributes: [:property_type_id, :is_binded, :set_ru_value, :set_com_value])
+      params.require(:boat_type).permit(entity_property_values_attributes: [:property_type_id, :is_binded, :set_ru_value, :set_en_value])
     end
     
     def configurator_entities_params

@@ -20,7 +20,7 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 {
-  en:
+  com:
     {
       download_brochure: "download brochure",
       technical_information: "TECHNICAL INFORMATION",

@@ -38,7 +38,7 @@ class PropertyTypesController < ApplicationController
   private
   
   def check_grants
-    redirect_to "/404" if !is_producer?
+    redirect_to "/404" if !is_producer? && !is_admin?
   end  
   
   def property_type_attr

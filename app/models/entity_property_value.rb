@@ -1,5 +1,5 @@
 class EntityPropertyValue < ApplicationRecord
-  attr_accessor :set_ru_value, :set_com_value
+  attr_accessor :set_ru_value, :set_en_value
   
   belongs_to :property_type
   belongs_to :entity, polymorphic: true #product или boat_type
@@ -16,17 +16,11 @@ class EntityPropertyValue < ApplicationRecord
                        property_types.tag AS tag,
                        property_types.value_type AS value_type,
                        boat_property_types.order_number AS order_number,
-                       property_types.ru_name AS ru_name,
-                       property_types.ru_short_name AS ru_short_name,
-                       property_types.ru_measure AS ru_measure,
-                       property_types.com_name AS com_name,
-                       property_types.com_short_name AS com_short_name,
-                       property_types.com_measure AS com_measure,
                        entity_property_values.is_binded AS is_binded,
                        entity_property_values.entity_type AS entity_type,
                        entity_property_values.entity_id AS entity_id,
                        #{EntityPropertyValue.select_values_string_by_locale('ru')},
-                       #{EntityPropertyValue.select_values_string_by_locale('com')}
+                       #{EntityPropertyValue.select_values_string_by_locale('en')}
                       "
      if !locale.nil?
        return entity.entity_property_values.joins(property_type: [:boat_property_type]).select(select_query).order("boat_property_types.order_number ASC").where(is_binded: true) 
@@ -37,6 +31,9 @@ class EntityPropertyValue < ApplicationRecord
   
   def self.select_values_string_by_locale(locale) #используется для извлечения из БД параметров в BoatType.property_values()
     "
+     property_types.#{locale}_name AS #{locale}_name,
+     property_types.#{locale}_short_name AS #{locale}_short_name,
+     property_types.#{locale}_measure AS #{locale}_measure,
      entity_property_values.#{locale}_integer_value AS #{locale}_integer_value,
      entity_property_values.#{locale}_float_value AS #{locale}_float_value,
      entity_property_values.#{locale}_string_value AS #{locale}_string_value,
@@ -60,10 +57,10 @@ class EntityPropertyValue < ApplicationRecord
         ru_short_name: self.ru_short_name,
         ru_measure: self.ru_measure,
         ru_value: self.get_value('ru'),
-        com_name: self.com_name,
-        com_short_name: self.com_short_name,
-        com_measure: self.com_measure,
-        com_value: self.get_value('com'),
+        en_name: self.en_name,
+        en_short_name: self.en_short_name,
+        en_measure: self.en_measure,
+        en_value: self.get_value('en'),
         is_binded: self.is_binded,
         value_type: self.value_type,
         property_type_id: self.property_type_id
@@ -97,11 +94,11 @@ class EntityPropertyValue < ApplicationRecord
   def select_value_type 
     return if get_value_type == 'option'
     self["ru_#{get_value_type}_value".to_sym] = identify_value 
-    self["com_#{get_value_type}_value".to_sym] = identify_value('com')
+    self["en_#{get_value_type}_value".to_sym] = identify_value('en')
   end
   
   def identify_value(locale='ru')
-    set_value = locale == 'com' ? self.set_com_value : self.set_ru_value
+    set_value = locale == 'en' ? self.set_en_value : self.set_ru_value
     case get_value_type
     when "string"
       return set_value.to_s

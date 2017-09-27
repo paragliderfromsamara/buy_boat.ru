@@ -25,8 +25,8 @@
 @AlterText = (text, alter)-> #возвращает альтернативное значение строки 
     alter = if alter is undefined then '' else alter
     if text is null || text is undefined then alter else text
-#для выводит мультилокальную строку в виде записи 'ru {com}'
-@MultLocStr = (ru, com)-> "#{ru}#{if com is '' then '' else " {#{com}}"}"
+#для выводит мультилокальную строку в виде записи 'ru {en}'
+@MultLocStr = (ru, en)-> "#{ru}#{if en is '' then '' else " {#{en}}"}"
 
 #Обрезает текст t по длине l
 @TrimText = (t, l)->

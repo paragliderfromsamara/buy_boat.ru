@@ -47,18 +47,18 @@ class PropertyType < ApplicationRecord
     #return true if name.blank?
     if !self.name.nil?
       _name = self.split_by_locale(self.name)
-      self.com_name = _name[:com]
+      self.en_name = _name[:en]
       self.ru_name = _name[:ru]
     end  
     if !self.short_name.nil?
       _short_name = self.split_by_locale(self.short_name)
-      self.com_short_name = _short_name[:com]
+      self.en_short_name = _short_name[:en]
       self.ru_short_name = _short_name[:ru]
       #return true if description.blank?
     end  
     if !self.measure.nil?
       _measure = self.split_by_locale(self.measure)
-      self.com_measure = _measure[:com]
+      self.en_measure = _measure[:en]
       self.ru_measure = _measure[:ru]
       #return true if description.blank?
     end  

@@ -134,17 +134,17 @@ PropTypesRow = React.createClass
                 React.DOM.td null, 
                     React.DOM.input
                         type: "text"
-                        defaultValue: MultLocStr(@props.pt.ru_name, @props.pt.com_name)
+                        defaultValue: MultLocStr(@props.pt.ru_name, @props.pt.en_name)
                         ref: "name"
                 React.DOM.td null,
                      React.DOM.input
                          type: "text"
-                         defaultValue: MultLocStr(@props.pt.ru_short_name, @props.pt.com_short_name)
+                         defaultValue: MultLocStr(@props.pt.ru_short_name, @props.pt.en_short_name)
                          ref: "short_name"
                 React.DOM.td null,
                      React.DOM.input
                          type: "text"
-                         defaultValue: MultLocStr(@props.pt.ru_measure, @props.pt.com_measure)
+                         defaultValue: MultLocStr(@props.pt.ru_measure, @props.pt.en_measure)
                          ref: "measure"
                 React.DOM.td null,
                      React.DOM.input
@@ -163,9 +163,9 @@ PropTypesRow = React.createClass
                         React.createElement FIcon, fig: "x"
         else
             React.DOM.tr null,
-                React.DOM.td null, MultLocStr(@props.pt.ru_name, @props.pt.com_name)
-                React.DOM.td null, MultLocStr(@props.pt.ru_short_name, @props.pt.com_short_name)
-                React.DOM.td null, MultLocStr(@props.pt.ru_measure, @props.pt.com_measure)
+                React.DOM.td null, MultLocStr(@props.pt.ru_name, @props.pt.en_name)
+                React.DOM.td null, MultLocStr(@props.pt.ru_short_name, @props.pt.en_short_name)
+                React.DOM.td null, MultLocStr(@props.pt.ru_measure, @props.pt.en_measure)
                 React.DOM.td null, "#{@props.pt.tag}"
                 React.DOM.td null, "#{@props.pt.value_type}"
                 React.DOM.td null, 

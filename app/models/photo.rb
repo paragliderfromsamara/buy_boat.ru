@@ -4,7 +4,7 @@ class Photo < ApplicationRecord
   before_save :makeNewFileName
   mount_uploader :link, PhotoUploader
   
-  def hash_view(is_wide=false)
+  def hash_view
         {
           id: self.id,
           wide_small: link.wide_small.url,

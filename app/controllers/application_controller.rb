@@ -11,9 +11,8 @@ class ApplicationController < ActionController::Base
   
   
   def set_site
-    if is_realcraft?
-      set_locale
-    elsif is_control?
+    set_locale
+    if is_control?
       redirect_to signin_path if !is_admin? and !is_producer? and !is_manager? and self.controller_name != 'sessions' #перенаправляем на страницу входа если вход в режим админ меню
     end
   end

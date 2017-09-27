@@ -9,6 +9,17 @@ class EntityPhoto < ApplicationRecord
     order('id DESC')
   end
   
+  #Выбирает главную фотографию из списка
+  def self.main_photo(entity)
+    return nil if entity.entity_photos.blank?
+    ph = entity.entity_photos.find_by(is_main: true)
+    if ph.nil?
+      entity.entity_photos.first.photo
+    else
+      ph.photo
+    end
+  end
+  
   def hash_view
     ph = self.photo.hash_view
     ph[:entity_photo_id] = self.id

@@ -5,14 +5,13 @@ boatPropertyValuesManageTableRow = React.createClass
     value: (locale)->
         React.DOM.p null,
             if @props.p.is_binded
-                if @props.p.property_type is 'bool'
+                if @props.p.value_type is 'bool'
                     React.createElement YesNoIcon, value: @props.p["#{locale}_value"]
                 else
                     "#{@props.p["#{locale}_value"]}, #{@props.p["#{locale}_measure"]}"
             else
                 React.createElement FIcon, fig: 'minus', title: 'Не используется'
     updValueHandle: (e)->
-        console.log @props.p.value_type
         attr = e.target.name
         @props.updValListFunc(@props.p.id, attr, e.target.value)
     editCol: (locale)->
@@ -38,9 +37,9 @@ boatPropertyValuesManageTableRow = React.createClass
         React.DOM.tr null,
             React.DOM.td null,
                 React.DOM.p null, "#{@props.p.ru_name}"
-                React.DOM.p null, "#{@props.p.com_name}"
+                React.DOM.p null, "#{@props.p.en_name}"
             React.DOM.td null, @valCol('ru')
-            React.DOM.td null, @valCol('com')
+            React.DOM.td null, @valCol('en')
             React.DOM.td null, @bindCol()
                 
                 
@@ -61,7 +60,7 @@ boatPropertyValuesManageTableRow = React.createClass
         {
             is_binded: p.is_binded
             property_type_id: p.property_type_id
-            set_com_value: p.com_value
+            set_en_value: p.en_value
             set_ru_value: p.ru_value
         }
     makePropertyValuesParams: ->

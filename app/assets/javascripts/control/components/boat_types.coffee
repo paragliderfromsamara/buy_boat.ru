@@ -285,9 +285,9 @@ NewBoatTypeForm = React.createClass
                     React.DOM.td width: '30%', 'Использовать для русской версии'
                     React.DOM.td null, React.createElement YesNoIcon, value: @state.use_on_ru
                 React.DOM.tr
-                    key: 'use_on_com',
+                    key: 'use_on_en',
                     React.DOM.td null, 'Использовать для английской версии'
-                    React.DOM.td null, React.createElement YesNoIcon, value: @state.use_on_com
+                    React.DOM.td null, React.createElement YesNoIcon, value: @state.use_on_en
                 React.DOM.tr
                     key: 'is_active_row',
                     React.DOM.td null, 'Активность'
@@ -319,7 +319,7 @@ NewBoatTypeForm = React.createClass
                         React.DOM.h6 null, 'На русском'
                         React.DOM.p null, if $.trim(@state.ru_slogan) is '' then 'Не указан' else @state.ru_slogan
                         React.DOM.h6 null, 'На английском'
-                        React.DOM.p null, if $.trim(@state.com_slogan) is '' then 'Не указан' else @state.com_slogan
+                        React.DOM.p null, if $.trim(@state.en_slogan) is '' then 'Не указан' else @state.en_slogan
                 React.DOM.tr
                     key: 'description_row'
                     React.DOM.td null, 'Описание'
@@ -327,7 +327,7 @@ NewBoatTypeForm = React.createClass
                         React.DOM.h6 null, 'На русском'
                         React.DOM.p null, if $.trim(@state.ru_description) is '' then 'Не указано' else @state.ru_description
                         React.DOM.h6 null, 'На английском'
-                        React.DOM.p null, if $.trim(@state.com_description) is '' then 'Не указано' else @state.com_description
+                        React.DOM.p null, if $.trim(@state.en_description) is '' then 'Не указано' else @state.en_description
     changeInputHandle: (e)->
         name = e.target.name
         value = e.target.value
@@ -350,9 +350,9 @@ NewBoatTypeForm = React.createClass
                         React.DOM.td width: '30%', 'Использовать для русской версии'
                         React.DOM.td null, React.createElement YesNowDropdownList, key: 'use_on_ru_cb', inputName: 'use_on_ru', value: @state.use_on_ru, changeEvent: @changeInputHandle
                     React.DOM.tr
-                        key: 'use_on_com',
+                        key: 'use_on_en',
                         React.DOM.td null, 'Использовать для английской версии'
-                        React.DOM.td null, React.createElement YesNowDropdownList, key: 'use_on_com_cb', inputName: 'use_on_com', value: @state.use_on_com, changeEvent: @changeInputHandle
+                        React.DOM.td null, React.createElement YesNowDropdownList, key: 'use_on_en_cb', inputName: 'use_on_en', value: @state.use_on_en, changeEvent: @changeInputHandle
                     React.DOM.tr
                         key: 'is_active_row',
                         React.DOM.td null, 'Активен'
@@ -398,13 +398,13 @@ NewBoatTypeForm = React.createClass
                                 name: 'ru_slogan'
                                 onChange: @changeInputHandle
                                 rows: 2
-                                value: @state.com_slogan
+                                value: @state.en_slogan
                             React.DOM.h6 null, 'На английском'
                             React.DOM.textarea
-                                name: 'com_slogan'
+                                name: 'en_slogan'
                                 rows: 2
                                 onChange: @changeInputHandle
-                                value: @state.com_slogan
+                                value: @state.en_slogan
                     React.DOM.tr
                         key: 'description_row'
                         React.DOM.td null, 'Описание'
@@ -417,10 +417,10 @@ NewBoatTypeForm = React.createClass
                                 value: @state.ru_description
                             React.DOM.h6 null, 'На английском'
                             React.DOM.textarea
-                                name: 'com_description'
+                                name: 'en_description'
                                 rows: 10
                                 onChange: @changeInputHandle
-                                value: @state.com_description 
+                                value: @state.en_description 
     switchEditMode: (e)->
         if e isnt undefined then e.preventDefault()
         @setState isEdit: !@state.isEdit

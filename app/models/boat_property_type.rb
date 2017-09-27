@@ -11,7 +11,7 @@ class BoatPropertyType < ApplicationRecord
   def create_boat_property_values
     vals = []
     boat_types = BoatType.all
-    boat_types.each {|bt| vals.push(bt.entity_property_values.build(property_type_id: self.property_type_id, set_value: self.property_type.default_value, is_binded: false)) if bt.entity_property_values.find_by(property_type_id: self.property_type_id).blank? }
+    boat_types.each {|bt| vals.push(bt.entity_property_values.build(property_type_id: self.property_type_id, set_ru_value: self.property_type.default_value, set_en_value: self.property_type.default_value, is_binded: false)) if bt.entity_property_values.find_by(property_type_id: self.property_type_id).blank? }
     vals.each {|v| v.save} if !vals.blank?
   end
 end

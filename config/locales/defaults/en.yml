@@ -19,7 +19,7 @@
 # To learn more, please read the Rails Internationalization guide
 # available at http://guides.rubyonrails.org/i18n.html.
 
-en:
+com:
   self_url_name: "www.realcraftboats.com"
   coming_soon: "Coming soon"
   default_title: "REALCRAFT-Motor Boats"
