@@ -1,5 +1,4 @@
-<%= react_component 'BoatTypeShow', { data: @boat_type.hash_view(cur_locale) } unless is_control? %>
-<%= render 'control' if is_control? %>
+<%= react_component 'BoatTypeShow', @data %>
 
 <!--
 

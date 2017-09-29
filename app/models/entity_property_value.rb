@@ -4,7 +4,26 @@ class EntityPropertyValue < ApplicationRecord
   belongs_to :property_type
   belongs_to :entity, polymorphic: true #product или boat_type
   before_validation :select_value_type
-
+  
+  def self.default_entity_hash(property_type)
+    return nil if property_type.nil?
+    return {set_en_value: property_type.default_value, set_ru_value: property_type.default_value, property_type_id: property_type.id}
+  end
+  
+  def self.make_default_values(entity)
+    case entity.class.name
+    when 'BoatType'
+      vals = PropertyType.where(id: BoatPropertyType.all.pluck(:property_type_id)).to_a
+    when 'Product'
+      vals = entity.product_type.property_types.to_a
+    end
+    return if vals.blank?
+    vals.map! {|pt| EntityPropertyValue.default_entity_hash(pt)}
+    vals.compact!
+    entity.entity_property_values.create(vals) if !vals.blank?
+    return true
+  end
+  
   def self.boat_type_property_values_hash(entity, locale = nil)
     EntityPropertyValue.boat_type_property_values(entity, locale).to_a.map {|pv| pv.hash_view(locale)}
   end
@@ -86,6 +105,10 @@ class EntityPropertyValue < ApplicationRecord
   end
   
   private
+  
+  #def default_entity_hash(property_type)
+   
+  #end
   
   def option_tag
     !has_attribute?(:tag) ? property_type.tag : tag

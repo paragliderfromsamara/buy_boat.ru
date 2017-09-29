@@ -10,6 +10,7 @@
 #= require react_ujs
 #= require ./general_components
 #= require ./photo_viewer
+#= require ./effects
 
 @XHRErrMsg = (jqXHR)-> #Выдаёт сообщение ошибки при отклике error от сервера. Важно чтобы текст сообщения был указан под меткой :message
     if jqXHR is undefined then return

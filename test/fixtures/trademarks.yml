@@ -6,8 +6,7 @@ one:
   email: MarkOne
   phone: MyString
   logo: ''
-  creator_id: admin
-  updater_id: admin
+
 
 two:
   name: MarkTwo
@@ -15,6 +14,4 @@ two:
   email: MarkTwo@gg.com
   phone: 4434535
   logo: ''
-  creator_id: admin
-  updater_id: admin
 

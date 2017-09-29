@@ -90,13 +90,15 @@ Rails.application.routes.draw do
   resources :boat_parameter_types, only: [:new, :create, :destroy, :edit, :update, :index]
   post "/reorder_boat_parameter_types", to: "boat_parameter_types#update_numbers"
   
-  resources :boat_types
+  resources :boat_types, only: [:create, :edit, :update, :destroy, :show]
   post '/boat_types/:id/add_configurator_entity', to: "boat_types#add_configurator_entity"  
   get "/manage_boat_types", to: "boat_types#manage_index", as: :manage_boat_types
   get '/boat_types/:id/photos', to: "boat_types#photos", as: :boat_photos
   get '/boat_types/:id/photos/:photo_id', to: "boat_types#photo", as: :boat_photo
   get '/boat_types/:id/property_values', to: 'boat_types#property_values'
+  get '/boat_types/:id/modifications/:modification_id', to: 'boat_types#modification_show', as: :modification
   put '/boat_types/:id/property_values', to: 'boat_types#update_property_values'
+  post '/boat_types/:id/modifications', to: 'boat_types#create_modification'
   resources :users
   
   resources :boat_property_types, only: [:index, :create] 

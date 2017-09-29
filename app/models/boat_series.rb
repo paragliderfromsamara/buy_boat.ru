@@ -1,2 +1,3 @@
 class BoatSeries < ApplicationRecord
+  
 end

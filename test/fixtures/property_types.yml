@@ -1,13 +1,18 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  ru_name: MyString
-  com_name: MyString
-  ru_measure: MyString
-  com_measure: MyString
-
-two:
-  ru_name: MyString
-  com_name: MyString
-  ru_measure: MyString
-  com_measure: MyString
+<% i = 0 %>
+<% 100.times do |b| %>
+<% %w( string integer float bool option).each do |type| %>
+<% i += 1 %>
+<%= type %>_<%= b %>:
+  id: <%= i %>
+  ru_name: ru_name_<%= b %>
+  en_name: en_name_<%= b %>
+  ru_measure: ru_measure_<%= b %>
+  en_measure: en_measure_<%= b %>
+  en_measure: en_measure_<%= b %>
+  en_short_name: en_short_<%= b %>
+  ru_short_name: ru_short_<%= b %>
+  value_type: <%= type %>
+<%end%>
+<% end %>

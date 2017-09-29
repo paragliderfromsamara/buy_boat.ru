@@ -4,21 +4,19 @@
 
 
 @BoatTypesTableRow = React.createClass
-     tmName: ->
-         tm = GetEntityById(@props.control.state.trademarks, @props.boat_type.trademark_id)
-         if tm isnt null then tm.name else 'Не выбран'
-     bsName: ->
-         bs = GetEntityById(@props.control.state.boat_series, @props.boat_type.boat_series_id)
-         if bs isnt null then bs.name else 'Вне серии'
      locales: ->
          v = ''
          if @props.boat_type.use_on_ru then v += 'Рус.'
-         if @props.boat_type.use_on_com then v += ' Англ.'
+         if @props.boat_type.use_on_en then v += ' Англ.'
          return $.trim v
+     componentDidMount: ->
+         ShowEl("#bt_row_#{@props.boat_type.id}", 1000)
      render: ->
-         React.DOM.tr null,
-             React.DOM.td null, @tmName()
-             React.DOM.td null, @bsName()
+         React.DOM.tr
+             id: "bt_row_#{@props.boat_type.id}"
+             style: {display: 'none'},
+             React.DOM.td null, @props.boat_type.trademark_name
+             React.DOM.td null, @props.boat_type.boat_series_name
              React.DOM.td null, @props.boat_type.name
              React.DOM.td null, @locales()
              React.DOM.td null,
@@ -43,83 +41,118 @@
                             React.DOM.th null, null
                     React.DOM.tbody null,
                         for bt in @props.boat_types
-                            React.createElement BoatTypesTableRow, key: bt.id, boat_type: bt, control: @props.control
-                            
-                            
-            
-BTControlMenu = React.createClass
-    indexButtons: ->
-        React.DOM.div
-            className: 'button-group'
-            React.DOM.a
-                className: 'button success'
-                href: '/boat_types/new'
-                React.createElement IconWithText, txt: 'Добавить тип лодки', fig: 'plus'
-    newButtons: ->
-        React.DOM.div
-            className: 'button-group'
-            React.DOM.a
-                className: 'button secondary'
-                href: '/manage_boat_types'
-                React.createElement IconWithText, txt: 'К списку типов лодок', fig: 'arrow-left'
-    showButtons: ->
-        React.DOM.div
-            className: 'button-group'
-            React.DOM.a
-                className: 'button secondary'
-                href: '/manage_boat_types'
-                React.createElement IconWithText, txt: 'К списку типов лодок', fig: 'arrow-left'
-    render: ->
-        if @props.mode is 'manage_index'
-            @indexButtons()
-        else if @props.mode is 'show'
-            @showButtons()
-        else if @props.mode is 'new'
-            @newButtons()
+                            React.createElement BoatTypesTableRow, key: bt.id, boat_type: bt
 
-NewBoatTypeForm = React.createClass
+@BoatTypeNew = React.createClass 
     getInitialState: ->
-        mode: 'manage_index' # index edit show new
+        maxNameLength: 16
+        minNameLength: 3
+        boat_series: null
+        trademark: if @props.trademarks.length is 0 then null else @props.trademarks[0]
+        body_type: ''
+        copy_params_table_from_id: null
+        modifications_number: 1
+        name: ''
+        isOpen: false
+    onChangeHandle: (e)->
+        name = e.target.name
+        @setState "#{name}": e.target.value
+        console.log @state
+    params: ->
+        boat_series_id: @state.boat_series.id
+        trademark_id: @state.trademark.id
+        name: name
+        copy_params_table_from_id: @state.copy_params_table_from_id
+        body_type: @state.body_type
+        has_modifications: true
+    handleSubmit: (e)->
+        e.preventDefault()
+        console.log @state
+    handleSwitch: (e)->
+        e.preventDefault()
+        @setState isOpen: !@state.isOpen
+    tmErrors: ->
+        errs = []
+        if @state.trademark is null then errs.push "Не выбрана марка лодки"
+    nameErrors: ->
+        name = @state.name
+        name = $.trim name
+        if name.size > @state.maxNameLength then return ["Количество знаков в названии типа лодки не должно превышать #{@state.maxNameLength} знаков"]
+        if name.size < @state.minNameLength then return ["Количество знаков в названии типа лодки не должно быть меньше #{@state.minNameLength} знаков"]
+    valid: ->
+        errors = {}
+        
+        
     render: ->
-        React.DOM.div null, 'form'
-
-@BoatTypesControl = React.createClass
-    getInitialState: ->
-        form_token: @props.authenticity_token
-        boat_types: @props.boat_types
-        trademarks: @props.trademarks
-        boat_series: @props.boat_series
-        boat_type: @props.boat_type
-        mode: @props.mode # index edit show new
-    setMode: (mode)->
-        @setState mode: mode
-    pageTitle: ->
-        if @state.mode is 'new'
-            'Новый тип лодки'
-        else
-            'Управление типами лодок'
-    render: ->
-        React.DOM.div null,
-            React.DOM.div
+        React.DOM.div 
+            id: "new_boat_type_form",
+            React.DOM.div 
                 className: 'row'
                 React.DOM.div
-                    className: 'small-12 columns tb-pad-s'
-                    React.DOM.h1 null, @pageTitle()
-            React.DOM.div
-                className: "row"
-                React.DOM.div
                     className: 'small-12 columns'
-                    React.createElement BTControlMenu, mode: @state.mode, setMode: @setMode
-            React.DOM.div null,
-                if @state.mode is 'manage_index'
-                    React.createElement BoatTypesTable, boat_types: @state.boat_types, control: @
-                else if @state.mode is 'new'
-                    React.createElement NewBoatTypeForm, trademarks: @state.trademarks
-                else if @state.mode is 'show'
-                    React.createElement BoatTypeShow, boat_type: @state.boat_type, control: @, trademarks: @state.trademarks, boat_series: @state.boat_series, form_token: @state.form_token
-
-
-
+                    React.DOM.div
+                        className: 'button-group'
+                        React.DOM.a
+                            className: 'button primary'
+                            onClick: @handleSwitch
+                            React.createElement YesNoIconWithText, figs: ['plus', 'minus'], txts: ['Новый тип лодки', 'Скрыть форму'], value: !@state.isOpen
+                        if @state.isOpen
+                            React.DOM.button
+                                    className: 'button success'
+                                    disabled: true                                    
+                                    type: 'submit'
+                                    'Создать'
+                            
+            if @state.isOpen
+                React.DOM.form 
+                    onSubmit: @handleSubmit
+                    React.DOM.div
+                        className: 'row'
+                        React.DOM.div 
+                            className: 'small-12 medium-2 columns'
+                            React.createElement DropdownList, inputName: 'trademark', items: @props.trademarks, selected: @state.trademark, changeEvent: @onChangeHandle, label: 'Марка'
+                        React.DOM.div 
+                            className: 'small-12 medium-2 columns'
+                            React.createElement DropdownList, inputName: 'boat_series', items: @props.boat_series_list, selected: @state.boat_series, changeEvent: @onChangeHandle, nullValName: 'Вне серии', label: 'Серия'
+                        React.DOM.div 
+                            className: 'small-12 medium-2 end columns'
+                            React.DOM.label null,
+                                "Название"
+                                React.DOM.input
+                                    name: 'name'
+                                    type: 'text'
+                                    onChange: @onChangeHandle
+                                    value: @state.name
+                        React.DOM.div 
+                            className: 'small-12 medium-2  columns'
+                            React.DOM.label null,
+                                "Проектная категория"
+                                React.DOM.input
+                                    name: 'design_category'
+                                    type: 'text'
+                                    onChange: @onChangeHandle
+                                    value: @state.design_category
+                        React.DOM.div 
+                            className: 'small-12 medium-2 columns'
+                            React.DOM.label null,
+                                "Тип корпуса"
+                                React.DOM.input
+                                    name: 'body_type'
+                                    type: 'text'
+                                    onChange: @onChangeHandle
+                                    value: @state.body_type
+                        React.DOM.div 
+                            className: 'small-12 medium-2 end columns'
+                            React.DOM.label null,
+                                "Кол-во компоновок"
+                                React.DOM.input
+                                    name: 'modifications_number'
+                                    type: 'number'
+                                    max: 5
+                                    min: 1
+                                    onChange: @onChangeHandle
+                                    value: @state.modifications_number
+                                    
 @BoatPhoto = React.createClass
     render: ->
         React.DOM.div
@@ -218,19 +251,56 @@ NewBoatTypeForm = React.createClass
         React.DOM.div null,
             React.createElement BoatMainInfo, boat_type: @state.boat_type, boat_series: @state.boat_series, trademarks: @state.trademarks
             React.createElement BoatTypePhotos, boat_type: @state.boat_type, form_token: @props.form_token
-            React.createElement BoatTypeProperties, properties: @state.boat_type.properties, boat_type: @state.boat_type
+            React.createElement BoatTypeModifications, boat_type: @state.boat_type
+
+
+@BoatTypeModifications = React.createClass
+    getInitialState: ->
+        modifications: if @props.boat_type.modifications is undefined then [] else @props.boat_type.modifications
+    render: ->
+        React.DOM.div null,
+            React.DOM.div
+                className: 'row'
+                React.DOM.div 
+                    className: 'small-12 columns'
+                    React.DOM.h5 null, "Компоновки"
+            if @state.modifications.length > 0 
+                idx = 0
+                React.DOM.div null,
+                    for m in @state.modifications
+                        idx++
+                        React.createElement BoatTypeModification, key: "modification-#{idx}", modification: m, idx: idx 
+            else
+                React.DOM.div
+                    className: 'row'
+                    React.DOM.div 
+                        className: 'small-12 columns'
+                        React.DOM.p null, "Нет ни одной компоновки"
+
+@BoatTypeModification = React.createClass
+    altName: ->
+        if $.trim(@props.modification.name) is '' then "#{@props.idx}"
+    render: ->
+        React.DOM.div null,
+            React.DOM.div
+                className: 'row'
+                React.DOM.div
+                    className: 'small-12 columns'
+                    React.DOM.h4 null, "Компоновка #{@altName()}"
+            React.createElement ModificationProperties, properties: @props.modification.properties, modification: @props.modification
+                    
 @BoatMainInfo = React.createClass
     getInitialState: ->
         use_on_ru: @props.boat_type.use_on_ru
-        use_on_com: @props.boat_type.use_on_com
+        use_on_en: @props.boat_type.use_on_en
         is_active: @props.boat_type.is_active
         is_deprecated: @props.boat_type.is_deprecated
         name: AlterText(@props.boat_type.name)
         design_category: AlterText @props.boat_type.design_category
         ru_description: AlterText(@props.boat_type.ru_description)
-        com_description: AlterText @props.boat_type.com_description
+        en_description: AlterText @props.boat_type.en_description
         ru_slogan: AlterText @props.boat_type.ru_slogan
-        com_slogan: AlterText @props.boat_type.com_slogan
+        en_slogan: AlterText @props.boat_type.en_slogan
         trademark_id: @props.boat_type.trademark_id
         trademark: GetEntityById(@props.trademarks, @props.boat_type.trademark_id)
         trademarks: @props.trademarks
@@ -243,15 +313,15 @@ NewBoatTypeForm = React.createClass
             name: @state.name
             design_category: @state.design_category
             ru_description: @state.ru_description
-            com_description: @state.com_description
+            en_description: @state.en_description
             ru_slogan: @state.ru_slogan
-            com_slogan: @state.com_slogan
+            en_slogan: @state.en_slogan
             trademark_id: @state.trademark_id
             boat_series_id: @state.boat_series_id
             is_deprecated: @state.is_deprecated
             is_active: @state.is_active
             use_on_ru: @state.use_on_ru
-            use_on_com: @state.use_on_com
+            use_on_en: @state.use_on_en
         }
     tmName: ->
         tm = @state.trademark 
@@ -430,7 +500,7 @@ NewBoatTypeForm = React.createClass
                 className: 'row'
                 React.DOM.div
                     className: 'small-12 medium-7 columns'
-                    React.DOM.h3 null, 'Основная информация'
+                    React.DOM.h5 null, 'Основная информация'
                 React.DOM.div 
                     className: 'small-12 medium-5 columns'
                     React.DOM.div
@@ -463,19 +533,19 @@ NewBoatTypeForm = React.createClass
                 className: 'row'
                 React.DOM.div
                     className: 'small-12 columns'
-                    React.DOM.h3 null, 'Фотографии'
+                    React.DOM.h5 null, 'Фотографии'
             React.createElement PhotosControl, photos: @state.photos, entity: 'boat_type', entity_id: @state.boatType.id, form_token: @props.form_token
 
-@BoatTypeProperties = React.createClass
+@ModificationProperties = React.createClass
     getInitialState: ->
-        boatType: @props.boat_type
-        properties: if @props.properties is undefined then [] else @props.properties    
+        modification: @props.modification
+        properties: if @props.modification.properties is undefined then [] else @props.properties    
     render: ->
         React.DOM.div null,
             React.DOM.div 
                 className: 'row'
                 React.DOM.div
                     className: 'small-12 columns'
-                    React.DOM.h3 null, 'Технические характеристики'
-            React.createElement BoatPropertyValuesManageTable, properties: @state.properties, boatType: @state.boatType 
+                    React.DOM.h5 null, 'Технические характеристики'
+            React.createElement ModificationPropertyValuesManageTable, properties: @state.properties, modification: @state.modification
     

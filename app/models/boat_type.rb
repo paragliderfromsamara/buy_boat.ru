@@ -1,7 +1,13 @@
 class BoatType < ApplicationRecord
-  attr_accessor :copy_params_table_from_id
+  
+  #copy_params_table_from_id - id типа лодки с которой копируется таблица характеристик
+  #modifications_number - количество модификаций, которые автоматически добавляются при создании лодки (если не указано, то создается 1)
+  
+  attr_accessor :copy_params_table_from_id, :modifications_number
     
-  after_create :make_boat_parameter_values
+  after_create :make_boat_parameter_values, :make_modifications, :set_default_url_name 
+  before_save :sync_general_attrs_on_modifications
+  before_validation :set_general_attrs_on_modification #устанавливает общие атрибуты у модификации с базовым типом
   
   #связи для отношения boat_type <- modifications  
   has_many :modifications, class_name: 'BoatType', foreign_key: 'boat_type_id', dependent: :destroy
@@ -16,7 +22,7 @@ class BoatType < ApplicationRecord
   #belongs_to :photo
   
   belongs_to :boat_series, optional: true, validate: false
-  belongs_to :trademark
+  belongs_to :trademark#, optional: true #, validate: false, optional: true
   
   has_many :boat_for_sales, dependent: :destroy
   
@@ -29,7 +35,12 @@ class BoatType < ApplicationRecord
   mount_uploader :accomodation_view_1, ModificationViewsUploader
   mount_uploader :accomodation_view_2, ModificationViewsUploader
   mount_uploader :accomodation_view_3, ModificationViewsUploader
-
+  
+  #вытаскивает типы лодок не имеющие модификаций
+  def self.base_types
+    where(boat_type_id: nil)
+  end
+  
   def self.on_tm_site_boats(site_tag) # выдает список лодок, в соответстивии с сайтом производителя
     tm = Trademark.find_by(site_tag: site_tag)
     return tm.nil? ? [] : tm.boat_types
@@ -39,11 +50,11 @@ class BoatType < ApplicationRecord
     PropertyType.all.joins(:boat_property_type).select(
                                                       "
                                                         property_types.ru_name AS ru_name,
-                                                        property_types.com_name AS com_name,
+                                                        property_types.en_name AS en_name,
                                                         property_types.ru_measure AS ru_measure,
-                                                        property_types.com_measure AS com_measure,
+                                                        property_types.en_measure AS en_measure,
                                                         property_types.ru_short_name AS ru_short_name,
-                                                        property_types.com_short_name AS com_short_name,
+                                                        property_types.en_short_name AS en_short_name,
                                                         property_types.tag AS tag,
                                                         property_types.value_type AS value_type,
                                                         boat_property_types.property_type_id AS id,
@@ -78,7 +89,6 @@ class BoatType < ApplicationRecord
     end 
     return {max: max, min: min}
   end
-
   
   def self.show_page_scope
     joins(:trademark).includes(:photos)#.active
@@ -91,6 +101,7 @@ class BoatType < ApplicationRecord
   def self.active #лодки которые показываются в каталоге
     where(is_deprecated: false, is_active: true)
   end
+  
   
   def self.not_active  #лодки которые по каким-то причинам не показаны в каталоге, к примеру
     where(is_deprecated: false, is_active: false)
@@ -268,9 +279,6 @@ class BoatType < ApplicationRecord
   #  photos.map {|ph| ph.hash_view(is_wide)}
   #end
   
-  private
-  
-
   
   def default_hash(locale)
     if is_modification?
@@ -284,7 +292,8 @@ class BoatType < ApplicationRecord
       modification_description: description(locale),
       photo: main_photo_hash_view, 
       properties: self.property_values_hash(locale),
-      photos: self.photos_hash_view#,
+      photos: self.photos_hash_view,
+      type: 'modification'#,
       #boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
     }
     else
@@ -298,30 +307,67 @@ class BoatType < ApplicationRecord
         slogan: slogan(locale),
         photo: main_photo_hash_view, 
         properties: self.property_values_hash(locale),
-        photos: self.photos_hash_view#,
+        photos: self.photos_hash_view,
+        type: 'boat_type'#,
         #boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
       }
     end
   end
   
   def control_hash
+    if !is_modification?
     {
        id: self.id,
        name: self.name,
+       trademark_name: trademark.nil? ? 'Не выбрана' : trademark.name,
        trademark_id: self.trademark_id,
+       boat_series_name: boat_series.nil? ? 'Вне серии' : boat_series.name,
+       boat_series_id: self.boat_series_id,
+       body_type: self.body_type,
        ru_description: self.ru_description,
        en_description: self.en_description,
        ru_slogan: self.ru_slogan,
        en_slogan: self.en_slogan,
        design_category: self.design_category,
+       modifications: self.modifications.map{|mdf| mdf.control_hash},
        photos: self.entity_photos.includes(:photo).to_a.map{|ep| ep.hash_view},
-       properties: self.property_values_hash
+       properties: self.property_values_hash,
+       use_on_ru: self.use_on_ru,
+       use_on_en: self.use_on_en,
+       is_active: self.is_active,
+       is_deprecated: self.is_deprecated
     }
+    else
+      {
+         id: self.id,
+         name: self.name,
+         trademark_id: self.trademark_id,
+         ru_description: self.ru_description,
+         en_description: self.en_description,
+         photos: self.entity_photos.includes(:photo).to_a.map{|ep| ep.hash_view},
+         properties: self.property_values_hash,
+         use_on_ru: self.use_on_ru,
+         use_on_en: self.use_on_en,
+         is_active: self.is_active,
+         is_deprecated: self.is_deprecated
+      }
+    end
   end
+  
+  private
+  
+  def check_attributes_for_modification #добавляет к атрибутам 
+    return if !is_modification?
+    trademark_id = boat_type.trademark_id
+    boat_series_id = boat_type.boat_series_id
+    body_type = boat_type.body_type
+  end
+  
+
   
   #Достаёт свойства по тэгам 
   def get_property_values_by_tags(tags)
-    entity_property_values.includes(:property_type).where(property_types: {tag: ["min_hp", "max_hp"]})
+    entity_property_values.includes(:property_type).where(property_types: {tag: tags})
   end
   
   #Добавляет новые модификации по ключам таблицы boat_option_type
@@ -334,6 +380,7 @@ class BoatType < ApplicationRecord
   end
   
   def make_boat_parameter_values #создаёт таблицу значений параметров лодки 
+    return if !is_modification?
     if !copy_params_table_from_id.blank?
       bt = BoatType.find_by(id: copy_params_table_from_id)
       make_clear_parameter_values if bt.nil?
@@ -352,12 +399,26 @@ class BoatType < ApplicationRecord
     entity_property_values.create(vals) if !vals.blank?  #если список сформировался - создаем
   end
   
+  #Создаёт модификации на базовом типе в зависимости от количества указанного в атрибуте modifications_number
+  #Протестированно в Тест создания модификаций при добавлении нового типа лодки
+  def make_modifications
+    return if is_modification?
+    self.modifications_number = modifications_number.blank? || modifications_number == 0 ? 1 : modifications_number
+    self.modifications_number = 5 if self.modifications_number > 5
+    mdfs = []
+    self.modifications_number.times do 
+      mdfs.push({})
+    end 
+    self.modifications.create(mdfs)
+  end
+  
   def make_clear_parameter_values #создает новую таблицу параметров
-    vals = []
-    PropertyType.where(id: BoatPropertyType.all.pluck(:property_type_id)).each do |t|
-      vals[vals.length] = {set_en_value: t.default_value, set_ru_value: t.default_value, property_type_id: t.id, is_binded: true}
-    end
-    entity_property_values.create vals
+    EntityPropertyValue.make_default_values(self)
+    #vals = []
+    #PropertyType.where(id: BoatPropertyType.all.pluck(:property_type_id)).each do |t|
+    #  vals[vals.length] = {set_en_value: t.default_value, set_ru_value: t.default_value, property_type_id: t.id, is_binded: true}
+    #end
+    #entity_property_values.create vals
   end
   
   def cnf_folder_name #папка в которой хранятся файлы конфигуратора
@@ -368,7 +429,42 @@ class BoatType < ApplicationRecord
     "boatOptions_#{self.id}.js"
   end
   
+  #при удалении или добавлении модификации, проверяет флаг has_modifications на типе лодки. 
+  #Если модификаций раньше не было, то флаг has_modifications = true
+  #Если при удалении данная модификация последняя, то has_modifications = false
+  #протестировано в test/models/mdification_test.rb "Тест изменения has_modifications флага"
+  def check_has_modifications_flag #проверка флага has_modifications на boat_type после создания и удаления модификации
+    return if !is_modification?
+    hasMdfsFlag = self.boat_type.has_modifications
+    hasMdfs = !self.boat_type.reload.modifications.blank?
+    self.boat_type.update_attribute(:has_modifications, hasMdfs) if hasMdfsFlag != hasMdfs
+  end
+  
+  #При добавлении новой модификации копирует атрибуты trademark_id, boat_series_id, body_type из типа лодки
+  #Копирует таблицу параметров с типа лодки
+  #протестировано в test/models/mdification_test.rb "Тест на обновление атрибутов связей boat_series_id trademark_id, также и body_type"
+  def set_general_attrs_on_modification
+    return if !is_modification? || !new_record?
+    self.boat_series_id = self.boat_type.boat_series_id
+    self.trademark_id = self.boat_type.trademark_id
+    self.body_type = self.boat_type.body_type
+    self.copy_params_table_from_id = self.boat_type.id if copy_params_table_from_id.blank?
+  end
+  
+  
+  #при изменении атрибутов boat_series_id, trademark_id, body_type в типе лодки, обновляет данные атрибуты на всех модификациях
+  #протестировано в test/models/mdification_test.rb "Тест на обновление атрибутов связей boat_series_id trademark_id, также и body_type"
+  def sync_general_attrs_on_modifications
+    return if !boat_series_id_changed? && !trademark_id_changed? && !body_type_changed?
+    self.modifications.each do |mdf|
+      mdf.update_attributes(trademark_id: self.trademark_id, boat_series_id: self.boat_series_id, body_type: self.body_type) 
+    end
+  end
+  
+  def set_default_url_name
+    return if !self.url_name.blank?
+    self.update_attribute(:url_name, is_modification? ? "modification_#{id}" : "boat_type_#{id}" )
+  end
 
   
-
 end

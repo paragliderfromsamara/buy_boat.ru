@@ -43,7 +43,7 @@ boatPropertyValuesManageTableRow = React.createClass
             React.DOM.td null, @bindCol()
                 
                 
-@BoatPropertyValuesManageTable = React.createClass
+@ModificationPropertyValuesManageTable = React.createClass
     getInitialState: ->
         properties: @props.properties
         editMode: false
@@ -82,7 +82,7 @@ boatPropertyValuesManageTableRow = React.createClass
     updateVals: (e)->
         e.preventDefault()
         $.ajax 
-            url: "/boat_types/#{@props.boatType.id}/property_values"
+            url: "/boat_types/#{@props.modification.id}/property_values"
             type: 'PUT'
             dataType: 'JSON'
             data: {boat_type: @makePropertyValuesParams()}

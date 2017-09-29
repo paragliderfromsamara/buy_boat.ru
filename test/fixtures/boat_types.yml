@@ -1,6 +1,39 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+modifications_test:
+  name: MyString
+  boat_series: one
+  trademark: one
+  body_type: "430"
+  ru_description: MyString
+  en_description: MyString
+  is_deprecated: false
+  has_modifications: false
+  is_active: true
 
+has_modifications_flag_test:
+  name: MyString
+  boat_series: one
+  trademark: one
+  body_type: "430"
+  ru_description: MyString
+  en_description: MyString
+  is_deprecated: false
+  has_modifications: false
+  is_active: true
+
+update_common_attrs_test:
+  name: MyString
+  boat_series: one
+  trademark: one
+  body_type: "430"
+  ru_description: MyString
+  en_description: MyString
+  is_deprecated: false
+  has_modifications: false
+  use_on_ru: true
+  use_on_en: false
+  is_active: true
 
 one:
   name: MyString
@@ -8,7 +41,7 @@ one:
   trademark: one
   body_type: "430"
   ru_description: MyString
-  com_description: MyString
+  en_description: MyString
   is_deprecated: false
   is_active: true
 
@@ -18,7 +51,7 @@ two:
   trademark: one
   body_type: "480"
   ru_description: MyString
-  com_description: MyString
+  en_description: MyString
   is_deprecated: false
   is_active: true
   
@@ -29,7 +62,7 @@ for_photos:
   trademark: one
   body_type: "480"
   ru_description: MyString
-  com_description: MyString
+  en_description: MyString
   is_deprecated: false
   is_active: true
 
@@ -40,7 +73,7 @@ active_boat_<%= b %>:
   trademark: one
   body_type: MyString
   ru_description: MyString
-  com_description: MyString
+  en_description: MyString
   is_deprecated: false 
   is_active: true
 <%end%>
@@ -52,7 +85,7 @@ disabled_boat_<%= b %>:
   trademark: one
   body_type: MyString
   ru_description: MyString
-  com_description: MyString
+  en_description: MyString
   is_deprecated: false 
   is_active: true
 <%end%>

@@ -63,11 +63,11 @@ class ProductType < ApplicationRecord
     return {} if self.property_types.blank?
     v = []
     self.property_types.each do |pt|
-      v.push({property_type_id: pt.id, set_value: pt.default_value}) 
+      v.push({property_type_id: pt.id, set_ru_value: pt.default_value, set_com_value: pt.default_value}) 
     end
     return v.to_ass_hash
   end
-  
+
   private
   
   def set_plural_name

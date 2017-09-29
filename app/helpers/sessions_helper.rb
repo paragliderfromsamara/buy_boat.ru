@@ -1,7 +1,7 @@
 module SessionsHelper
 
   def domains_list
-    %w( .myapps.ru .myapps.com .salut-boats.ru .realcraftboats.com .realcraftboats.ru .control.myapps.ru control.myapps.com )
+    %w( .myapps.ru .myapps.com .salut-boats.ru .realcraftboats.com .realcraftboats.ru .control.myapps.ru .control.myapps.com )
   end 
   
   def sign_in(user)
