@@ -1,8 +1,15 @@
-makeDropdownItems = (items, vTitle, nTitle, nullValName, selected)->
+getSelectedItem = (items, v, sel)->
+    if items.length is 0 then return null
+    if sel is undefined || sel is null then return null
+    for i in items
+        if "#{i[v]}" is "sel" then return i
+    return null
+makeDropdownItems = (items, vTitle, nTitle, nullValName, selVal)->
     value = []
     nullVal = if nullValName is undefined then {value: '', name: 'Список пуст'} else {value: '', name: nullValName}
     if vTitle is undefined then vTitle = 'id'
     if nTitle is undefined then nTitle = 'name'
+    selected = getSelectedItem(items, vTitle, selVal)
     if items.length is 0
         value.push nullVal
     else

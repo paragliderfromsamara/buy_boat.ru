@@ -6,7 +6,7 @@ class BoatType < ApplicationRecord
   attr_accessor :copy_params_table_from_id, :modifications_number
     
   after_create :make_boat_parameter_values, :make_modifications, :set_default_url_name 
-  before_save :sync_general_attrs_on_modifications
+  before_save :sync_general_attrs_on_modifications, :set_en_name
   before_validation :set_general_attrs_on_modification #устанавливает общие атрибуты у модификации с базовым типом
   
   #связи для отношения boat_type <- modifications  
@@ -36,9 +36,45 @@ class BoatType < ApplicationRecord
   mount_uploader :accomodation_view_2, ModificationViewsUploader
   mount_uploader :accomodation_view_3, ModificationViewsUploader
   
+  validate :ru_name_presence, :name_uniqueness
+  
+  def ru_name_presence
+    if new_record?
+      errors.add(:ru_name, "Лодка не может быть без названия") if ru_name.blank?  
+    else
+      errors.add(:ru_name, "Лодка не может быть без названия") if ru_name.blank? && !ru_name.nil?
+    end
+  end
+  
+  
+  def name_uniqueness
+    return if ru_name.nil? && en_name.nil?
+    if is_modification?
+      err_msg = "Компоновка с таким названием у лодки #{self.boat_type.catalog_name} уже существует"
+      ru_names = ru_name.blank? ? [] : self.boat_type.modifications.where.not(id: self.id).pluck(:ru_name).map{|n| n.nil? ? '' : n.mb_chars.downcase.to_s}
+      en_names = en_name.blank? ? [] : self.boat_type.modifications.where.not(id: self.id).pluck(:en_name).map{|n| n.nil? ? '' : n.mb_chars.downcase.to_s}
+    else
+      ru_err_msg = "Лодка #{catalog_name} уже существует"
+      en_err_msg = "Лодка с английским названием #{catalog_name('en')} уже существует"
+      ru_names = ru_name.blank? ? [] : BoatType.base_types.where.not(id: id).where(trademark_id: self.trademark_id).pluck(:ru_name).map{|n| n.nil? ? '' : n.mb_chars.downcase.to_s}
+      en_names = en_name.blank? ? [] : BoatType.base_types.where.not(id: id).where(trademark_id: self.trademark_id).pluck(:en_name).map{|n| n.nil? ? '' : n.mb_chars.downcase.to_s}
+    end
+    if !ru_name.nil?
+      errors.add(:ru_name, ru_err_msg) if !ru_names.index(ru_name.mb_chars.downcase.to_s).nil?
+    end
+    if !en_name.nil?
+      errors.add(:en_name, en_err_msg) if !en_names.index(en_name.mb_chars.downcase.to_s).nil?
+    end
+  end
+  
+  
   #вытаскивает типы лодок не имеющие модификаций
   def self.base_types
     where(boat_type_id: nil)
+  end
+  
+  def self.modification_types
+    where.not(boat_type_id: nil)
   end
   
   def self.on_tm_site_boats(site_tag) # выдает список лодок, в соответстивии с сайтом производителя
@@ -185,6 +221,10 @@ class BoatType < ApplicationRecord
     end
   end
   
+  def name(locale='ru')
+    attr_by_locale('name', locale)
+  end
+  
   def description(locale='ru')
     attr_by_locale('description', locale)
   end
@@ -208,11 +248,12 @@ class BoatType < ApplicationRecord
   end
   
   def is_modification?
-    !boat_type_id.nil?
+    !boat_type_id.nil? || !self.boat_type_id.nil?
   end
   
-  def catalog_name #название типа лодки с наименованием производителя, серией и типом корпуса
-    %{#{self.trademark.name} #{%{ #{self.name}} if !self.name.blank?}}
+  
+  def catalog_name(locale='ru') #название типа лодки с наименованием производителя, серией и типом корпуса
+    %{#{self.trademark.name} #{self.name(locale)}}
   #  %{#{self.trademark_name}#{%{ #{self.series_name}} if !self.series_name.nil?} #{self.body_type} #{%{ #{self.name}} if !self.name.blank?}}
   end
   
@@ -284,7 +325,7 @@ class BoatType < ApplicationRecord
     if is_modification?
     {
       id: self.id,
-      name: boat_type.name,
+      name: boat_type.name(locale),
       description: boat_type.description(locale),
       slogan: boat_type.slogan(locale),
       body_type: self.boat_type.body_type,
@@ -302,7 +343,7 @@ class BoatType < ApplicationRecord
         body_type: self.body_type,
         trademark: self.trademark.hash_view,
         modifications: self.modifications.map{|mdf| mdf.default_hash(locale)},
-        name: self.catalog_name,
+        name: self.catalog_name(locale),
         description: description(locale),
         slogan: slogan(locale),
         photo: main_photo_hash_view, 
@@ -318,7 +359,8 @@ class BoatType < ApplicationRecord
     if !is_modification?
     {
        id: self.id,
-       name: self.name,
+       ru_name: self.ru_name,
+       en_name: self.en_name,
        trademark_name: trademark.nil? ? 'Не выбрана' : trademark.name,
        trademark_id: self.trademark_id,
        boat_series_name: boat_series.nil? ? 'Вне серии' : boat_series.name,
@@ -340,7 +382,8 @@ class BoatType < ApplicationRecord
     else
       {
          id: self.id,
-         name: self.name,
+         ru_name: self.ru_name,
+         en_name: self.en_name,
          trademark_id: self.trademark_id,
          ru_description: self.ru_description,
          en_description: self.en_description,
@@ -406,8 +449,8 @@ class BoatType < ApplicationRecord
     self.modifications_number = modifications_number.blank? || modifications_number == 0 ? 1 : modifications_number
     self.modifications_number = 5 if self.modifications_number > 5
     mdfs = []
-    self.modifications_number.times do 
-      mdfs.push({})
+    self.modifications_number.times do |n|
+      mdfs.push({ru_name: "Компоновка #{n+1}", en_name: "Consumption #{n+1}"})
     end 
     self.modifications.create(mdfs)
   end
@@ -459,6 +502,10 @@ class BoatType < ApplicationRecord
     self.modifications.each do |mdf|
       mdf.update_attributes(trademark_id: self.trademark_id, boat_series_id: self.boat_series_id, body_type: self.body_type) 
     end
+  end
+  
+  def set_en_name
+    self.en_name = ru_name if en_name.blank?
   end
   
   def set_default_url_name

@@ -1,6 +1,6 @@
 #@BoatParameterType = React.createClass
 #    render: ->
-
+boatTypeAttrs = ['ru_name', 'en_name', 'boat_series_id', 'trademark_id', 'boat_type_id', 'ru_description', 'en_description', 'ru_slogan', 'en_slogan']
 
 
 @BoatTypesTableRow = React.createClass
@@ -10,79 +10,173 @@
          if @props.boat_type.use_on_en then v += ' Англ.'
          return $.trim v
      componentDidMount: ->
-         ShowEl("#bt_row_#{@props.boat_type.id}", 1000)
+         ShowEl("#bt_row_#{@props.boat_type.id}", 500)
      render: ->
          React.DOM.tr
              id: "bt_row_#{@props.boat_type.id}"
              style: {display: 'none'},
              React.DOM.td null, @props.boat_type.trademark_name
              React.DOM.td null, @props.boat_type.boat_series_name
-             React.DOM.td null, @props.boat_type.name
+             React.DOM.td null, @props.boat_type.ru_name
              React.DOM.td null, @locales()
              React.DOM.td null,
                  React.DOM.a
                      href: "/boat_types/#{@props.boat_type.id}",
                      React.createElement IconWithText, txt: 'Перейти', fig: 'arrow-right'
-             
-@BoatTypesTable = React.createClass
+
+
+@BoatTypesTables = React.createClass
+    activeBoatTypes: ->
+        bTypes = []
+        for b in @props.boat_types
+            if b.is_active && !b.is_deprecated then bTypes.push b
+        bTypes
+    notActiveBoatTypes: ->
+        bTypes = []
+        for b in @props.boat_types
+            if !b.is_active && !b.is_deprecated then bTypes.push b
+        bTypes
+    deprecatedBoatTypes: ->
+        bTypes = []
+        for b in @props.boat_types
+            if b.is_deprecated then bTypes.push b
+        bTypes
     render: ->
         React.DOM.div
             className: 'row'
             React.DOM.div
                 className: 'small-12 columns'
-                React.DOM.table
-                    id: 'boat_types',
-                    React.DOM.thead null,
-                        React.DOM.tr null, 
-                            React.DOM.th null, "Торговая марка"
-                            React.DOM.th null, "Серия"
-                            React.DOM.th null, 'Название лодки'
-                            React.DOM.th null, 'Локали'
-                            React.DOM.th null, null
-                    React.DOM.tbody null,
-                        for bt in @props.boat_types
-                            React.createElement BoatTypesTableRow, key: bt.id, boat_type: bt
+                React.createElement BoatTypesTable, header: "Не активные", showIfEmpty: false, boat_types: @notActiveBoatTypes()
+                React.createElement BoatTypesTable, header: "Активные", showIfEmpty: true, boat_types: @activeBoatTypes()
+                React.createElement BoatTypesTable, header: "Удалённые", showIfEmpty: true, boat_types: @deprecatedBoatTypes()
+                                         
+@BoatTypesTable = React.createClass
+    empty: ->
+        React.DOM.p null, "Список пуст"
+    notEmpty: ->
+        React.DOM.table
+            id: 'boat_types',
+            React.DOM.thead null,
+                React.DOM.tr null, 
+                    React.DOM.th null, "Торговая марка"
+                    React.DOM.th null, "Серия"
+                    React.DOM.th null, 'Название лодки'
+                    React.DOM.th null, 'Локали'
+                    React.DOM.th null, null
+            React.DOM.tbody null,
+                for bt in @props.boat_types
+                    React.createElement BoatTypesTableRow, key: bt.id, boat_type: bt    
+    render: ->
+        if @props.boat_types.length is 0 && !@props.showIfEmpty then return null
+        React.DOM.div 
+            className: 'tb-pad-xs'
+            React.DOM.h5 null, @props.header
+            if @props.boat_types.length is 0 then @empty() else @notEmpty()
+            
+
+
+
+                
+@BoatTypesManageIndex = React.createClass
+    getInitialState: ->
+        boat_types: @props.boat_types
+        curTM: if @props.trademarks.length > 0 then @props.trademarks[0] else null
+    addBoatType: (boat_type)->
+        console.log boat_type
+        boatTypes = @state.boat_types.slice()
+        boatTypes.push boat_type
+        @setState boat_types: boatTypes
+    selectedBoatTypes: ->
+        tm = @state.curTM
+        bts = []
+        if tm is null then return []
+        for b in @props.boat_types
+            if b.trademark_id is tm.id then bts.push(b)
+        return bts
+    setTM: (tm)->
+        @setState curTM: tm
+    tmMenu: ->
+        if @props.trademarks.length > 0 then React.createElement SimpleMenu, items: @props.trademarks, selected: @state.curTM, clickItemEvent: @setTM
+    render: ->
+        React.DOM.div
+            id: 'boat_type_manage_index'
+            React.createElement BoatTypeNew, boat_series_list: @props.boat_series_list, trademarks: @props.trademarks, addBoatType: @addBoatType
+            @tmMenu()
+            React.createElement BoatTypesTables, boat_types: @selectedBoatTypes()
+            
 
 @BoatTypeNew = React.createClass 
     getInitialState: ->
         maxNameLength: 16
         minNameLength: 3
-        boat_series: null
-        trademark: if @props.trademarks.length is 0 then null else @props.trademarks[0]
+        boat_series_id: null
+        trademark_id: if @props.trademarks.length is 0 then null else @props.trademarks[0].id
         body_type: ''
         copy_params_table_from_id: null
         modifications_number: 1
-        name: ''
+        ru_name: ''
         isOpen: false
+        errors: []
+    defaultState: ->
+        boat_series_id: null
+        trademark_id: if @props.trademarks.length is 0 then null else @props.trademarks[0].id
+        body_type: ''
+        modifications_number: 1
+        ru_name: ''
+        errors: []
     onChangeHandle: (e)->
         name = e.target.name
         @setState "#{name}": e.target.value
-        console.log @state
+        console.log @params()
     params: ->
-        boat_series_id: @state.boat_series.id
-        trademark_id: @state.trademark.id
-        name: name
-        copy_params_table_from_id: @state.copy_params_table_from_id
-        body_type: @state.body_type
-        has_modifications: true
+        {
+            boat_series_id: @state.boat_series_id
+            trademark_id: @state.trademark_id
+            ru_name: @state.ru_name
+            modifications_number: @state.modifications_number
+            body_type: @state.body_type
+        }
     handleSubmit: (e)->
         e.preventDefault()
+        $.ajax({
+          url: "/boat_types"
+          type: "POST"
+          data: {boat_type: @params()}
+          success: (data)=>
+              @props.addBoatType(data)
+              @setState @defaultState
+          error: (jqXHR, textStatus, errorThrown)=>
+              
+              @fillErrors(jqXHR.responseJSON)
+          dataType: 'json'
+        })
         console.log @state
     handleSwitch: (e)->
         e.preventDefault()
         @setState isOpen: !@state.isOpen
-    tmErrors: ->
+    fillErrors: (errors)->
         errs = []
-        if @state.trademark is null then errs.push "Не выбрана марка лодки"
-    nameErrors: ->
-        name = @state.name
-        name = $.trim name
-        if name.size > @state.maxNameLength then return ["Количество знаков в названии типа лодки не должно превышать #{@state.maxNameLength} знаков"]
-        if name.size < @state.minNameLength then return ["Количество знаков в названии типа лодки не должно быть меньше #{@state.minNameLength} знаков"]
-    valid: ->
-        errors = {}
-        
-        
+        for attr in boatTypeAttrs
+            if errors["#{attr}"] isnt undefined
+                for err in errors["#{attr}"]
+                    errs.push err
+        @setState errors: errs
+        #console.log errs
+    drawErrors: ->
+        idx = 0
+        React.DOM.div
+            className: 'row'
+            React.DOM.div
+                className: 'small-12 columns'
+                React.DOM.div
+                    className: 'callout alert'
+                    React.DOM.ul null
+                        for err in @state.errors
+                            idx++
+                            React.DOM.li
+                                type: '1'
+                                key: "err-#{err}",
+                                err
     render: ->
         React.DOM.div 
             id: "new_boat_type_form",
@@ -96,33 +190,27 @@
                             className: 'button primary'
                             onClick: @handleSwitch
                             React.createElement YesNoIconWithText, figs: ['plus', 'minus'], txts: ['Новый тип лодки', 'Скрыть форму'], value: !@state.isOpen
-                        if @state.isOpen
-                            React.DOM.button
-                                    className: 'button success'
-                                    disabled: true                                    
-                                    type: 'submit'
-                                    'Создать'
-                            
             if @state.isOpen
                 React.DOM.form 
                     onSubmit: @handleSubmit
+                    if @state.errors.length > 0 then @drawErrors() 
                     React.DOM.div
                         className: 'row'
                         React.DOM.div 
                             className: 'small-12 medium-2 columns'
-                            React.createElement DropdownList, inputName: 'trademark', items: @props.trademarks, selected: @state.trademark, changeEvent: @onChangeHandle, label: 'Марка'
+                            React.createElement DropdownList, inputName: 'trademark_id', items: @props.trademarks, selected: @state.trademark_id, changeEvent: @onChangeHandle, label: 'Марка'
                         React.DOM.div 
                             className: 'small-12 medium-2 columns'
-                            React.createElement DropdownList, inputName: 'boat_series', items: @props.boat_series_list, selected: @state.boat_series, changeEvent: @onChangeHandle, nullValName: 'Вне серии', label: 'Серия'
+                            React.createElement DropdownList, inputName: 'boat_series_id', items: @props.boat_series_list, selected: @state.boat_series_id, changeEvent: @onChangeHandle, nullValName: 'Вне серии', label: 'Серия'
                         React.DOM.div 
                             className: 'small-12 medium-2 end columns'
                             React.DOM.label null,
                                 "Название"
                                 React.DOM.input
-                                    name: 'name'
+                                    name: 'ru_name'
                                     type: 'text'
                                     onChange: @onChangeHandle
-                                    value: @state.name
+                                    value: @state.ru_name
                         React.DOM.div 
                             className: 'small-12 medium-2  columns'
                             React.DOM.label null,
@@ -152,6 +240,14 @@
                                     min: 1
                                     onChange: @onChangeHandle
                                     value: @state.modifications_number
+                    React.DOM.div
+                        className: 'row'
+                        React.DOM.div
+                            className: 'small-12 columns'
+                            React.DOM.button
+                                    className: 'button success expanded'                                 
+                                    type: 'submit'
+                                    'Создать'
                                     
 @BoatPhoto = React.createClass
     render: ->
@@ -165,7 +261,7 @@
                     "data-image-versions": "[#{@props.photo.small}, small], [#{@props.photo.medium}, medium],[#{@props.photo.large}, large]"  
                     #"data-interchange": "[#{@props.photo.small}, small], [#{@props.photo.medium}, medium],[#{@props.photo.large}, large]"
 
-@BoatTypeTitleBlock = React.createClass
+@BoatTypeTitleBlock = React.createClass #в версии contol не используется
     render: ->
         React.DOM.div null,#className: "tb-pad-s"
             React.DOM.div 
@@ -242,7 +338,7 @@
                             React.DOM.img
                                 "data-interchange": MakeInterchangeData(v.view)
                 
-@BoatTypeShow = React.createClass      
+@BoatTypeShow = React.createClass #     
     getInitialState: -> 
         boat_type: @props.boat_type
         trademarks: if @props.trademarks is undefined then [] else @props.trademarks
@@ -253,40 +349,126 @@
             React.createElement BoatTypePhotos, boat_type: @state.boat_type, form_token: @props.form_token
             React.createElement BoatTypeModifications, boat_type: @state.boat_type
 
+ModificationMenuItem = React.createClass
+    altName: ->
+        if $.trim(@props.modification.name) is '' || @props.modification.name is null then "Компоновка #{@props.idx}"
+    handleClick: (e)->
+        e.preventDefault()
+        @props.selModification(@props.modification)
+    render: ->
+        console.log @props.curModification
+        console.log @props.modification
+        React.DOM.button
+             className: 'button primary'
+             onClick: @handleClick
+             disabled: if @props.curModification is null then false else @props.curModification.id is @props.modification.id
+             @altName()
 
 @BoatTypeModifications = React.createClass
     getInitialState: ->
         modifications: if @props.boat_type.modifications is undefined then [] else @props.boat_type.modifications
+        curModification: if @props.boat_type.modifications is undefined then null else @props.boat_type.modifications[0]
+        name: ''
+        ru_description: ''
+        en_description: ''
+    selModification: (modification)->
+        console.log @state.curModification
+        @setState curModification: modification
+    newModificationFormOpen: (e)->
+        e.preventDefault()
+        $('#new_modification_form').foundation('open')
+        #@setState curModification: null
+    mdfsPanel: ->
+        idx = 0
+        React.DOM.div
+            className: 'row'
+            React.DOM.div
+                className: 'small-12 columns'
+                React.DOM.div
+                    className: 'button-group'
+                    React.DOM.button
+                        className: 'button'
+                        onClick: @newModificationFormOpen
+                        disabled: @state.curModification is null
+                        React.createElement IconWithText, fig: 'plus', txt: 'Добавить компоновку'
+                    for m in @state.modifications
+                        idx++
+                        React.createElement ModificationMenuItem, key: "mdf-item-#{idx}", modification: m, curModification: @state.curModification, selModification: @selModification, idx: idx
+                    
+    createModification: (e)->
+        e.preventDefault()
+        console.log 'createModification'
+    handleChange: (e)->
+        @setState "#{e.target.name}": e.target.value
+    componentDidMount: ->
+        $('#new_modification_form').foundation()
+    newModificationForm: ->
+        React.DOM.div
+            className: 'reveal large'
+            id: 'new_modification_form'
+            'data-reveal': true,
+            React.DOM.h3 null, "Новая компоновка лодки #{@props.boat_type.trademark_name} #{@props.boat_type.ru_name}"
+            React.DOM.form
+                onSubmit: @createModification
+                React.DOM.div 
+                    className: 'row  tb-pad-s'
+                    React.DOM.div
+                        className: 'small-12 medium-4 columns'
+                        React.DOM.label null,
+                            "Название компоновки"
+                            React.DOM.input
+                                            type: 'text'
+                                            name: 'name'
+                                            onChange: @handleChange
+                                            value: @state.name
+                    React.DOM.div
+                        className: 'small-12 medium-4 columns'
+                        React.DOM.label null,
+                            "Описание компоновки"
+                            React.DOM.textarea
+                                name: 'ru_description'
+                                onChange: @handleChange
+                                value: @state.ru_description
+                    React.DOM.div
+                        className: 'small-12 medium-4 columns'
+                        React.DOM.label null,
+                            "Описание компоновки для английской версии"
+                            React.DOM.textarea
+                                name: 'en_description'
+                                onChange: @handleChange
+                                value: @state.en_description
+                React.DOM.div
+                    className: 'row'
+                    React.DOM.div
+                        className: 'small-12 columns'
+                        React.DOM.div 
+                            className: 'expanded button-group'
+                            React.DOM.button
+                                className: 'button success  '
+                                type: 'submit'
+                                'Создать компоновку'
+                            React.DOM.button
+                                className: 'button'
+                                'data-close': true
+                                'Закрыть'
+                        
+                                
     render: ->
-        React.DOM.div null,
+        if @state.modifications.length > 0 
+            React.DOM.div null,
+                @mdfsPanel()
+                @newModificationForm()
+                React.createElement BoatTypeModification, modification: @state.curModification
+        else
             React.DOM.div
                 className: 'row'
                 React.DOM.div 
                     className: 'small-12 columns'
-                    React.DOM.h5 null, "Компоновки"
-            if @state.modifications.length > 0 
-                idx = 0
-                React.DOM.div null,
-                    for m in @state.modifications
-                        idx++
-                        React.createElement BoatTypeModification, key: "modification-#{idx}", modification: m, idx: idx 
-            else
-                React.DOM.div
-                    className: 'row'
-                    React.DOM.div 
-                        className: 'small-12 columns'
-                        React.DOM.p null, "Нет ни одной компоновки"
+                    React.DOM.p null, "Нет ни одной компоновки"
 
 @BoatTypeModification = React.createClass
-    altName: ->
-        if $.trim(@props.modification.name) is '' then "#{@props.idx}"
     render: ->
         React.DOM.div null,
-            React.DOM.div
-                className: 'row'
-                React.DOM.div
-                    className: 'small-12 columns'
-                    React.DOM.h4 null, "Компоновка #{@altName()}"
             React.createElement ModificationProperties, properties: @props.modification.properties, modification: @props.modification
                     
 @BoatMainInfo = React.createClass
@@ -345,8 +527,7 @@
                 console.log data
                 @switchEditMode()
             error: (jqXHR)->
-                XHRErrMsg(jqXHR)
-            
+                XHRErrMsg(jqXHR)         
     showMode: ->
         React.DOM.table null,
             React.DOM.tbody null,
@@ -381,15 +562,13 @@
                 React.DOM.tr
                     key: 'name_row'
                     React.DOM.td null, 'Название'
-                    React.DOM.td null,  if @btName().length is 0 then "Без имени" else @btName()
+                    React.DOM.td null,  
+                        if @btName().length is 0 then "Без имени" else @btName()
                 React.DOM.tr
                     key: 'slogan_row'
                     React.DOM.td null, 'Слоган'
                     React.DOM.td null,
-                        React.DOM.h6 null, 'На русском'
-                        React.DOM.p null, if $.trim(@state.ru_slogan) is '' then 'Не указан' else @state.ru_slogan
-                        React.DOM.h6 null, 'На английском'
-                        React.DOM.p null, if $.trim(@state.en_slogan) is '' then 'Не указан' else @state.en_slogan
+                         
                 React.DOM.tr
                     key: 'description_row'
                     React.DOM.td null, 'Описание'
@@ -453,12 +632,22 @@
                         key: 'name_row'
                         React.DOM.td null, 'Название'
                         React.DOM.td null,  
-                            React.DOM.input 
-                                type: 'text' 
-                                placeholder: 'Название типа лодки' 
-                                name: 'name'
-                                onChange: @changeInputHandle
-                                value: @state.name
+                            React.DOM.label null, 
+                                'Для русской версии' 
+                                React.DOM.input 
+                                    type: 'text' 
+                                    placeholder: 'Название лодки' 
+                                    name: 'eu_name'
+                                    onChange: @changeInputHandle
+                                    value: @state.ru_name
+                            React.DOM.label null, 
+                                'Для английской версии' 
+                                React.DOM.input 
+                                    type: 'text' 
+                                    placeholder: 'Название лодки' 
+                                    name: 'en_name'
+                                    onChange: @changeInputHandle
+                                    value: @state.en_name
                     React.DOM.tr
                         key: 'slogan_row'
                         React.DOM.td null, 'Слоган'

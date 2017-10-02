@@ -25,6 +25,61 @@ class BoatTypeTest < ActiveSupport::TestCase
   #  t.string   "cnf_data_file_url"
   #end
   
+  test "Нельзя создать лодку без атрибута ru_name" do
+    assert_no_difference("BoatType.count", "Удалось добавить boat_type без атрибута ru_name") do 
+      default_boat_type({ru_name: nil})
+    end
+    assert_no_difference("BoatType.count", "Удалось добавить boat_type без атрибута со значением ru_name = '' ") do 
+      default_boat_type({ru_name: ''})
+    end
+    
+    boat_type = default_boat_type
+    assert_not boat_type.update_attributes(ru_name: ''), 'Удалось обновить boat_type со строкой ""'
+    assert boat_type.update_attributes(ru_name: nil), 'Не удалось обновить boat_type со строкой nil'
+  end
+  
+  test "Если при создании типа лодки не указан en_name, то он копируется с атрибута ru_name" do 
+    name = default_string
+    boat_type = default_boat_type({ru_name: name})
+    assert_equal name, boat_type.en_name, 'Атрибут en_name должен копироваться с атрибута ru_name' 
+  end
+  
+  test "Уникальность атрибутов ru_name и en_name для базовых типов одного производителя" do
+    boat_type_tm_1_1 = default_boat_type
+    boat_type_tm_1_2 = default_boat_type
+    boat_type_tm_2_1 = default_boat_type({trademark_id: Trademark.last.id})
+    assert_no_difference("BoatType.count", "Удалось добавить базовый тип с существующим названием") do
+      default_boat_type({ru_name: boat_type_tm_1_1.ru_name})
+    end
+    assert_not boat_type_tm_1_2.update_attributes(ru_name: boat_type_tm_1_1.ru_name), "Удалось обновить атрибут ru_name на ru_name существующего типа"
+    assert_not boat_type_tm_1_2.update_attributes(en_name: boat_type_tm_1_1.en_name), "Удалось обновить атрибут en_name на en_name существующего типа"
+    boat_type_tm_1_2.reload
+    assert_difference("BoatType.base_types.count", 1, "Не удалось добавить базовый с совпадающим названием базового типа другого производителя") do
+      default_boat_type({ru_name: boat_type_tm_1_1.ru_name, trademark_id: Trademark.last.id})
+    end
+    assert boat_type_tm_2_1.update_attributes(ru_name: boat_type_tm_1_2.ru_name), "Не удалось обновить атрибут ru_name совпадающий с атрибутом ru_name лодки другой торговой марки"
+    assert boat_type_tm_2_1.update_attributes(en_name: boat_type_tm_1_2.en_name), "Не удалось обновить атрибут en_name совпадающий с атрибутом en_name лодки другой торговой марки"
+  end
+  
+  test "Уникальность атрибутов ru_name и en_name для модификаций одного базового типа" do 
+    name = default_string
+    boat_type_1 = default_boat_type
+    boat_type_2 = default_boat_type
+    boat_type_3 = default_boat_type(modifications_number: 3)
+    modification = boat_type_1.modifications.first
+    assert_no_difference("BoatType.count", "Удалось создать модификацию одного типа с уже существующим именем") do
+      boat_type_1.modifications.create(ru_name: modification.ru_name)
+    end
+    assert_difference("BoatType.modification_types.count", 1, "Не удалось создать модификацию одного типа с новым именем") do
+      boat_type_1.modifications.create(ru_name: name)
+    end
+    assert_difference("BoatType.modification_types.count", 1, "Не удалось создать модификацию одного типа с новым именем, которое существует у модификации другого базового типа") do
+      boat_type_2.modifications.create(ru_name: name)
+    end
+    assert_not boat_type_3.modifications.first.update_attributes(ru_name: boat_type_3.modifications.last.ru_name), "Удалось обновить ru_name модификации на уже существующее у данного базового типа"
+    assert_not boat_type_3.modifications.first.update_attributes(en_name: boat_type_3.modifications.last.en_name), "Удалось обновить en_name модификации на уже существующее у данного базового типа"
+  end
+  
   test "При создании типа лодки и модификации должно автоматически заполняться url_name" do
     boat_type = default_boat_type
     assert_equal "boat_type_#{boat_type.id}", boat_type.url_name, "Если экземпляр базовый тип, то url_name должен быть 'boat_type_#{boat_type.id}'"
@@ -59,7 +114,7 @@ class BoatTypeTest < ActiveSupport::TestCase
   
   test "При создании модификации boat_type должна создаваться entity_property_values" do 
     boat_type = default_boat_type
-    modification = boat_type.modifications.build
+    modification = boat_type.modifications.build(ru_name: default_string)
     assert modification.save, "Не удалось добавить модификацию"
     modification.reload
     assert_not BoatPropertyType.all.size == 0, "Список типов свойств для типов лодок пуст"
@@ -142,16 +197,19 @@ class BoatTypeTest < ActiveSupport::TestCase
   private
   
   def default_boat_type(add_hash = {})
-    default = {name: default_string,
+    default = {ru_name: default_string,
                               boat_series_id: BoatSeries.first.id,
                               trademark_id: Trademark.first.id,
                               body_type: "480",
                               design_category: 'C'
               }
-    default.merge! add_hash
+    default.merge! add_hash if !add_hash.blank?
     boat_type = BoatType.new(default)
-    assert boat_type.save, "Не удалось сохранить тестовый тип лодки"
-    return  boat_type.reload
+    if boat_type.save #assert boat_type.save, "Не удалось сохранить тестовый тип лодки"
+      return boat_type.reload
+    else
+      return nil
+    end
   end
   
   def convert_arr_to_hash(arr) #преобразует массив ['a', 'b', 'c'] в хэш вида {'0' => 'a', '1' => 'b', '2' => 'c' }

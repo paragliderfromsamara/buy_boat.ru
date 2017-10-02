@@ -46,7 +46,7 @@ next_series = BoatSeries.create(name: "NEXT", description: "")
 pro_series = BoatSeries.create(name: "PRO", description: "")
 newline_series = BoatSeries.create(name: "NEWLINE", description: "")
 
-classic_430_scout = BoatType.create(name: "430 SCOUT", body_type: "430", url_name: 'scout_430', boat_series_id: classic_series.id, trademark_id: tm_salut.id)
+classic_430_scout = BoatType.create(ru_name: "430 SCOUT", body_type: "430", url_name: 'scout_430', boat_series_id: classic_series.id, trademark_id: tm_salut.id)
 
 boat = classic_430_scout.reload.modifications.first
 boat.entity_property_values.find_by(property_type_id: places.id).update_attributes(set_ru_value: 5, set_en_value: 5) #пассажировместимость
@@ -64,7 +64,7 @@ boat.entity_property_values.find_by(property_type_id:  max_speed.id).update_attr
 boat.entity_property_values.find_by(property_type_id: boat_weight.id).update_attributes(set_ru_value: 198, set_en_value: 198) #масса 
 boat.entity_property_values.find_by(property_type_id: deadrise_angle.id).update_attributes(set_ru_value: 6, set_en_value: 6) #килеватость
 
-classic_480 = BoatType.create(name: "", body_type: "480", url_name: '480_classic', boat_series_id: classic_series.id, trademark_id: tm_salut.id)
+classic_480 = BoatType.create(ru_name: "480", body_type: "480", url_name: '480_classic', boat_series_id: classic_series.id, trademark_id: tm_salut.id)
 boat = classic_480.reload.modifications.first
 boat.entity_property_values.find_by(property_type_id: places.id).update_attributes(set_ru_value: 5) #пассажировместимость
 boat.entity_property_values.find_by(property_type_id: max_length.id).update_attributes(set_ru_value: 4720) #длина наибольшая 
@@ -80,7 +80,7 @@ boat.entity_property_values.find_by(property_type_id: boat_weight.id).update_att
 boat.entity_property_values.find_by(property_type_id: deadrise_angle.id).update_attributes(set_ru_value: 11) #килеватость
 boat.entity_property_values.find_by(property_type_id: max_speed.id).update_attributes(set_ru_value: 65) #максимальная скорость 
 
-classic_480 = BoatType.create(name: "480 CLASSIC", body_type: "480", boat_series_id: classic_series.id, trademark_id: tm_salut.id)
+classic_480 = BoatType.create(ru_name: "480 CLASSIC", body_type: "480", boat_series_id: classic_series.id, trademark_id: tm_salut.id)
 boat = classic_480.reload.modifications.first
 boat.entity_property_values.find_by(property_type_id: places.id).update_attributes(set_ru_value: 5) #пассажировместимость
 boat.entity_property_values.find_by(property_type_id: max_length.id).update_attributes(set_ru_value: 4720) #длина наибольшая 
@@ -96,7 +96,7 @@ boat.entity_property_values.find_by(property_type_id: boat_weight.id).update_att
 boat.entity_property_values.find_by(property_type_id: deadrise_angle.id).update_attributes(set_ru_value: 11) #килеватость
 boat.entity_property_values.find_by(property_type_id: max_speed.id).update_attributes(set_ru_value: 65) #максимальная скорость
 
-realcraft_190 = BoatType.create(name: "190", body_type: "480", trademark_id: tm_real.id)
+realcraft_190 = BoatType.create(ru_name: "190", body_type: "480", trademark_id: tm_real.id)
 boat = realcraft_190.reload.modifications.first
 boat.entity_property_values.find_by(property_type_id: places.id).update_attributes(set_ru_value: 5, set_en_value: 5) #пассажировместимость
 boat.entity_property_values.find_by(property_type_id: max_length.id).update_attributes(set_ru_value: 4720, set_en_value: 4720) #длина наибольшая 
@@ -112,7 +112,7 @@ boat.entity_property_values.find_by(property_type_id: boat_weight.id).update_att
 boat.entity_property_values.find_by(property_type_id: deadrise_angle.id).update_attributes(set_ru_value: 11, set_en_value: 11) #килеватость
 boat.entity_property_values.find_by(property_type_id: max_speed.id).update_attributes(set_ru_value: 65, set_en_value: 65) #максимальная скорость 
 
-realcraft_200 = BoatType.create(name: "200", body_type: "490", trademark_id: tm_real.id)
+realcraft_200 = BoatType.create(ru_name: "200", body_type: "490", trademark_id: tm_real.id)
 boat = realcraft_200.reload.modifications.first
 boat.entity_property_values.find_by(property_type_id: places.id).update_attributes(set_ru_value: 5, set_en_value: 5) #пассажировместимость
 boat.entity_property_values.find_by(property_type_id: max_length.id).update_attributes(set_ru_value: 4720, set_en_value: 4720) #длина наибольшая 

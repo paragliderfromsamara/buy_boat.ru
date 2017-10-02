@@ -6,6 +6,7 @@ class BoatTypesController < ApplicationController
   def manage_index
     @title = @header = "Управление типами лодок"
     @boat_types = BoatType.base_types.to_a.map{ |bt| bt.hash_view('control')}
+    @data = {boat_types: @boat_types, boat_series_list: @boat_series, trademarks: @trademarks}
   end
   
   # GET /boat_types
@@ -76,8 +77,8 @@ class BoatTypesController < ApplicationController
     @boat_type = BoatType.new(boat_type_params)
     respond_to do |format|
       if @boat_type.save
-        format.html { redirect_to edit_boat_type_path(@boat_type), notice: 'Новый тип лодки успешно добавлен' }
-        format.json { render :show, status: :created, location: @boat_type }
+        format.html { redirect_to edit_boat_type_path(@boat_type)}
+        format.json { render json: @boat_type.hash_view('control'), status: :created, location: @boat_type }
       else
         format.html { render :new }
         format.json { render json: @boat_type.errors, status: :unprocessable_entity }
@@ -141,7 +142,7 @@ class BoatTypesController < ApplicationController
 
   private
     def check_grants
-      redirect_to "/404" if !could_manage_boat_types?
+      redirect_to "/404" if !could_manage_boat_types? || !is_control?
     end 
     # Use callbacks to share common setup or constraints between actions.
     def set_boat_type
@@ -150,11 +151,11 @@ class BoatTypesController < ApplicationController
     
     # Never trust parameters from the scary internet, only allow the white list through.
     def boat_type_params
-      params.require(:boat_type).permit(:name, :design_category, :copy_params_table_from_id, :boat_series_id, :body_type, :ru_description, :en_description, :ru_slogan, :en_slogan, :cnf_data_file_url, :base_cost, :is_deprecated, :is_active, :trademark_id, :use_on_ru, :use_on_en)
+      params.require(:boat_type).permit(:ru_name, :en_name, :design_category, :copy_params_table_from_id, :boat_series_id, :body_type, :ru_description, :en_description, :ru_slogan, :en_slogan, :cnf_data_file_url, :base_cost, :is_deprecated, :is_active, :trademark_id, :use_on_ru, :use_on_en)
     end
     
     def modification_params
-      params.require(:boat_type).permit(:name, :ru_description, :en_description, :is_deprecated, :is_active, :use_on_ru, :use_on_en)
+      params.require(:boat_type).permit(:ru_name, :en_name, :ru_description, :en_description, :is_deprecated, :is_active, :use_on_ru, :use_on_en)
     end
     
     def boat_properties_params

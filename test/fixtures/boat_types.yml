@@ -1,7 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 modifications_test:
-  name: MyString
+  ru_name: modifications_test
   boat_series: one
   trademark: one
   body_type: "430"
@@ -12,7 +12,7 @@ modifications_test:
   is_active: true
 
 has_modifications_flag_test:
-  name: MyString
+  ru_name: has_modifications_flag_test
   boat_series: one
   trademark: one
   body_type: "430"
@@ -23,7 +23,7 @@ has_modifications_flag_test:
   is_active: true
 
 update_common_attrs_test:
-  name: MyString
+  ru_name: update_common_attrs_test
   boat_series: one
   trademark: one
   body_type: "430"
@@ -36,7 +36,7 @@ update_common_attrs_test:
   is_active: true
 
 one:
-  name: MyString
+  ru_name: MyString_one
   boat_series: one
   trademark: one
   body_type: "430"
@@ -46,7 +46,7 @@ one:
   is_active: true
 
 two:
-  name: "480"
+  ru_name: "two_480"
   boat_series: one
   trademark: one
   body_type: "480"
@@ -57,7 +57,8 @@ two:
   
 for_photos:
   id: 1005500
-  name: "480"
+  ru_name: "for_photos_480"
+  en_name: "for_photos_480"
   boat_series: one
   trademark: one
   body_type: "480"
@@ -68,7 +69,8 @@ for_photos:
 
 <% 100.times do |b| %>
 active_boat_<%= b %>:
-  name: active_boat_<%= b %>
+  ru_name: active_boat_<%= b %>
+  en_name: active_boat_<%= b %>
   boat_series: one
   trademark: one
   body_type: MyString
@@ -80,7 +82,8 @@ active_boat_<%= b %>:
 
 <% 100.times do |b| %>
 disabled_boat_<%= b %>:
-  name: disabled_boat_<%= b %>
+  ru_name: disabled_boat_<%= b %>
+  en_name: disabled_boat_<%= b %>
   boat_series: one
   trademark: one
   body_type: MyString
