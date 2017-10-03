@@ -36,8 +36,7 @@ boatPropertyValuesManageTableRow = React.createClass
     render: ->
         React.DOM.tr null,
             React.DOM.td null,
-                React.DOM.p null, "#{@props.p.ru_name}"
-                React.DOM.p null, "#{@props.p.en_name}"
+                React.DOM.p null, "#{@props.p.ru_name} #{if @props.p.en_name isnt '' && @props.p.en_name isnt undefined then "{#{@props.p.en_name}}" else ''}"
             React.DOM.td null, @valCol('ru')
             React.DOM.td null, @valCol('en')
             React.DOM.td null, @bindCol()
@@ -45,7 +44,6 @@ boatPropertyValuesManageTableRow = React.createClass
                 
 @ModificationPropertyValuesManageTable = React.createClass
     getInitialState: ->
-        properties: @props.properties
         editMode: false
         onlyBinded: true
     emptyList: ->
@@ -53,7 +51,7 @@ boatPropertyValuesManageTableRow = React.createClass
             className: 'tb-pad-s'
             "У данного типа лодки нет ни одного параметра"
     hasUnbinded: ->
-        for p in @state.properties
+        for p in @props.modification.properties
             if !p.is_binded then return true
         false
     propertyHash: (p)->
@@ -66,19 +64,19 @@ boatPropertyValuesManageTableRow = React.createClass
     makePropertyValuesParams: ->
         val = {}
         i = 0
-        for p in @state.properties
+        for p in @props.modification.properties
             #if !p.is_binded then continue
             val["#{i}"] = @propertyHash(p)
             i++
         {entity_property_values_attributes: val}
-    updateList: (id, attr, val)->
-        
-        vals = @state.properties.slice()
+    updateList: (id, attr, val)->  
+        vals = @props.modification.properties.slice()
         vals = vals.map (e)->
             if id isnt e.id then return e
             e["#{attr}"] = val
             return e
-        @setState properties: vals
+        @props.updateProperties(vals)
+        #@setState properties: vals
     updateVals: (e)->
         e.preventDefault()
         $.ajax 
@@ -87,6 +85,7 @@ boatPropertyValuesManageTableRow = React.createClass
             dataType: 'JSON'
             data: {boat_type: @makePropertyValuesParams()}
             success: (data)=>
+                @props.updateProperties(data)
                 @setState properties: data
                 @switchEditMode()
             error: (jqXHR)->
@@ -123,7 +122,7 @@ boatPropertyValuesManageTableRow = React.createClass
                         React.DOM.th null, "Значение, мера (анг.)"
                         React.DOM.th null, "Используется"
                 React.DOM.tbody null,
-                    for p in @state.properties
+                    for p in @props.modification.properties
                         if !p.is_binded && @state.onlyBinded then continue
                         React.createElement boatPropertyValuesManageTableRow, key: "pv-#{p.id}", p: p, editMode: @state.editMode, updValListFunc: @updateList
                     
@@ -132,7 +131,7 @@ boatPropertyValuesManageTableRow = React.createClass
             className: 'row'
             React.DOM.div
                 className: 'small-12 columns'
-                if @state.properties.length is 0 then @emptyList() else @notEmptyList()
+                if @props.modification.properties.length is 0 then @emptyList() else @notEmptyList()
                 
 
 #------- все что ниже, можно удалить-----------------
@@ -279,8 +278,7 @@ boatPropertyValuesManageTableRow = React.createClass
         else
             @unbindedRow()    
 
-       
-      
+
         
 @BoatParameterValuesTable = React.createClass
     getInitialState: ->

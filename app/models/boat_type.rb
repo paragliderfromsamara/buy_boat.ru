@@ -39,10 +39,11 @@ class BoatType < ApplicationRecord
   validate :ru_name_presence, :name_uniqueness
   
   def ru_name_presence
+    msg = is_modification? ? "Компановка не может быть без названия" : "Лодка не может быть без названия"
     if new_record?
-      errors.add(:ru_name, "Лодка не может быть без названия") if ru_name.blank?  
+      errors.add(:ru_name, msg) if ru_name.blank?  
     else
-      errors.add(:ru_name, "Лодка не может быть без названия") if ru_name.blank? && !ru_name.nil?
+      errors.add(:ru_name, msg) if ru_name.blank? && !ru_name.nil?
     end
   end
   
@@ -50,7 +51,8 @@ class BoatType < ApplicationRecord
   def name_uniqueness
     return if ru_name.nil? && en_name.nil?
     if is_modification?
-      err_msg = "Компоновка с таким названием у лодки #{self.boat_type.catalog_name} уже существует"
+      ru_err_msg = "Компоновка с таким русским названием у лодки #{self.boat_type.catalog_name} уже существует"
+      en_err_msg = "Компоновка с таким английским названием у лодки #{self.boat_type.catalog_name} уже существует"
       ru_names = ru_name.blank? ? [] : self.boat_type.modifications.where.not(id: self.id).pluck(:ru_name).map{|n| n.nil? ? '' : n.mb_chars.downcase.to_s}
       en_names = en_name.blank? ? [] : self.boat_type.modifications.where.not(id: self.id).pluck(:en_name).map{|n| n.nil? ? '' : n.mb_chars.downcase.to_s}
     else

@@ -88,9 +88,7 @@ class BoatTypesController < ApplicationController
   
   #POST /boat_types/1/modifications
   def create_modification
-    mdfParams = modification_params
-    mdfParams[:boat_type_id] = @boat_type.id
-    @modification = BoatType.new(mdfParams)
+    @modification = @boat_type.modifications.build(modification_params)
     respond_to do |format|
       if @modification.save
         format.json { render json: @modification.hash_view('control'), status: :created}

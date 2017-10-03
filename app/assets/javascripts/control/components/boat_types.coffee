@@ -1,6 +1,14 @@
 #@BoatParameterType = React.createClass
 #    render: ->
 boatTypeAttrs = ['ru_name', 'en_name', 'boat_series_id', 'trademark_id', 'boat_type_id', 'ru_description', 'en_description', 'ru_slogan', 'en_slogan']
+getErrorsFromResponse = (r)->
+    errs = []
+    for attr in boatTypeAttrs
+        if r["#{attr}"] isnt undefined
+            for err in r["#{attr}"]
+                errs.push err
+    return errs
+    
 
 
 @BoatTypesTableRow = React.createClass
@@ -150,33 +158,17 @@ boatTypeAttrs = ['ru_name', 'en_name', 'boat_series_id', 'trademark_id', 'boat_t
               @fillErrors(jqXHR.responseJSON)
           dataType: 'json'
         })
-        console.log @state
+        #console.log @state
     handleSwitch: (e)->
         e.preventDefault()
         @setState isOpen: !@state.isOpen
     fillErrors: (errors)->
-        errs = []
-        for attr in boatTypeAttrs
-            if errors["#{attr}"] isnt undefined
-                for err in errors["#{attr}"]
-                    errs.push err
+        errs = getErrorsFromResponse(errors)
         @setState errors: errs
         #console.log errs
     drawErrors: ->
-        idx = 0
-        React.DOM.div
-            className: 'row'
-            React.DOM.div
-                className: 'small-12 columns'
-                React.DOM.div
-                    className: 'callout alert'
-                    React.DOM.ul null
-                        for err in @state.errors
-                            idx++
-                            React.DOM.li
-                                type: '1'
-                                key: "err-#{err}",
-                                err
+        React.createElement ErrorsCallout, errors: @state.errors
+
     render: ->
         React.DOM.div 
             id: "new_boat_type_form",
@@ -368,9 +360,11 @@ ModificationMenuItem = React.createClass
     getInitialState: ->
         modifications: if @props.boat_type.modifications is undefined then [] else @props.boat_type.modifications
         curModification: if @props.boat_type.modifications is undefined then null else @props.boat_type.modifications[0]
-        name: ''
+        ru_name: ''
+        en_name: ''
         ru_description: ''
         en_description: ''
+        errors: []
     selModification: (modification)->
         console.log @state.curModification
         @setState curModification: modification
@@ -378,6 +372,13 @@ ModificationMenuItem = React.createClass
         e.preventDefault()
         $('#new_modification_form').foundation('open')
         #@setState curModification: null
+    params: ->
+        {
+            ru_name: @state.ru_name
+            en_name: @state.en_name
+            ru_description: @state.ru_description
+            en_description: @state.en_description
+        }
     mdfsPanel: ->
         idx = 0
         React.DOM.div
@@ -387,19 +388,34 @@ ModificationMenuItem = React.createClass
                 React.DOM.div
                     className: 'button-group'
                     React.DOM.button
-                        className: 'button'
+                        className: 'button primary'
                         onClick: @newModificationFormOpen
                         disabled: @state.curModification is null
                         React.createElement IconWithText, fig: 'plus', txt: 'Добавить компоновку'
-                    for m in @state.modifications
-                        idx++
-                        React.createElement ModificationMenuItem, key: "mdf-item-#{idx}", modification: m, curModification: @state.curModification, selModification: @selModification, idx: idx
-                    
+                        
+    addModificationToState: (mdf)->
+        mdfs = @state.modifications.slice()
+        mdfs.push(mdf)
+        @setState modifications: mdfs, curModification: mdf, errors: [] 
+        $('#new_modification_form').foundation('close')
     createModification: (e)->
         e.preventDefault()
-        console.log 'createModification'
+        $.ajax({
+          url: "/boat_types/#{@props.boat_type.id}/modifications"
+          type: "POST"
+          data: {boat_type: @params()}
+          success: (data)=>
+              @addModificationToState(data)
+          error: (jqXHR, textStatus, errorThrown)=>
+              errs = getErrorsFromResponse(jqXHR.responseJSON)
+              console.log errs
+              @setState errors: errs
+          dataType: 'json'
+        })
     handleChange: (e)->
         @setState "#{e.target.name}": e.target.value
+    drawErrors: ->
+        React.createElement ErrorsCallout, errors: @state.errors
     componentDidMount: ->
         $('#new_modification_form').foundation()
     newModificationForm: ->
@@ -408,57 +424,96 @@ ModificationMenuItem = React.createClass
             id: 'new_modification_form'
             'data-reveal': true,
             React.DOM.h3 null, "Новая компоновка лодки #{@props.boat_type.trademark_name} #{@props.boat_type.ru_name}"
-            React.DOM.form
-                onSubmit: @createModification
-                React.DOM.div 
-                    className: 'row  tb-pad-s'
-                    React.DOM.div
-                        className: 'small-12 medium-4 columns'
-                        React.DOM.label null,
-                            "Название компоновки"
-                            React.DOM.input
-                                            type: 'text'
-                                            name: 'name'
-                                            onChange: @handleChange
-                                            value: @state.name
-                    React.DOM.div
-                        className: 'small-12 medium-4 columns'
-                        React.DOM.label null,
-                            "Описание компоновки"
-                            React.DOM.textarea
-                                name: 'ru_description'
-                                onChange: @handleChange
-                                value: @state.ru_description
-                    React.DOM.div
-                        className: 'small-12 medium-4 columns'
-                        React.DOM.label null,
-                            "Описание компоновки для английской версии"
-                            React.DOM.textarea
-                                name: 'en_description'
-                                onChange: @handleChange
-                                value: @state.en_description
-                React.DOM.div
-                    className: 'row'
-                    React.DOM.div
-                        className: 'small-12 columns'
+                React.DOM.form
+                    onSubmit: @createModification
+                    @drawErrors()
+                    React.DOM.div 
+                        className: 'tb-pad-s'
                         React.DOM.div 
-                            className: 'expanded button-group'
-                            React.DOM.button
-                                className: 'button success  '
-                                type: 'submit'
-                                'Создать компоновку'
-                            React.DOM.button
-                                className: 'button'
-                                'data-close': true
-                                'Закрыть'
+                            className: 'row'
+                            React.DOM.div
+                                className: 'small-12 medium-6 columns'
+                                React.DOM.label null,
+                                    "Русское название"
+                                    React.DOM.input
+                                        type: 'text'
+                                        name: 'ru_name'
+                                        onChange: @handleChange
+                                        value: @state.ru_name
+                            React.DOM.div
+                                className: 'small-12 medium-6 columns'
+                                React.DOM.label null,
+                                    "Английское название"
+                                    React.DOM.input
+                                        type: 'text'
+                                        name: 'en_name'
+                                        onChange: @handleChange
+                                        value: @state.en_name
+                        React.DOM.div 
+                            className: 'row'
+                            React.DOM.div
+                                className: 'small-12 medium-6 columns'
+                                React.DOM.label null,
+                                    "Описание компоновки"
+                                    React.DOM.textarea
+                                        name: 'ru_description'
+                                        onChange: @handleChange
+                                        value: @state.ru_description
+                            React.DOM.div
+                                className: 'small-12 medium-6 columns'
+                                React.DOM.label null,
+                                    "Описание компоновки для английской версии"
+                                    React.DOM.textarea
+                                        name: 'en_description'
+                                        onChange: @handleChange
+                                        value: @state.en_description
+                    React.DOM.div
+                        className: 'row'
+                        React.DOM.div
+                            className: 'small-12 columns'
+                            React.DOM.div 
+                                className: 'expanded button-group'
+                                React.DOM.button
+                                    className: 'button success  '
+                                    type: 'submit'
+                                    'Создать компоновку'
+                                React.DOM.a
+                                    className: 'button'
+                                    onClick: @cleanErrors
+                                    'data-close': 'new_modification_form'
+                                    'Закрыть'
                         
-                                
+    cleanErrors: ->
+        @setState errors: []
+    selModification: (modification)->
+        @setState curModification: modification                            
+    updateProperties: (properties)->
+        cMd = @state.curModification
+        cMd.properties = properties
+        mdfs = @state.modifications.slice()
+        mdfs.map (md)=>
+            if md.id is cMd.id then cMd else md
+        @setState modifications: mdfs, curModification: cMd
+        
+    propertiesTable: ->
+        React.DOM.div null,
+            React.DOM.div 
+                className: 'row'
+                React.DOM.div
+                    className: 'small-12 columns'
+                    React.DOM.h5 null, "Технические характеристики \"#{@state.curModification.ru_name}\""
+            React.createElement ModificationPropertyValuesManageTable, modification: @state.curModification, updateProperties: @updateProperties
     render: ->
         if @state.modifications.length > 0 
             React.DOM.div null,
                 @mdfsPanel()
+                React.DOM.div
+                    className: 'tb-pad-s'
+                    React.createElement SimpleMenu, items: @state.modifications, nTitle: 'ru_name', clickItemEvent: @selModification, selected: @state.curModification
                 @newModificationForm()
-                React.createElement BoatTypeModification, modification: @state.curModification
+                React.createElement ModificationMainInfo, modification: @state.curModification
+                @propertiesTable()
+                
         else
             React.DOM.div
                 className: 'row'
@@ -469,8 +524,62 @@ ModificationMenuItem = React.createClass
 @BoatTypeModification = React.createClass
     render: ->
         React.DOM.div null,
-            React.createElement ModificationProperties, properties: @props.modification.properties, modification: @props.modification
-                    
+            React.createElement ModificationProperties, modification: @props.modification
+
+
+@ModificationMainInfo = React.createClass
+    getInitialState: ->
+        editMode: false
+    switchEditMode: (e)->
+        e.preventDefault()
+        @setState editMode: !@state.editMode
+    showMode: ->
+        React.DOM.table null,
+            React.DOM.tbody null,
+                React.DOM.tr null,
+                    React.DOM.td null,
+                        React.DOM.p null,  "Название"
+                    React.DOM.td null, 
+                        React.DOM.h6 null, 'на русском'
+                        React.DOM.p null, @props.modification.ru_name
+                        React.DOM.h6 null, 'на английском'
+                        React.DOM.p null, @props.modification.en_name
+                React.DOM.tr null,
+                    React.DOM.td null,
+                        React.DOM.p null,  "Описание"
+                    React.DOM.td null, 
+                        React.DOM.h6 null, 'на русском'
+                        React.DOM.p null, if $.trim(@props.modification.ru_description) is '' then 'Не указано' else @props.modification.ru_description
+                        React.DOM.h6 null, 'на английском'
+                        React.DOM.p null, if $.trim(@props.modification.en_description) is '' then 'Не указано' else @props.modification.en_description
+    editMode: ->
+        React.DOM.table null,
+            React.DOM.tbody null,
+                React.DOM.tr null,
+                    React.DOM.td null,
+                        React.DOM.p null,  "Название"
+                    React.DOM.td null, 
+                        React.DOM.p null, if $.trim(@props.modification.ru_name) is '' then 'Не указано' else @props.modification.ru_name
+    render: ->
+        React.DOM.div null,
+            React.DOM.div
+                className: 'row'
+                React.DOM.div
+                    className: 'small-8 columns'
+                    React.DOM.h5 null, "Основная информация о компоновке \"#{@props.modification.ru_name}\""
+                React.DOM.div
+                    className: 'small-4 columns'
+                    React.DOM.a 
+                        className: 'button float-right'
+                        onClick: @switchEditMode
+                        React.createElement YesNoIconWithText, figs: ['save','pencil'], txts: ['Сохранить', 'Редактировать'], value: @state.editMode
+            React.DOM.div
+                className: 'row'
+                React.DOM.div
+                    className: 'small-12 columns'
+                    if @state.editMode then @editMode() else @showMode()
+
+
 @BoatMainInfo = React.createClass
     getInitialState: ->
         use_on_ru: @props.boat_type.use_on_ru
@@ -725,16 +834,6 @@ ModificationMenuItem = React.createClass
                     React.DOM.h5 null, 'Фотографии'
             React.createElement PhotosControl, photos: @state.photos, entity: 'boat_type', entity_id: @state.boatType.id, form_token: @props.form_token
 
-@ModificationProperties = React.createClass
-    getInitialState: ->
-        modification: @props.modification
-        properties: if @props.modification.properties is undefined then [] else @props.properties    
-    render: ->
-        React.DOM.div null,
-            React.DOM.div 
-                className: 'row'
-                React.DOM.div
-                    className: 'small-12 columns'
-                    React.DOM.h5 null, 'Технические характеристики'
-            React.createElement ModificationPropertyValuesManageTable, properties: @state.properties, modification: @state.modification
+
+       
     
