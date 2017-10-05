@@ -398,6 +398,11 @@ ModificationMenuItem = React.createClass
         mdfs.push(mdf)
         @setState modifications: mdfs, curModification: mdf, errors: [] 
         $('#new_modification_form').foundation('close')
+    updModificationOnList: (mdf)->
+        mdfs = @state.modifications.slice()
+        mdfs = mdfs.map (m)->
+            if m.id is mdf.id then mdf else m
+        @setState modifications: mdfs, curModification: mdf 
     createModification: (e)->
         e.preventDefault()
         $.ajax({
@@ -511,7 +516,7 @@ ModificationMenuItem = React.createClass
                     className: 'tb-pad-s'
                     React.createElement SimpleMenu, items: @state.modifications, nTitle: 'ru_name', clickItemEvent: @selModification, selected: @state.curModification
                 @newModificationForm()
-                React.createElement ModificationMainInfo, modification: @state.curModification
+                React.createElement ModificationMainInfo, modification: @state.curModification, updMdfFunc: @updModificationOnList
                 @propertiesTable()
                 
         else
@@ -530,9 +535,35 @@ ModificationMenuItem = React.createClass
 @ModificationMainInfo = React.createClass
     getInitialState: ->
         editMode: false
+        mdfId: @props.modification.id
+        ru_name: ''
+        en_name: ''
+        ru_description: ''
+        en_description: ''
+        errors: []
+    btParams: ->
+        {
+            en_name: @state.en_name
+            ru_name: @state.ru_name
+            en_description: @state.en_description
+            ru_description: @state.ru_description
+        }
     switchEditMode: (e)->
         e.preventDefault()
-        @setState editMode: !@state.editMode
+        if not @state.editMode
+            @setState editMode: true, ru_name: @props.modification.ru_name, en_name: @props.modification.en_name, ru_description: @props.modification.ru_description, en_description: @props.modification.en_description
+        else
+            $.ajax 
+                url: "/boat_types/#{@props.modification.id}"
+                type: 'PUT'
+                dataType: 'json'
+                data: {boat_type: @btParams()}
+                success: (data)=>
+                    @props.updMdfFunc(data)
+                    @setState editMode: !@state.editMode
+                error: (jqXHR)=>
+                    @setState errors: getErrorsFromResponse(jqXHR.responseJSON)
+                    console.log jqXHR.responseJSON
     showMode: ->
         React.DOM.table null,
             React.DOM.tbody null,
@@ -552,15 +583,54 @@ ModificationMenuItem = React.createClass
                         React.DOM.p null, if $.trim(@props.modification.ru_description) is '' then 'Не указано' else @props.modification.ru_description
                         React.DOM.h6 null, 'на английском'
                         React.DOM.p null, if $.trim(@props.modification.en_description) is '' then 'Не указано' else @props.modification.en_description
+    changeInputHandle: (e)->
+        @setState "#{e.target.name}": e.target.value
+        
     editMode: ->
-        React.DOM.table null,
-            React.DOM.tbody null,
-                React.DOM.tr null,
-                    React.DOM.td null,
-                        React.DOM.p null,  "Название"
-                    React.DOM.td null, 
-                        React.DOM.p null, if $.trim(@props.modification.ru_name) is '' then 'Не указано' else @props.modification.ru_name
+        React.DOM.div null,
+            React.createElement ErrorsCallout, errors: @state.errors
+            React.DOM.table null,
+                React.DOM.tbody null,
+                    React.DOM.tr null,
+                        React.DOM.td null,
+                            React.DOM.p null,  "Название"
+                        React.DOM.td null, 
+                            React.DOM.label 
+                                'на русском'
+                                React.DOM.input
+                                    onChange: @changeInputHandle
+                                    type: 'text'
+                                    name: 'ru_name'
+                                    value: @state.ru_name
+                            React.DOM.label 
+                                'на английском'
+                                React.DOM.input
+                                    onChange: @changeInputHandle
+                                    type: 'text'
+                                    name: 'en_name'
+                                    value: @state.en_name
+                    React.DOM.tr null,
+                        React.DOM.td null,
+                            React.DOM.p null,  "Описание"
+                        React.DOM.td null,
+                            React.DOM.label 
+                                'на русском'
+                                React.DOM.textarea
+                                    onChange: @changeInputHandle
+                                    name: 'ru_description'
+                                    value: @state.ru_description
+                            React.DOM.label 
+                                'на английском'
+                                React.DOM.textarea
+                                    onChange: @changeInputHandle
+                                    name: 'en_description'
+                                    value: @state.en_description
+
+    checkMdf: ->
+        if @state.mdfId isnt @props.modification.id
+            @setState editMode: false, mdfId: @props.modification.id
     render: ->
+        @checkMdf()
         React.DOM.div null,
             React.DOM.div
                 className: 'row'
@@ -582,11 +652,13 @@ ModificationMenuItem = React.createClass
 
 @BoatMainInfo = React.createClass
     getInitialState: ->
+        errors: []
         use_on_ru: @props.boat_type.use_on_ru
         use_on_en: @props.boat_type.use_on_en
         is_active: @props.boat_type.is_active
         is_deprecated: @props.boat_type.is_deprecated
-        name: AlterText(@props.boat_type.name)
+        ru_name: AlterText(@props.boat_type.ru_name)
+        en_name: AlterText(@props.boat_type.en_name)
         design_category: AlterText @props.boat_type.design_category
         ru_description: AlterText(@props.boat_type.ru_description)
         en_description: AlterText @props.boat_type.en_description
@@ -601,7 +673,8 @@ ModificationMenuItem = React.createClass
         isEdit: false
     btParams: ->
         {
-            name: @state.name
+            ru_name: @state.ru_name
+            en_name: @state.en_name
             design_category: @state.design_category
             ru_description: @state.ru_description
             en_description: @state.en_description
@@ -621,7 +694,9 @@ ModificationMenuItem = React.createClass
         bs = @state.boat_series
         if bs isnt null then bs.name else '' 
     btName: ->
-        if @state.name is undefined then '' else $.trim(@state.name)
+        if @state.ru_name is undefined then '' else $.trim(@state.ru_name)
+    btEnName: ->
+        if @state.en_name is undefined then '' else $.trim(@state.en_name)
     resetForm: (e)->
         e.preventDefault()
         @setState @getInitialState()
@@ -633,10 +708,10 @@ ModificationMenuItem = React.createClass
             dataType: 'json'
             data: {boat_type: @btParams()}
             success: (data)=>
-                console.log data
                 @switchEditMode()
-            error: (jqXHR)->
-                XHRErrMsg(jqXHR)         
+            error: (jqXHR)=>
+                @setState errors: getErrorsFromResponse(jqXHR.responseJSON)
+                #XHRErrMsg(jqXHR)         
     showMode: ->
         React.DOM.table null,
             React.DOM.tbody null,
@@ -671,8 +746,11 @@ ModificationMenuItem = React.createClass
                 React.DOM.tr
                     key: 'name_row'
                     React.DOM.td null, 'Название'
-                    React.DOM.td null,  
-                        if @btName().length is 0 then "Без имени" else @btName()
+                    React.DOM.td null,
+                        React.DOM.h6 null, 'Для русской версии' 
+                        React.DOM.p null, if @btName().length is 0 then "Без имени" else @btName()
+                        React.DOM.h6 null, 'Для английской версии' 
+                        React.DOM.p null, if @btEnName().length is 0 then "Не указано" else @btEnName()
                 React.DOM.tr
                     key: 'slogan_row'
                     React.DOM.td null, 'Слоган'
@@ -701,6 +779,7 @@ ModificationMenuItem = React.createClass
         @setState "#{name}": e.target.value, "#{entName}": entity    
     editMode: ->
         React.DOM.form null,
+            React.createElement ErrorsCallout, errors: @state.errors
             React.DOM.table null,
                 React.DOM.tbody null,
                     React.DOM.tr
@@ -717,7 +796,7 @@ ModificationMenuItem = React.createClass
                         React.DOM.td null, React.createElement YesNowDropdownList, key: 'is_active_cb', inputName: 'is_active', value: @state.is_active, changeEvent: @changeInputHandle, trueName: 'Активен', falseName: 'Не активен'
                     React.DOM.tr
                         key: 'is_deprecated_row',
-                        React.DOM.td null, 'Устарел'
+                        React.DOM.td null, 'Актуальность'
                         React.DOM.td null, React.createElement YesNowDropdownList, key: 'is_deprecated_cb', inputName: 'is_deprecated', value: @state.is_deprecated, changeEvent: @changeInputHandle, trueName: 'Устарел', falseName: 'Актуален'
                     React.DOM.tr
                         key: 'design_category_row',
@@ -746,7 +825,7 @@ ModificationMenuItem = React.createClass
                                 React.DOM.input 
                                     type: 'text' 
                                     placeholder: 'Название лодки' 
-                                    name: 'eu_name'
+                                    name: 'ru_name'
                                     onChange: @changeInputHandle
                                     value: @state.ru_name
                             React.DOM.label null, 

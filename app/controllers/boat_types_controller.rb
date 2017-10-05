@@ -105,7 +105,7 @@ class BoatTypesController < ApplicationController
     respond_to do |format|
       if @boat_type.update(prms)
         format.html { redirect_to edit_boat_type_path(@boat_type), notice: 'Тип лодки успешно обновлён' }
-        format.json { render :show, status: :ok, location: @boat_type }
+        format.json { render json: @boat_type.hash_view('control'), status: :ok}
       else
         format.html { render :edit }
         format.json { render json: @boat_type.errors, status: :unprocessable_entity }

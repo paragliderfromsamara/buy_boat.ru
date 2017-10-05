@@ -38,6 +38,10 @@ class BoatType < ApplicationRecord
   
   validate :ru_name_presence, :name_uniqueness
   
+  def self.default_scope
+    order("created_at ASC")
+  end
+  
   def ru_name_presence
     msg = is_modification? ? "Компановка не может быть без названия" : "Лодка не может быть без названия"
     if new_record?
