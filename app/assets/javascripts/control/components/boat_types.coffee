@@ -335,11 +335,14 @@ getErrorsFromResponse = (r)->
         boat_type: @props.boat_type
         trademarks: if @props.trademarks is undefined then [] else @props.trademarks
         boat_series: if @props.boat_series is undefined then [] else @props.boat_series
+    handleUpdated: (boat_type)->
+        @setState boat_type: boat_type        
     render: ->
-        React.DOM.div null,
-            React.createElement BoatMainInfo, boat_type: @state.boat_type, boat_series: @state.boat_series, trademarks: @state.trademarks
+        React.DOM.div 
+            className: "bt-show",
+            React.createElement BoatMainInfo, boat_type: @state.boat_type, boat_series: @state.boat_series, trademarks: @state.trademarks, handleUpdated: @handleUpdated
             React.createElement BoatTypePhotos, boat_type: @state.boat_type, form_token: @props.form_token
-            React.createElement BoatTypeModifications, boat_type: @state.boat_type
+            React.createElement BoatTypeModifications, boat_type: @state.boat_type, form_token: @props.form_token
 
 ModificationMenuItem = React.createClass
     altName: ->
@@ -516,7 +519,7 @@ ModificationMenuItem = React.createClass
                     className: 'tb-pad-s'
                     React.createElement SimpleMenu, items: @state.modifications, nTitle: 'ru_name', clickItemEvent: @selModification, selected: @state.curModification
                 @newModificationForm()
-                React.createElement ModificationMainInfo, modification: @state.curModification, updMdfFunc: @updModificationOnList
+                React.createElement ModificationMainInfo, modification: @state.curModification, updMdfFunc: @updModificationOnList, form_token: @props.form_token
                 @propertiesTable()
                 
         else
@@ -540,6 +543,12 @@ ModificationMenuItem = React.createClass
         en_name: ''
         ru_description: ''
         en_description: ''
+        bow_view: ''
+        aft_view: ''
+        top_view: ''
+        accomodation_view_1: ''
+        accomodation_view_2: ''
+        accomodation_view_3: ''
         errors: []
     btParams: ->
         {
@@ -560,7 +569,7 @@ ModificationMenuItem = React.createClass
                 data: {boat_type: @btParams()}
                 success: (data)=>
                     @props.updMdfFunc(data)
-                    @setState editMode: !@state.editMode
+                    @setState editMode: false
                 error: (jqXHR)=>
                     @setState errors: getErrorsFromResponse(jqXHR.responseJSON)
                     console.log jqXHR.responseJSON
@@ -583,9 +592,12 @@ ModificationMenuItem = React.createClass
                         React.DOM.p null, if $.trim(@props.modification.ru_description) is '' then 'Не указано' else @props.modification.ru_description
                         React.DOM.h6 null, 'на английском'
                         React.DOM.p null, if $.trim(@props.modification.en_description) is '' then 'Не указано' else @props.modification.en_description
+
     changeInputHandle: (e)->
-        @setState "#{e.target.name}": e.target.value
-        
+        name = e.target.name
+        val = e.target.value
+        val = if name is 'top_view' then File.open(val) else val
+        @setState "#{e.target.name}":  val
     editMode: ->
         React.DOM.div null,
             React.createElement ErrorsCallout, errors: @state.errors
@@ -648,6 +660,7 @@ ModificationMenuItem = React.createClass
                 React.DOM.div
                     className: 'small-12 columns'
                     if @state.editMode then @editMode() else @showMode()
+            React.createElement TechnicalViewsLoader, form_token: @props.form_token, modification: @props.modification, updMdfFunc: @props.updMdfFunc
 
 
 @BoatMainInfo = React.createClass
@@ -664,13 +677,15 @@ ModificationMenuItem = React.createClass
         en_description: AlterText @props.boat_type.en_description
         ru_slogan: AlterText @props.boat_type.ru_slogan
         en_slogan: AlterText @props.boat_type.en_slogan
-        trademark_id: @props.boat_type.trademark_id
-        trademark: GetEntityById(@props.trademarks, @props.boat_type.trademark_id)
+        trademark_id: @props.boat_type.trademark_id 
         trademarks: @props.trademarks
         boat_series_id: @props.boat_type.boat_series_id
-        boat_series: GetEntityById(@props.boat_series, @props.boat_type.boat_series_id)
         boat_series_list: if @props.boat_series is undefined then [] else @props.boat_series
         isEdit: false
+    getTrademark: ->
+        GetEntityById(@props.trademarks, @props.boat_type.trademark_id)
+    getBoatSeries: ->
+        GetEntityById(@props.boat_series, @props.boat_type.boat_series_id)
     btParams: ->
         {
             ru_name: @state.ru_name
@@ -688,10 +703,10 @@ ModificationMenuItem = React.createClass
             use_on_en: @state.use_on_en
         }
     tmName: ->
-        tm = @state.trademark 
+        tm = @getTrademark()
         if tm isnt null then tm.name else ''
     bsName: ->
-        bs = @state.boat_series
+        bs = @getBoatSeries()
         if bs isnt null then bs.name else '' 
     btName: ->
         if @state.ru_name is undefined then '' else $.trim(@state.ru_name)
@@ -707,7 +722,8 @@ ModificationMenuItem = React.createClass
             type: 'PUT'
             dataType: 'json'
             data: {boat_type: @btParams()}
-            success: (data)=>
+            success: (data)=>                
+                @props.handleUpdated(data)
                 @switchEditMode()
             error: (jqXHR)=>
                 @setState errors: getErrorsFromResponse(jqXHR.responseJSON)
@@ -768,15 +784,6 @@ ModificationMenuItem = React.createClass
         name = e.target.name
         value = e.target.value
         @setState "#{ name }": value
-    changeDropdownList: (e)->
-        name = e.target.name
-        if name is 'boat_series_id'
-            entName = 'boat_series'
-            entity = GetEntityById(@state.boat_series_list, e.target.value)
-        else if name is 'trademark_id'
-            entName = 'trademark'
-            entity = GetEntityById(@state.trademarks, e.target.value)
-        @setState "#{name}": e.target.value, "#{entName}": entity    
     editMode: ->
         React.DOM.form null,
             React.createElement ErrorsCallout, errors: @state.errors
@@ -811,11 +818,11 @@ ModificationMenuItem = React.createClass
                     React.DOM.tr
                         key: 'trademark_row',
                         React.DOM.td null, 'Торговая марка'
-                        React.DOM.td null, React.createElement DropdownList, key: 'tm', items: @state.trademarks, selected: @state.trademark, valTitle: 'id', nameTitle: 'name', inputName: 'trademark_id', changeEvent: @changeDropdownList
+                        React.DOM.td null, React.createElement DropdownList, key: 'tm', items: @state.trademarks, selected: @state.trademark_id, valTitle: 'id', nameTitle: 'name', inputName: 'trademark_id', changeEvent: @changeInputHandle
                     React.DOM.tr
                         key: 'boat_series_row'
                         React.DOM.td null, 'Серия'
-                        React.DOM.td null, React.createElement DropdownList, key: 'bs', items: @state.boat_series_list, selected: @state.boat_series, valTitle: 'id', nameTitle: 'name', inputName: 'boat_series_id', nullValName: 'Вне серии', changeEvent: @changeDropdownList
+                        React.DOM.td null, React.createElement DropdownList, key: 'bs', items: @state.boat_series_list, selected: @state.boat_series_id, valTitle: 'id', nameTitle: 'name', inputName: 'boat_series_id', nullValName: 'Вне серии', changeEvent: @changeInputHandle
                     React.DOM.tr
                         key: 'name_row'
                         React.DOM.td null, 'Название'
@@ -844,12 +851,12 @@ ModificationMenuItem = React.createClass
                             React.DOM.textarea
                                 name: 'ru_slogan'
                                 onChange: @changeInputHandle
-                                rows: 2
-                                value: @state.en_slogan
+                                rows: 3
+                                value: @state.ru_slogan
                             React.DOM.h6 null, 'На английском'
                             React.DOM.textarea
                                 name: 'en_slogan'
-                                rows: 2
+                                rows: 3
                                 onChange: @changeInputHandle
                                 value: @state.en_slogan
                     React.DOM.tr
@@ -870,6 +877,7 @@ ModificationMenuItem = React.createClass
                                 value: @state.en_description 
     switchEditMode: (e)->
         if e isnt undefined then e.preventDefault()
+        @setState @btParams()
         @setState isEdit: !@state.isEdit
     render: ->
         React.DOM.div null,
@@ -898,6 +906,7 @@ ModificationMenuItem = React.createClass
                     className: 'small-12 columns'
                     React.DOM.div null,
                         if @state.isEdit then @editMode() else @showMode()
+             
 
 
 @BoatTypePhotos = React.createClass
@@ -914,5 +923,58 @@ ModificationMenuItem = React.createClass
             React.createElement PhotosControl, photos: @state.photos, entity: 'boat_type', entity_id: @state.boatType.id, form_token: @props.form_token
 
 
-       
+technicalViewLoaderCell = React.createClass
+    handleRemove: (e)->
+        e.preventDefault()
+        $.ajax(
+                url: "/boat_types/#{@props.modification.id}"
+                type: "PUT"
+                data: {boat_type: {delete_view: @props.view.attr}}
+                dataType: 'json'
+                success: (data)=>
+                    @props.viewUploaded(data)
+               )
+    hasPhoto: ->
+        @props.modification["#{@props.view.attr}"] isnt '' and @props.modification["#{@props.view.attr}"] isnt null and @props.modification["#{@props.view.attr}"] isnt undefined
+    showMode: ->
+        React.DOM.div null,
+            React.DOM.a
+                className: 'button expanded'
+                onClick: @handleRemove
+                'Удилить'
+            React.DOM.img
+                src: if @hasPhoto() then @props.modification["#{@props.view.attr}"] else NoPhoto()
+
+    editMode: ->
+        React.createElement MiniPhotoUploader, url: "/boat_types/#{@props.modification.id}}", entity: 'boat_type', attr: @props.view.attr, form_token: @props.form_token, handleSuccess: @props.viewUploaded
+    render: ->
+        React.DOM.div
+            className: 'column'
+            React.DOM.div 
+                className: 'tb-pad-s'
+                React.DOM.h6 null, @props.view.name
+                if not @hasPhoto() then @editMode() else @showMode()
+
+
+
+@TechnicalViewsLoader = React.createClass
+    getInitialState: ->
+        curEdit: null
+        viewsList: [
+                        {attr: "top_view", name: "Вид сверху", isEdit: false},
+                        {attr: "aft_view", name: "Вид сзади", isEdit: false},
+                        {attr: 'bow_view', name: 'Вид спереди', isEdit: false},
+                        {attr: "accomodation_view_1", name: "Схема рассадки 1", isEdit: false},
+                        {attr: "accomodation_view_2", name: "Схема рассадки 2", isEdit: false},
+                        {attr: "accomodation_view_3", name: "Схема рассадки 3", isEdit: false}
+                    ]
+    viewUploaded: (data)->
+        @props.updMdfFunc(data)
+    render: ->
+        React.DOM.div
+            className: 'small-up-1 medium-up-3 row'
+            for i in @state.viewsList 
+                React.createElement technicalViewLoaderCell, key: i.attr, view: i, form_token: @props.form_token, modification: @props.modification, viewUploaded: @viewUploaded
+
+                
     

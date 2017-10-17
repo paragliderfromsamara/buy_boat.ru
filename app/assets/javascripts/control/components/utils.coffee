@@ -44,3 +44,29 @@ simpleMenuItem = React.createClass
                     for item in @props.items
                         React.createElement simpleMenuItem, key: "item-#{item.id}", item: item, nTitle: @state.nTitle, clickItemEvent: @props.clickItemEvent, isActive: @props.selected is item
                 
+@MiniPhotoUploader = React.createClass
+    componentDidMount: ->
+        @initLoader()
+    dzElementId: ->
+        "#{@props.entity}-#{@props.attr}-dz"
+    initLoader: ->
+        $("div##{@dzElementId()}").dropzone(
+                { 
+                    url: @props.url 
+                    method: 'PUT'
+                    maxFiles: 1
+                    paramName: "#{@props.entity}[#{@props.attr}]"
+                    dictDefaultMessage: "Выберите файл <i class = \"fi-upload fi-large\"></i>"
+                    sending: (file, xhr, formData)=>
+                        formData.append("authenticity_token", @props.form_token)
+                    success: (file, response)=> 
+                        @props.handleSuccess(response)
+                        
+                })
+    render: ->
+        React.DOM.div 
+            id: @dzElementId()
+            className: 'dropzone'
+            null
+        
+        

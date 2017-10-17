@@ -3,10 +3,10 @@ class BoatType < ApplicationRecord
   #copy_params_table_from_id - id типа лодки с которой копируется таблица характеристик
   #modifications_number - количество модификаций, которые автоматически добавляются при создании лодки (если не указано, то создается 1)
   
-  attr_accessor :copy_params_table_from_id, :modifications_number
+  attr_accessor :copy_params_table_from_id, :modifications_number, :delete_view, :aft_view_cache, :bow_view_cache, :top_view_cache, :accomodation_view_1_cache, :accomodation_view_2_cache, :accomodation_view_3_cache
     
   after_create :make_boat_parameter_values, :make_modifications, :set_default_url_name 
-  before_save :sync_general_attrs_on_modifications, :set_en_name
+  before_save :sync_general_attrs_on_modifications, :set_en_name, :check_technical_views_del_flag
   before_validation :set_general_attrs_on_modification #устанавливает общие атрибуты у модификации с базовым типом
   
   #связи для отношения boat_type <- modifications  
@@ -37,6 +37,24 @@ class BoatType < ApplicationRecord
   mount_uploader :accomodation_view_3, ModificationViewsUploader
   
   validate :ru_name_presence, :name_uniqueness
+  
+  def check_technical_views_del_flag
+    return if delete_view.blank?
+    case delete_view
+    when 'top_view'
+      self.remove_top_view!
+    when 'bow_view'
+      self.remove_bow_view!
+    when 'aft_view'
+      self.remove_aft_view!
+    when 'accomodation_view_1'
+      self.remove_accomodation_view_1!
+    when 'accomodation_view_2'
+      self.remove_accomodation_view_2!
+    when 'accomodation_view_3'
+      self.remove_accomodation_view_3!
+    end
+  end
   
   def self.default_scope
     order("created_at ASC")
@@ -398,7 +416,15 @@ class BoatType < ApplicationRecord
          use_on_ru: self.use_on_ru,
          use_on_en: self.use_on_en,
          is_active: self.is_active,
-         is_deprecated: self.is_deprecated
+         is_deprecated: self.is_deprecated,
+         top_view: top_view.nil? ? '' : top_view.url,
+         bow_view: bow_view.nil? ? '' : bow_view.url,
+         aft_view: aft_view.nil? ? '' : aft_view.url,
+         accomodation_view_1: accomodation_view_1.nil? ? '' : accomodation_view_1.url,
+         accomodation_view_2: accomodation_view_2.nil? ? '' : accomodation_view_2.url,
+         accomodation_view_3: accomodation_view_3.nil? ? '' : accomodation_view_3.url
+         
+         
       }
     end
   end

@@ -11,8 +11,6 @@
 # about supported directives.
 #
 #= require ./application
-#= require react
-#= require react_ujs
 #= require_tree ./control
 
 bbMiniAutosize = ()->

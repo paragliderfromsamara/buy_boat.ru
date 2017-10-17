@@ -2,7 +2,7 @@ getSelectedItem = (items, v, sel)->
     if items.length is 0 then return null
     if sel is undefined || sel is null then return null
     for i in items
-        if "#{i[v]}" is "sel" then return i
+        if "#{i[v]}" is "#{sel}" then return i
     return null
 makeDropdownItems = (items, vTitle, nTitle, nullValName, selVal)->
     value = []

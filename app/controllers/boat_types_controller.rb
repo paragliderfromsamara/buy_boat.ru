@@ -153,7 +153,7 @@ class BoatTypesController < ApplicationController
     end
     
     def modification_params
-      params.require(:boat_type).permit(:ru_name, :en_name, :ru_description, :en_description, :is_deprecated, :is_active, :use_on_ru, :use_on_en)
+      params.require(:boat_type).permit(:top_view, :aft_view, :bow_view, :accomodation_view_1, :accomodation_view_2, :accomodation_view_3, :delete_view, :ru_name, :en_name, :ru_description, :en_description, :is_deprecated, :is_active, :use_on_ru, :use_on_en)
     end
     
     def boat_properties_params
