@@ -13,6 +13,39 @@
 #= require ./application
 #= require_tree ./realcraft
 
+
+
+enDict = {
+            modifications: "Modifications"
+            design_category: "Design category"
+            technical_information: "Technical Information"
+            photos: "Photos"
+            videos: "Videos"
+            engeneering: "Engeneering"
+            buy: 'Send request'
+            top_view: 'Top view'
+            aft_view: 'Aft view'
+            bow_view: 'Bow view'
+            scheme: 'Scheme'
+            crew_accomodation: 'Crew accomodation'
+         }
+         
+ruDict = {
+            modifications: "Модификации"
+            design_category: "Класс"
+            technical_information: "Характеристики"
+            photos: "Фото"
+            videos: "Видео"
+            engeneering: "Инженерия"
+            buy: "Отправить запрос"
+            top_view: 'Вид сверху'
+            aft_view: 'Вид с кормы'
+            bow_view: 'Вид с носа'
+            scheme: 'Схема'
+            crew_accomodation: "Размещение пассажиров"
+         }
+@Dict = if IsRuLocale() then ruDict else enDict
+
 fResFunction = ->
     f = $('#footer')
     c = f.find '#footer-contacts'
@@ -30,6 +63,7 @@ wResFunction = ->
     $(".orbit-container").height($(".orbit").height())
     fResFunction()
 
+#удалить так как реализовано в components/boat_type.coffee
 changeTabsEvent = ->
     tOffset = $("#rc-data-tabs").offset().top - 20
     curScroll = $(window).scrollTop()
@@ -39,13 +73,19 @@ changeTabsEvent = ->
 
 r = ->
     FoInit()
-    reqHash = GetReqHash()
-    wResFunction()
-    $("#rc-data-tabs").on 'change.zf.tabs', changeTabsEvent
-    if $('[data-tabs]').length > 0 and reqHash.length > 1 then $("#rc-data-tabs").foundation('selectTab', $(reqHash))
+    #reqHash = GetReqHash()
+    #wResFunction()
+    #$("#rc-data-tabs").on 'change.zf.tabs', changeTabsEvent
+    #if $('[data-tabs]').length > 0 and reqHash.length > 1 then $("#rc-data-tabs").foundation('selectTab', $(reqHash))
     #InitViewer()
     return true
+
+befRendFunc = -> 
+    ReactRailsUJS.unmountComponents() 
     
+   
+document.addEventListener "turbolinks:before-visit", befRendFunc 
+
 document.addEventListener "turbolinks:load", r
 $(window).resize(wResFunction)
         

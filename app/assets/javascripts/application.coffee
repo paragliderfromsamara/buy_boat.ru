@@ -30,6 +30,10 @@
 #для выводит мультилокальную строку в виде записи 'ru {en}'
 @MultLocStr = (ru, en)-> "#{ru}#{if en is '' then '' else " {#{en}}"}"
 
+@IsEmptyString = (txt)->
+    if txt is undefined then return true
+    txt = $.trim(txt)
+    txt.length is 0
 #Обрезает текст t по длине l
 @TrimText = (t, l)->
     if t is undefined then console.error "Не задан текст"
@@ -46,6 +50,9 @@
     for i in [0..arr.length-1]
         if arr[i].id is id then return i
     -1
+@PushIfIsUniq = (arr, val)->
+    if IndexOf(arr, val) is -1 then arr.push(val)
+    arr
 #ищем последний номер элемента el в массиве arr    
 @LastIndexOf = (arr, el)->
     idx = -1
@@ -137,6 +144,19 @@
     type = if type is undefined then "square" else type
     "/files/nophoto_#{type}.jpg"
 
+@IsRuLocale = ->
+    window.location.toString().indexOf(".ru") > -1
+    
+
+@GetPropertyByTag = (props, tag)->
+    if props.length == 0 then return null
+    for p in props
+        if p.tag is tag then return p
+    return null
+
+@GetPropertyValueTag = (props, tag)->
+    p = GetPropertyByTag(props, tag)
+    if p is null then 'нет' else p.value
 
 #AppReadyFunc = ->
     #Тут вносятся общие функции активируемые при загрузке страницы

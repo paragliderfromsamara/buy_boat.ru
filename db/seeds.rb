@@ -115,13 +115,42 @@ boat.entity_property_values.find_by(property_type_id: max_speed.id).update_attri
 realcraft_200 = BoatType.create(
                                   ru_name: "200", 
                                   body_type: "490", 
+                                  design_category: "C",
                                   trademark_id: tm_real.id,
                                   ru_slogan: "Cоздана для тех, кто не боится самых экстремальных метео условий",
                                   en_slogan: "Designed for people who are used to navigating in the most extreme conditions",
                                   ru_description: "Лодка RealCraft 190 предоставляет владельцу широкие возможности для всех видов отдыха на воде. Увеличенный основной кокпит, широкий проход в носовой кокпит, ровный пол, под которым большие отсеки для хранения якорей, фалов, кранцев и других вещей, предназначенные для спиннингов и удилищ полочки вдоль бортов делают RealCraft 190 отличной лодкой для увлеченного рыболова.",
                                   en_description: "Realсraft 190 can provide you a wide range of leisure activities on the water. Increased main cockpit, wide passage to the front cockpit, level floor, spacious units for storage of anchors, halyards, fenders and other things, shelves for spinning and fishing rods along the boards make Realсraft 190 a great boat for enthusiastic fishermen.",
+                                  modifications_number: 2
                                 )
 boat = realcraft_200.reload.modifications.first
+boat.update_attributes(
+                        ru_name: "Pro", 
+                        en_name: 'Pro',
+                        ru_description: 'Версия "Pro" выпускается с прямым ветровым остеклением. Остекление может быть выполнено как из пластика, так и калёного стекла', 
+                        en_description: 'PRO Version goes with the direct plastic or tempered glass'
+                        )
+boat.entity_property_values.find_by(property_type_id: places.id).update_attributes(set_ru_value: 5, set_en_value: 5) #пассажировместимость
+boat.entity_property_values.find_by(property_type_id: max_length.id).update_attributes(set_ru_value: 4720, set_en_value: 4720) #длина наибольшая 
+boat.entity_property_values.find_by(property_type_id: max_width.id).update_attributes(set_ru_value: 1706, set_en_value: 1706) #ширина наибольшая
+boat.entity_property_values.find_by(property_type_id: normal_length.id).update_attributes(set_ru_value: 5050, set_en_value: 5050) #длина габаритная
+boat.entity_property_values.find_by(property_type_id: normal_width.id).update_attributes(set_ru_value: 1750, set_en_value: 1750) #ширина габаритная
+boat.entity_property_values.find_by(property_type_id: board_height.id).update_attributes(set_ru_value: 740, set_en_value: 740) #высота борта
+boat.entity_property_values.find_by(property_type_id: capacity.id).update_attributes(set_ru_value: 500, set_en_value: 500) #грузоподъемность
+boat.entity_property_values.find_by(property_type_id: max_hp.id).update_attributes(set_ru_value: 70, set_en_value: 70) #макс мощность двигателя
+boat.entity_property_values.find_by(property_type_id: min_hp.id).update_attributes(set_ru_value: 40, set_en_value: 40) #мин мощность двигателя
+boat.entity_property_values.find_by(property_type_id: max_speed.id).update_attributes(set_ru_value: 57, set_en_value: 57) #максимальная скорость 
+boat.entity_property_values.find_by(property_type_id: boat_weight.id).update_attributes(set_ru_value: 322, set_en_value: 322) #масса 
+boat.entity_property_values.find_by(property_type_id: deadrise_angle.id).update_attributes(set_ru_value: 11, set_en_value: 11) #килеватость
+boat.entity_property_values.find_by(property_type_id: max_speed.id).update_attributes(set_ru_value: 65, set_en_value: 65) #максимальная скорость 
+
+boat = realcraft_200.reload.modifications.last
+boat.update_attributes(
+                        ru_name: "Navi", 
+                        en_name: 'Navi', 
+                        ru_description: 'Модификация "Navi" выпускается с гнутым ветровым остеклением выполненным из оргстекла', 
+                        en_description: 'Navi version with the curved plastic glass'
+                      )
 boat.entity_property_values.find_by(property_type_id: places.id).update_attributes(set_ru_value: 5, set_en_value: 5) #пассажировместимость
 boat.entity_property_values.find_by(property_type_id: max_length.id).update_attributes(set_ru_value: 4720, set_en_value: 4720) #длина наибольшая 
 boat.entity_property_values.find_by(property_type_id: max_width.id).update_attributes(set_ru_value: 1706, set_en_value: 1706) #ширина наибольшая

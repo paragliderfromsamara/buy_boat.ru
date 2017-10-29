@@ -126,7 +126,7 @@ div#rc-header
     h3
     {
         font-size: 0.7rem;
-        padding: 0;
+        padding: 0 0 0 0.2rem ;
         margin:0;
         font-weight: bolder;
     }
@@ -140,15 +140,14 @@ div#rc-header
     h4
     {
         font-size: 0.6rem;
-        padding: 0;
+        padding: 0 0 0 0.2rem;
         margin:0;
         font-weight: bolder;
     }
 }
 .rc-map-pattern
 {
-    
-    background-image: url("/files/pattern_map.png");
+    background-image: url("/realcraft_files/files/pattern_map.png");
 }
 div.rc-param-val-b
 {

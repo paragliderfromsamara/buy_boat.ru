@@ -10,7 +10,7 @@ counterId = "ph_counter"
 middleImgEscId = "close_reveral"
 #атрибуты
 collAttrName = "data-collection" #атрибут названия коллекции фотографий
-titleAttrName = "rc-box-title" #атрибут примечания к фото
+titleAttrName = "data-rc-box-title" #атрибут примечания к фото
 curImgAttrName = "is-cur-img" #атрибут отмечающий фотографию которая открыта сейчас
 imgIdxAttrName = "data-image-idx" #индекс фотографии
 imgListAttrName = "data-image-versions" #атрибут, содержащий ссылку на отображаемую в слайдере фотографию
@@ -113,12 +113,13 @@ initBoxPhotos = (phs)->
             showPhotoByIdx(parseInt($(this).find("img").attr("#{imgIdxAttrName}")))    
         urlsCollection[colName][idx] = {
                                             imgs: $(p).attr("#{imgListAttrName}")
-                                            title: if p.hasAttribute(titleAttrName) then $(p).attr(titleAttrName) else ""
+                                            title: if p.hasAttribute(titleAttrName) then " "+$(p).attr(titleAttrName) else ""
                                         }
         #box_phs += "<img #{titleAttrName} = \"#{if p.hasAttribute(titleAttrName) then $(p).attr(titleAttrName) else ""}\" #{collAttrName} = \"#{colName}\" #{imgIdxAttrName} = \"#{idx}\" data-interchange = \"#{if p.hasAttribute(imgListAttrName) then $(p).attr(imgListAttrName) else "[#{$(p).attr("src")}, small]"}\">"
     #console.log urlsCollection
 
 @InitViewer = ()-> 
+    console.log "InitViewer"
     bPhotos = document.getElementsByClassName("kra-ph-box")
     if bPhotos.length > 0
         initBoxPhotos(bPhotos)

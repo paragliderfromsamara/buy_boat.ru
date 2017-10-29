@@ -42,7 +42,7 @@ class EntityPropertyValue < ApplicationRecord
                        #{EntityPropertyValue.select_values_string_by_locale('en')}
                       "
      if !locale.nil?
-       return entity.entity_property_values.joins(property_type: [:boat_property_type]).select(select_query).order("boat_property_types.order_number ASC").where(is_binded: true) 
+       return entity.entity_property_values.joins(property_type: [:boat_property_type]).select(select_query).order("boat_property_types.order_number ASC")#.where(is_binded: true) 
      else
        return entity.entity_property_values.joins(property_type: [:boat_property_type]).select(select_query).order("boat_property_types.order_number ASC")
      end
@@ -64,10 +64,13 @@ class EntityPropertyValue < ApplicationRecord
     if !locale.nil?
       {
         name: self["#{locale}_name".to_sym],
-        short_name: self["#{locale}_short_name".to_sym],
+        short_name: self["#{locale}_short_name".to_sym].blank? ? self["#{locale}_name".to_sym] : self["#{locale}_short_name".to_sym],
         measure: self["#{locale}_measure".to_sym],
         value: self.get_value(locale),
-        locale: locale
+        type: self.value_type,
+        is_binded: self.is_binded,
+        locale: locale,
+        tag: self.tag
       }
     else
       {

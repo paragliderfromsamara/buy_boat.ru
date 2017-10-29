@@ -28,9 +28,9 @@ class BoatTypesController < ApplicationController
   # GET /boat_types/1
   # GET /boat_types/1.json
   def show
-    @title = @header = @boat_type.catalog_name
+    @title = @header = current_site + ' ' + @boat_type.catalog_name 
     @boat_type = @boat_type.hash_view(current_site, cur_locale.to_s)
-    @data = is_control? ? {boat_type: @boat_type, trademarks: @trademarks, boat_series: @boat_series, form_token: form_authenticity_token} : {data: @boat_type}
+    @data = is_control? ? {boat_type: @boat_type, trademarks: @trademarks, boat_series: @boat_series, form_token: form_authenticity_token} : {boat_type: @boat_type}
     respond_to do |format|
       format.html 
       format.json { render json: @boat_type}

@@ -10,13 +10,7 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require jquery
-//= require jquery_ujs
-//= require motion-ui
-//= require foundation-sites
-//= require turbolinks
-//= require ./components
-//= require_tree .
+
 
 var footerResFunc = function()
     {

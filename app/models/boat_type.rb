@@ -38,6 +38,7 @@ class BoatType < ApplicationRecord
   
   validate :ru_name_presence, :name_uniqueness
   
+  #флаги на удаление видов при редактирования в меню control
   def check_technical_views_del_flag
     return if delete_view.blank?
     case delete_view
@@ -69,6 +70,21 @@ class BoatType < ApplicationRecord
     end
   end
   
+  def model_views
+    views = []
+    views.push({title: 'top_view', small: top_view.small.url, medium: top_view.medium.url, large: top_view.large.url}) if !top_view.blank?
+    views.push({title: 'bow_view', small: bow_view.small.url, medium: bow_view.medium.url, large: bow_view.large.url}) if !bow_view.nil?
+    views.push({title: 'aft_view', small: aft_view.small.url, medium: aft_view.medium.url, large: aft_view.large.url}) if !aft_view.nil?
+    return views
+  end
+  
+  def accomodation_views
+    views = []
+    views.push({small: accomodation_view_1.small.url, medium: accomodation_view_1.medium.url, large: accomodation_view_1.large.url}) if !accomodation_view_1.blank?
+    views.push({small: accomodation_view_2.small.url, medium: accomodation_view_2.medium.url, large: accomodation_view_2.large.url}) if !accomodation_view_2.blank?
+    views.push({small: accomodation_view_3.small.url, medium: accomodation_view_3.medium.url, large: accomodation_view_3.large.url}) if !accomodation_view_3.blank?
+    return views
+  end
   
   def name_uniqueness
     return if ru_name.nil? && en_name.nil?
@@ -261,7 +277,10 @@ class BoatType < ApplicationRecord
   #подготавливает тип лодки для отрисовки React.js, в boat_types/show
   def hash_view(site = 'shop', locale = nil)
     case site
-    when 'shop', 'salut', 'realcraft'
+    when 'realcraft'
+      locale = 'ru' if locale.blank?
+      return realcraft_hash(locale)
+    when 'shop', 'salut'
       locale = 'ru' if locale.nil?
       return default_hash(locale)
     when 'control'
@@ -344,6 +363,34 @@ class BoatType < ApplicationRecord
   #  photos.map {|ph| ph.hash_view(is_wide)}
   #end
   
+  def realcraft_hash(locale)
+    if is_modification?
+    {
+      id: self.id,
+      name: name,
+      description: description(locale),
+      properties: self.property_values_hash(locale),
+      type: 'modification',
+      model_views: model_views,
+      accomodation_views: accomodation_views#,
+      #boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
+    }
+    else
+      {
+        id: self.id,
+        body_type: self.body_type,
+        trademark: self.trademark.hash_view,
+        modifications: self.modifications.map{|mdf| mdf.realcraft_hash(locale)},
+        name: self.catalog_name(locale),
+        description: description(locale),
+        slogan: slogan(locale),
+        photo: main_photo_hash_view, 
+        photos: self.photos_hash_view,
+        type: 'boat_type'
+        #boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
+      }
+    end
+  end
   
   def default_hash(locale)
     if is_modification?
@@ -371,9 +418,8 @@ class BoatType < ApplicationRecord
         description: description(locale),
         slogan: slogan(locale),
         photo: main_photo_hash_view, 
-        properties: self.property_values_hash(locale),
         photos: self.photos_hash_view,
-        type: 'boat_type'#,
+        type: 'boat_type'
         #boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
       }
     end
