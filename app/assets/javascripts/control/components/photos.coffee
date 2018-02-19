@@ -68,19 +68,21 @@ photoControlItem = React.createClass
 
 @PhotosControl = React.createClass
     getInitialState: ->
-        entity: @props.entity
-        entityId: @props.entity_id
         photos: if @props.photos is undefined then [] else @props.photos
+        copyFormIsOpened: false
+    componentWillUnmount:->
+        console.log "finish"
     componentDidMount: ->
-        $("div##{@props.entity}-dz").dropzone(
+        $("div##{@props.entity}-#{@props.entity_id}-dz").dropzone(
                             { 
-                                url: "/upload_photo/#{@state.entity}/#{@state.entityId}" 
+                                url: "/upload_photo/#{@props.entity}/#{@props.entity_id}" 
                                 method: 'POST'
                                 paramName: 'photo[link]'
                                 sending: (file, xhr, formData)=>
                                     formData.append("authenticity_token", @props.form_token)
                                 success: (file, response)=> 
                                     @updPhotosList(response)
+                                    console.log "#{@props.entity}-#{@props.entity_id}"
                                     setTimeout ()->
                                         $(".dz-preview").each ()->
                                             if $(this).hasClass('dz-complete') 
@@ -100,10 +102,13 @@ photoControlItem = React.createClass
     photosList: ->
         React.DOM.div
             className: 'row small-up-1 medium-up-3 large-up-4 '
-            for p in @state.photos
-                React.createElement photoControlItem, key: "photo-#{p.entity_photo_id}", photo: p, entity: @state.entity, entityId: @state.entityId, updPhotosList: @updPhotosList
+            for p in @props.photos
+                React.createElement photoControlItem, key: "photo-#{p.entity_photo_id}", photo: p, entity: @props.entity, entityId: @props.entity_id, updPhotosList: @updPhotosList
             
     updPhotosList: (phs)->
+        if @props.afterUpdHandle isnt undefined 
+            @props.afterUpdHandle({photos: []})
+            @props.afterUpdHandle({photos: phs})
         @setState photos: [] 
         @setState photos: phs
     photoUploader: ->
@@ -111,13 +116,14 @@ photoControlItem = React.createClass
             className: 'row'
             React.DOM.div
                 className: 'small-12 columns'
+                if @props.entity is "boat_type" then React.createElement CopyFromForm, type: "photos", boat_type_id: @props.entity_id, completeHandle: @updPhotosList
                 React.DOM.div
-                    id: "#{@props.entity}-dz"
+                    id: "#{@props.entity}-#{@props.entity_id}-dz"
                     className: 'dropzone'
                     null    
     render: ->
         React.DOM.div null,
             @photoUploader()
-            if @state.photos.length > 0 then @photosList() else @noPhotosList()
+            if @props.photos.length > 0 then @photosList() else @noPhotosList()
 
             

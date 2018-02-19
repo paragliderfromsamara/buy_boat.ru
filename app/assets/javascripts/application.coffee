@@ -158,6 +158,7 @@
     p = GetPropertyByTag(props, tag)
     if p is null then 'нет' else p.value
 
+
 #AppReadyFunc = ->
     #Тут вносятся общие функции активируемые при загрузке страницы
     #$(document).foundation()

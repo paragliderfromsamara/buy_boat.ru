@@ -10,7 +10,6 @@ getErrorsFromResponse = (r)->
     return errs
     
 
-
 @BoatTypesTableRow = React.createClass
      locales: ->
          v = ''
@@ -80,10 +79,6 @@ getErrorsFromResponse = (r)->
             className: 'tb-pad-xs'
             React.DOM.h5 null, @props.header
             if @props.boat_types.length is 0 then @empty() else @notEmpty()
-            
-
-
-
                 
 @BoatTypesManageIndex = React.createClass
     getInitialState: ->
@@ -98,7 +93,7 @@ getErrorsFromResponse = (r)->
         tm = @state.curTM
         bts = []
         if tm is null then return []
-        for b in @props.boat_types
+        for b in @state.boat_types
             if b.trademark_id is tm.id then bts.push(b)
         return bts
     setTM: (tm)->
@@ -122,6 +117,7 @@ getErrorsFromResponse = (r)->
         body_type: ''
         copy_params_table_from_id: null
         modifications_number: 1
+        design_category: "C"
         ru_name: ''
         isOpen: false
         errors: []
@@ -130,6 +126,7 @@ getErrorsFromResponse = (r)->
         trademark_id: if @props.trademarks.length is 0 then null else @props.trademarks[0].id
         body_type: ''
         modifications_number: 1
+        design_category: "C"
         ru_name: ''
         errors: []
     onChangeHandle: (e)->
@@ -168,7 +165,6 @@ getErrorsFromResponse = (r)->
         #console.log errs
     drawErrors: ->
         React.createElement ErrorsCallout, errors: @state.errors
-
     render: ->
         React.DOM.div 
             id: "new_boat_type_form",
@@ -253,116 +249,121 @@ getErrorsFromResponse = (r)->
                     "data-image-versions": "[#{@props.photo.small}, small], [#{@props.photo.medium}, medium],[#{@props.photo.large}, large]"  
                     #"data-interchange": "[#{@props.photo.small}, small], [#{@props.photo.medium}, medium],[#{@props.photo.large}, large]"
 
-@BoatTypeTitleBlock = React.createClass #в версии contol не используется
+@BoatTypeShowMenuItem = React.createClass
+    handleClick: (e)->
+        e.preventDefault()
+        history.pushState(@props.item, @props.item.title, e.target.href)
+        @props.setPartAct(@props.item)
     render: ->
-        React.DOM.div null,#className: "tb-pad-s"
-            React.DOM.div 
-                className: "bb-wide-block"
-                "data-interchange": MakeInterchangeData(@props.b.photo, true)
-                React.DOM.div
-                    className: "rc-fog hard-fog dark-blue-bg"
-                    null
-                React.DOM.div
-                    className: "row tb-pad-s"
-                    React.DOM.div
-                        className: "small-12 columns text-center"
-                        React.DOM.h3 null, @props.b.name
-                React.DOM.div
-                    className: "row show-for-large"
-                    React.DOM.div
-                        className: 'medium-12 columns text-center'
-                        React.DOM.p
-                            title: @props.b.description,
-                            TrimText(@props.b.description, 500)
-                React.DOM.div
-                    className: "row tb-pad-s"
-                    for i in [0..@props.prms.length-1]
-                        if i > 5 then break
-                        React.DOM.div
-                            key: "parameter-#{i}"
-                            className: "small-2 columns"
-                            React.DOM.div
-                                 className: "stat text-center rc-param-val-b"
-                                 React.DOM.span null, @props.prms[i].value
-                            React.DOM.p 
-                                 className: "rc-param-name-b text-center"
-                                 @props.prms[i].name
-                React.DOM.div
-                    className: "row"
-                    React.DOM.div
-                        className: "small-12 columns"
-                        React.DOM.img
-                            className: "float-center"
-                            src: @props.b.trademark.white_logo.small
-                    #        className: "button expanded"
-                    #        href: "#"
-                    #        "ПОДРОБНЕЕ"
-                    #React.DOM.div
-                    #    className: "small-4 small-offset-4 columns"
-                    #    React.DOM.a
-                    #        className: "button expanded"
-                    #        href: "#"
-                    #        "КУПИТЬ"
+        React.DOM.li null,
+            React.DOM.a
+                href: @props.item.url.replace('{0}', @props.bt_id)
+                onClick: @handleClick
+                @props.item.title
 
-@BoatModificationRow = React.createClass
-    modelViews: ->
-        views = []
-        if @props.mdf.views.aft isnt null then views.push({title: "Вид спереди", view: @props.mdf.views.aft})
-        if @props.mdf.views.bow isnt null then views.push({title: "Вид сзади", view: @props.mdf.views.bow})
-        if @props.mdf.views.top isnt null then views.push({title: "Вид сверху", view: @props.mdf.views.top})
-        return views
-    render: ->
-        views = @modelViews()
-        React.DOM.div null,
-            React.DOM.div
-                className: "row"
-                React.DOM.div
-                    className: "small-12 columns"
-                    React.DOM.h4 null, @props.mdf.name
-            if views.length > 0
-                React.DOM.div
-                    className: "row tb-pad-s small-up-2 medium-up-3",
-                    for v in views
-                        React.DOM.div
-                            key: "view-#{v.title}"
-                            className: "column"
-                            React.DOM.h6 null, v.title
-                            React.DOM.img
-                                "data-interchange": MakeInterchangeData(v.view)
-                
+BTSMenuItems = [
+                    {
+                        name: "main"
+                        title: "Основная информация"
+                        url: "/boat_types/{0}" 
+                    },
+                    {
+                        name: "modifications"
+                        title: "Компоновки"
+                        url: "/boat_types/{0}/modifications" 
+                    },
+                    {
+                        name: "videos"
+                        title: "Видео"
+                        url: "/boat_types/{0}/videos" 
+                    }
+                ]
+                   
 @BoatTypeShow = React.createClass #     
-    getInitialState: -> 
+    getInitialState: ->
+        curPart: @setPartByLocation()
         boat_type: @props.boat_type
-        trademarks: if @props.trademarks is undefined then [] else @props.trademarks
-        boat_series: if @props.boat_series is undefined then [] else @props.boat_series
+        trademarks: @props.trademarks
+        boat_series: @props.boat_series
+        videos: @props.videos
+        photos: @props.photos
+        form_token: @props.form_token
+        modifications: @props.modifications
+    updState: (data)->
+        boat_type: if data.boat_type is undefined then @state.boat_type else data.boat_type
+        trademarks: if data.trademarks is undefined then @state.trademarks else data.trademarks 
+        boat_series: if data.trademarks is undefined then @state.boat_series else data.boat_series 
+        videos: if data.videos is undefined then @state.videos else data.videos 
+        photos: if data.photos is undefined then @state.photos else data.photos 
+        form_token: if data.form_token is undefined then @state.form_token else data.form_token 
+        modifications: if data.modifications is undefined then @state.modifications else data.modifications 
+        curPart: if data.curPart is undefined then @state.curPart else data.curPart
+    setDataInState: (data)->
+        @setState @updState(data)
+    setPartByLocation: ()->
+        loc = window.location
+        for i in BTSMenuItems
+            if loc.toString().indexOf(i.name) > -1
+                return i
+        BTSMenuItems[0]
+    setPartAct: (state)->
+        needUpd = false
+        switch state.name
+            when 'main'
+                needUpd = @state.boat_series is undefined or @state.trademarks is undefined
+            when 'modifications'
+                needUpd = @state.modifications is undefined or @state.form_token is undefined
+            when 'videos'
+                needUpd = @state.videos is undefined 
+            when 'photos'
+                needUpd = @state.photos is undefined or @state.form_token is undefined
+        if needUpd 
+            $.ajax({
+              url: state.url.replace('{0}', @state.boat_type.id)
+              type: "GET"
+              success: (data)=>
+                  data.curPart = state
+                  @setState @updState(data)
+              error: (jqXHR, textStatus, errorThrown)=>
+                  errs = getErrorsFromResponse(jqXHR.responseJSON)
+                  console.log errs
+                  @setState errors: errs
+              dataType: 'json'
+            })    
+        else @setState curPart: state
+        
+    componentDidMount: ->
+        window.addEventListener('popstate', 
+                                (e)=> @setState curPart: e.state,
+                                false)
     handleUpdated: (boat_type)->
         @setState boat_type: boat_type        
     render: ->
         React.DOM.div 
             className: "bt-show",
-            React.createElement BoatMainInfo, boat_type: @state.boat_type, boat_series: @state.boat_series, trademarks: @state.trademarks, handleUpdated: @handleUpdated
-            React.createElement BoatTypePhotos, boat_type: @state.boat_type, form_token: @props.form_token
-            React.createElement BoatTypeModifications, boat_type: @state.boat_type, form_token: @props.form_token
+            React.DOM.div 
+                className: 'tb-pad-m'
+                React.DOM.div 
+                    className: 'row'
+                    React.DOM.div
+                        className: 'small-12 medium-6 columns'
+                        React.createElement HeaderWithSubHeader, h1: "#{@state.boat_type.trademark_name} #{@state.boat_type.ru_name}", h3: "#{@state.curPart.title}"
+                    React.DOM.div
+                        className: 'small-12 medium-6 columns'
+                        React.DOM.ul
+                            className: 'menu right-menu'
+                            for i in BTSMenuItems
+                                React.createElement BoatTypeShowMenuItem, key: "item-#{i.name}", item: i, bt_id: @state.boat_type.id, setPartAct: @setPartAct              
+            #switch @state.curPart.name 
+            #    when 'main' then React.createElement BoatMainInfo, boat_type: @state.boat_type, boat_series: @state.boat_series, trademarks: @state.trademarks, handleUpdated: @setDataInState
+            #    when 'modifications' then React.createElement BoatTypeModifications, modifications: @state.modifications, boat_type: @state.boat_type, form_token: @state.form_token, updHandle: @setDataInState
+            #    when 'videos' then React.createElement BoatTypeVideos, videos: @state.videos, boat_type: @state.boat_type, updHandle: @setDataInState
 
-ModificationMenuItem = React.createClass
-    altName: ->
-        if $.trim(@props.modification.name) is '' || @props.modification.name is null then "Компоновка #{@props.idx}"
-    handleClick: (e)->
-        e.preventDefault()
-        @props.selModification(@props.modification)
-    render: ->
-        console.log @props.curModification
-        console.log @props.modification
-        React.DOM.button
-             className: 'button primary'
-             onClick: @handleClick
-             disabled: if @props.curModification is null then false else @props.curModification.id is @props.modification.id
-             @altName()
 
 @BoatTypeModifications = React.createClass
     getInitialState: ->
-        modifications: if @props.boat_type.modifications is undefined then [] else @props.boat_type.modifications
-        curModification: if @props.boat_type.modifications is undefined then null else @props.boat_type.modifications[0]
+        modifications: if @props.modifications is undefined then [] else @props.modifications
+        curModification: if @props.modifications is undefined then null else @props.modifications[0]
         ru_name: ''
         en_name: ''
         ru_description: ''
@@ -375,7 +376,7 @@ ModificationMenuItem = React.createClass
         e.preventDefault()
         $('#new_modification_form').foundation('open')
         #@setState curModification: null
-    params: ->
+    prms: ->
         {
             ru_name: @state.ru_name
             en_name: @state.en_name
@@ -401,17 +402,35 @@ ModificationMenuItem = React.createClass
         mdfs.push(mdf)
         @setState modifications: mdfs, curModification: mdf, errors: [] 
         $('#new_modification_form').foundation('close')
+        @props.updHandle({modifications: mdfs})
     updModificationOnList: (mdf)->
         mdfs = @state.modifications.slice()
         mdfs = mdfs.map (m)->
             if m.id is mdf.id then mdf else m
         @setState modifications: mdfs, curModification: mdf 
+    deleteModification: (mdf)->
+        if confirm("Вы уверены что хотите удалить компоновку #{mdf.ru_name}")
+            $.ajax({
+                  url: "/boat_types/#{mdf.id}"
+                  type: "DELETE"
+                  success: (data)=>
+                      mdfs = []
+                      for m in @state.modifications
+                          if mdf isnt m then mdfs.push(m)
+                      @setState modifications: mdfs, curModification: mdfs[0]
+                      @props.updHandle({modifications: mdfs})
+                  error: (jqXHR, textStatus, errorThrown)=>
+                      errs = getErrorsFromResponse(jqXHR.responseJSON)
+                      console.log errs
+                      @setState errors: errs
+                  dataType: 'json'
+                })
     createModification: (e)->
         e.preventDefault()
         $.ajax({
           url: "/boat_types/#{@props.boat_type.id}/modifications"
           type: "POST"
-          data: {boat_type: @params()}
+          data: {boat_type: @prms()}
           success: (data)=>
               @addModificationToState(data)
           error: (jqXHR, textStatus, errorThrown)=>
@@ -426,6 +445,8 @@ ModificationMenuItem = React.createClass
         React.createElement ErrorsCallout, errors: @state.errors
     componentDidMount: ->
         $('#new_modification_form').foundation()
+    componentWillUnmount: ->
+        $('#new_modification_form').remove()
     newModificationForm: ->
         React.DOM.div
             className: 'reveal large'
@@ -519,9 +540,9 @@ ModificationMenuItem = React.createClass
                     className: 'tb-pad-s'
                     React.createElement SimpleMenu, items: @state.modifications, nTitle: 'ru_name', clickItemEvent: @selModification, selected: @state.curModification
                 @newModificationForm()
-                React.createElement ModificationMainInfo, modification: @state.curModification, updMdfFunc: @updModificationOnList, form_token: @props.form_token
+                React.createElement ModificationMainInfo, modification: @state.curModification, updMdfFunc: @updModificationOnList, form_token: @props.form_token, delMdfFunc: @deleteModification, mdfsCount: @state.modifications.length
                 @propertiesTable()
-                
+
         else
             React.DOM.div
                 className: 'row'
@@ -557,6 +578,9 @@ ModificationMenuItem = React.createClass
             en_description: @state.en_description
             ru_description: @state.ru_description
         }
+    delButHandleClick: (e)->
+        e.preventDefault()
+        @props.delMdfFunc(@props.modification)
     switchEditMode: (e)->
         e.preventDefault()
         if not @state.editMode
@@ -597,7 +621,7 @@ ModificationMenuItem = React.createClass
         name = e.target.name
         val = e.target.value
         val = if name is 'top_view' then File.open(val) else val
-        @setState "#{e.target.name}":  val
+        @setState "#{e.target.name}": val
     editMode: ->
         React.DOM.div null,
             React.createElement ErrorsCallout, errors: @state.errors
@@ -641,8 +665,13 @@ ModificationMenuItem = React.createClass
     checkMdf: ->
         if @state.mdfId isnt @props.modification.id
             @setState editMode: false, mdfId: @props.modification.id
+    updPhotos: (phs)->
+        @props.modification.photos = phs.photos
+        @props.updMdfFunc(@props.modification)
+    updVideos: (vds)->
+        @props.modification.videos = vds.videos
+        @props.updMdfFunc(@props.modification)
     render: ->
-        @checkMdf()
         React.DOM.div null,
             React.DOM.div
                 className: 'row'
@@ -651,18 +680,31 @@ ModificationMenuItem = React.createClass
                     React.DOM.h5 null, "Основная информация о компоновке \"#{@props.modification.ru_name}\""
                 React.DOM.div
                     className: 'small-4 columns'
-                    React.DOM.a 
-                        className: 'button float-right'
-                        onClick: @switchEditMode
-                        React.createElement YesNoIconWithText, figs: ['save','pencil'], txts: ['Сохранить', 'Редактировать'], value: @state.editMode
+                    React.DOM.div
+                        className: 'button-group'
+                        if @props.mdfsCount > 1
+                            React.DOM.a 
+                                className: 'button float-right alert'
+                                onClick: @delButHandleClick
+                                React.createElement IconWithText, fig: 'trash', txt: 'Удалить компоновку'
+                        React.DOM.a 
+                            className: 'button float-right'
+                            onClick: @switchEditMode
+                            React.createElement YesNoIconWithText, figs: ['save','pencil'], txts: ['Сохранить', 'Редактировать'], value: @state.editMode
             React.DOM.div
                 className: 'row'
                 React.DOM.div
                     className: 'small-12 columns'
                     if @state.editMode then @editMode() else @showMode()
             React.createElement TechnicalViewsLoader, form_token: @props.form_token, modification: @props.modification, updMdfFunc: @props.updMdfFunc
+            React.DOM.div
+                className: 'row'
+                React.DOM.div 
+                    className: 'small-12 columns'
+                    React.DOM.h5 null, "Фото"
+            React.createElement PhotosControl, key: "phs-boat-type-#{@props.modification.id}", photos: @props.modification.photos, entity: 'boat_type', entity_id: @props.modification.id, form_token: @props.form_token, afterUpdHandle: @updPhotos
 
-
+            
 @BoatMainInfo = React.createClass
     getInitialState: ->
         errors: []
@@ -679,6 +721,7 @@ ModificationMenuItem = React.createClass
         en_slogan: AlterText @props.boat_type.en_slogan
         trademark_id: @props.boat_type.trademark_id 
         trademarks: @props.trademarks
+        boat_type: @props.boat_type
         boat_series_id: @props.boat_type.boat_series_id
         boat_series_list: if @props.boat_series is undefined then [] else @props.boat_series
         isEdit: false
@@ -722,8 +765,8 @@ ModificationMenuItem = React.createClass
             type: 'PUT'
             dataType: 'json'
             data: {boat_type: @btParams()}
-            success: (data)=>                
-                @props.handleUpdated(data)
+            success: (data)=>
+                @setState boat_type: data                
                 @switchEditMode()
             error: (jqXHR)=>
                 @setState errors: getErrorsFromResponse(jqXHR.responseJSON)
@@ -909,18 +952,7 @@ ModificationMenuItem = React.createClass
              
 
 
-@BoatTypePhotos = React.createClass
-    getInitialState: ->
-        boatType: @props.boat_type
-        photos: if @props.boat_type.photos is undefined then [] else @props.boat_type.photos    
-    render: ->
-        React.DOM.div null,
-            React.DOM.div 
-                className: 'row'
-                React.DOM.div
-                    className: 'small-12 columns'
-                    React.DOM.h5 null, 'Фотографии'
-            React.createElement PhotosControl, photos: @state.photos, entity: 'boat_type', entity_id: @state.boatType.id, form_token: @props.form_token
+
 
 
 technicalViewLoaderCell = React.createClass
@@ -941,7 +973,7 @@ technicalViewLoaderCell = React.createClass
             React.DOM.a
                 className: 'button expanded'
                 onClick: @handleRemove
-                'Удилить'
+                'Удалить'
             React.DOM.img
                 src: if @hasPhoto() then @props.modification["#{@props.view.attr}"] else NoPhoto()
 
@@ -975,6 +1007,89 @@ technicalViewLoaderCell = React.createClass
             className: 'small-up-1 medium-up-3 row'
             for i in @state.viewsList 
                 React.createElement technicalViewLoaderCell, key: i.attr, view: i, form_token: @props.form_token, modification: @props.modification, viewUploaded: @viewUploaded
+#https://youtu.be/sy-uMlHFDSQ
+#https://youtu.be/DRNAndsH494
+
+#<iframe width="424" height="238" src="https://www.youtube.com/embed/sy-uMlHFDSQ" frameborder="0" gesture="media" allowfullscreen></iframe>
 
                 
-    
+@BoatTypeVideos = React.createClass
+     getInitialState: ->
+         url: ''
+         videos: @props.videos
+         video: @defaultVideo()
+     defaultVideo: ->
+         {boat_type_id: @props.boat_type_id, url: undefined}
+     addVideo: (v)->
+         vds = @state.videos.slice()
+         vds.push(v)
+         @setState videos: vds, video: @defaultVideo, url: ''
+     rmvAction: (rv)->
+         $.ajax
+             url: "/videos/#{rv.id}"
+             type: 'DELETE'
+             dataType: 'json'
+             success: (data)=> 
+                 vds = []
+                 for v in @state.videos
+                     if v.id isnt rv.id then vds.push(v)
+                 @setState videos: vds
+     handleSubmit: (e)->
+         e.preventDefault()
+         $.ajax
+             url: '/videos'
+             type: 'POST'
+             dataType: 'json'
+             data: {boat_video: @state.video}
+             success: (data)=> 
+                 @addVideo(data)
+     handleChange: (e)->
+         v = @defaultVideo()
+         v.url = GetYouTubeUrl(e.target.value)
+         @setState "#{e.target.name}": e.target.value, video: v 
+     videosList: ->
+         if @state.videos is undefined
+             console.log "videos list is undefined"
+             return null
+         if @state.videos.length > 0
+             React.DOM.div 
+                 className: 'small-up-1 medium-up-2 row'
+                 for v in @state.videos
+                     React.createElement VideoViewer, key: "video-#{v.id}", video: v, removeAction: @rmvAction
+         else null
+     render: ->
+         React.DOM.div null,
+             React.DOM.form
+                 onSubmit: @handleSubmit
+                 React.DOM.div
+                     className: 'row'
+                     React.DOM.div
+                         className: 'small-12 medium-6 medium columns'
+                         React.DOM.div
+                             className: 'row'
+                             React.DOM.div
+                                 className: 'small-5 medium-6 columns end'
+                                 if @state.video.url isnt null && @state.video.url isnt undefined 
+                                     React.createElement VideoViewer, video: @state.video
+                                 else
+                                     if @state.video.url isnt undefined then React.DOM.p null, "Не правильный формат ссылки"
+                         React.DOM.div
+                             className: 'row'
+                             React.DOM.div 
+                                 className: 'small-8 columns'
+                                 React.DOM.input
+                                     type: 'text'
+                                     name: 'url'
+                                     placeholder: 'Копируйте сюда ссылку на видео'
+                                     onChange: @handleChange
+                                     value: @state.url
+                             React.DOM.div 
+                                 className: 'small-4 columns'
+                                 React.DOM.button
+                                     type: 'submit'
+                                     className: 'button'
+                                     disabled: @state.video.url is undefined or @state.video.url is null
+                                     'Добавить'
+             @videosList()
+
+

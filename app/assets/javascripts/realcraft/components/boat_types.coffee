@@ -1,17 +1,16 @@
-@RCHeader = React.createClass
-    render: ->
-        React.DOM.div
-            id: 'rc-header'
-            if @props.h3 isnt undefined
-                React.DOM.h3 null, @props.h3.toUpperCase()
-            if @props.h1 isnt undefined
-                React.DOM.h1 null, @props.h1.toUpperCase()
-            if @props.h4 isnt undefined
-                React.DOM.h4 null, @props.h4.toUpperCase()
+
 
 @BoatTypeShow = React.createClass
     getInitialState: ->
         boat_type: @props.boat_type
+    getSliderPhotos: ->
+        photos = @state.boat_type.photos
+        sphs = []
+        if photos.length is 0 then return []
+        for p in photos
+            if p.is_slider then sphs.push(p)
+        if sphs.length is 0 then sphs.push(photos[0])
+        sphs
     smlVersDescr: ->
         React.DOM.div 
             className: 'c-box hide-for-large dark-blue-bg'
@@ -25,6 +24,7 @@
     render: ->
         React.DOM.div
             id: 'boat_type_template',
+            React.createElement RCSlider, photos: @getSliderPhotos(), fogColor: 'white', description: @state.boat_type.description, header: React.createElement(RCHeader, h3: Dict.model, h1: @state.boat_type.name, h4: "#{Dict.design_category} #{@state.boat_type.design_category}"), slogan: @state.boat_type.slogan
             if not IsEmptyString(@state.boat_type.description) then @smlVersDescr()
             React.createElement OnPatternParametersList, boat_type: @state.boat_type
             React.createElement BoatTypePageInfoTabs, boat_type: @state.boat_type
@@ -69,7 +69,7 @@ MakeModificationsParamsList = (bType)->
         mdfsProperties: MakeModificationsParamsList(@props.boat_type)
     render: ->
         React.DOM.div
-            className: 'white-text'
+            className: 'white-text tb-pad-s'
             id: 'rc-parameters'
             React.DOM.div
                 className: 'tb-pad-s'
@@ -128,7 +128,10 @@ TabsPageItem = React.createClass
                 React.DOM.div 
                     className: 'small-12 columns tb-pad-s'
                     React.createElement RCHeader, h3: @props.boat_type.name, h1: Dict[@props.tab.name]
-            if @props.tab.name is 'modifications' then React.createElement BoatTypeModificationsPart, boat_type: @props.boat_type
+            switch @props.tab.name
+                when 'modifications' then React.createElement BoatTypeModificationsPart, boat_type: @props.boat_type
+                when 'photos' then React.createElement PhotosPage, photos: @props.boat_type.photos
+                when 'videos' then React.createElement VideosPage, videos: @props.boat_type.videos
     
                 
                 
@@ -166,6 +169,7 @@ TabsPageItem = React.createClass
             hash = GetReqHash()
             if hash.length > 1 then @selectTab(hash.replace("#", ''))
     selectTab: (tabName)->
+        console.log tabName
         tabs = @state.tabs.slice()
         hasActive = false
         tabs = tabs.map (tab)->
@@ -174,7 +178,6 @@ TabsPageItem = React.createClass
             tab.isActive = flag
             tab
         if not hasActive then tabs[0].isActive = true
-        console.log tabs
         @setState tabs: tabs 
         @changeTabsHandle()
     render: ->
@@ -215,10 +218,12 @@ TabsPageItem = React.createClass
              "#{crewLimit} people #{@props.m.name} can be accommodated according to the following schemes."
      componentDidMount: ->
          InitViewer()
+         $("#modifications-page img").each ()-> Foundation.Motion.animateIn($(this), 'slide-in-right')
      render: ->
          React.DOM.div null,              
              React.DOM.hr null, null
              React.DOM.div
+                 id: 'modifications-page'
                  className: 'rc-modification-box tb-pad-s'
                  React.DOM.div
                      className: 'row'
@@ -270,7 +275,7 @@ TabsPageItem = React.createClass
                     className: 'kra-ph-box'
                     'data-collection': @props.collection_name
                     'data-rc-box-title': "#{@props.title}: #{Dict[@props.v.title]}"
-                    'data-image-versions': "[#{@props.v.small}, small], [#{@props.v.medium}, medium], [#{@props.v.large}, large]}"
+                    'data-image-versions': MakeInterchangeData(@props.v)
                     src: @props.v.small
 
 @AccViewItem = React.createClass
@@ -282,3 +287,41 @@ TabsPageItem = React.createClass
                 src: @props.v.small
 
                 
+@PhotosPage = React.createClass
+    componentDidMount: ->
+        InitViewer()
+        $('#photos-page img').each (p)->
+            Foundation.Motion.animateIn($(this), 'fade-in')
+    render: ->
+        React.DOM.div
+            id: 'photos-page'
+            if @props.photos.length is 0
+                React.DOM.div
+                    className: 'row tb-pad-m'
+                    React.DOM.div
+                        className: 'small-12 columns'
+                        Dict.no_photos_msg
+            else
+                React.DOM.div
+                    className: 'row small-up-2 medium-up-2 large-up-3'
+                    for p in [0..@props.photos.length-1]
+                        React.createElement PhotoPageItem, key: "bt-photo-#{p}", p: @props.photos[p]
+                    
+@PhotoPageItem = React.createClass
+    render: ->
+        React.DOM.div
+            className: 'column column-block tb-pad-s'
+            React.DOM.a null,
+                React.DOM.img
+                    className: 'kra-ph-box float-center'
+                    'data-collection': 'boat-type-photos'
+                    'data-image-versions': MakeInterchangeData(@props.p)
+                    src: @props.p.small
+
+@VideosPage = React.createClass
+    render: ->
+        React.DOM.div
+            id: 'photos-page'
+            React.DOM.div
+                className: 'tb-pad-m'
+                React.createElement BoatVideosList, videos: @props.videos

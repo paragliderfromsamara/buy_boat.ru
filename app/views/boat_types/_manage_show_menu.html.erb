@@ -1,0 +1,18 @@
+ <div class = 'row'>
+     <div class = 'small-12 columns tb-pad-s'>
+         <ul class = "menu right-menu">
+             <li>
+                 <%= link_to "Основная информация", @boat_type %>
+             </li>
+             <li>
+                 <%= link_to "Видео", boat_type_videos_path(@boat_type) %>
+             </li>
+             <li>
+                 <%= link_to "Компоновки", boat_type_modifications_path(@boat_type) %>
+             </li>
+             <li>
+                 <%= link_to "Список опций", boat_type_options_path(@boat_type) %>
+             </li>
+         </ul>
+     </div>
+ </div> 

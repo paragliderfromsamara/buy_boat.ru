@@ -78,4 +78,67 @@ dropdownListItem = React.createClass
             checked: @state.value
             onChange: @onChangeHandle
    
-    
+
+#Форма для выбора сущности из которой нужно копировать фото, или характеристики
+@CopyFromForm = React.createClass
+    getInitialState: ->
+        boat_types: []
+        type: @props.type
+        copy_to: @props.boat_type_id
+        formIsOpened: false
+        copy_from: null
+    submitFormHandle: (e)->
+        e.preventDefault()
+        if @state.copy_from == "" or @state.copy_from == null or @state.copy_from == undefined
+            alert("Выберите модификацию")
+        else
+            $.post(
+                    "/copy_#{@state.type}"
+                    {copy_entities: {copy_from: @state.copy_from, copy_to: @state.copy_to}}
+                    (data)=>
+                        @props.completeHandle(data)
+                    "json"
+                  )
+    handleClick: (e)->
+        e.preventDefault()
+        flag = !@state.formIsOpened
+        if flag 
+            $.get(
+                     "/get_boat_types_list"
+                     {type: @state.type}
+                     (data)=>
+                         f = []
+                         for m in data
+                             if "#{@state.copy_to}" isnt "#{m.id}" then f.push(m)
+                         @setState boat_types: f, formIsOpened: flag
+                     "json"
+                 )
+        else
+            @setState formIsOpened: flag
+    setCopyFrom: (e)->
+        e.preventDefault()
+        @setState copy_from: e.target.value   
+        console.log e.target.value             
+    render: ->
+        React.DOM.form
+            onSubmit: @submitFormHandle
+            React.DOM.div
+                className: "row"
+                if @state.formIsOpened
+                    React.DOM.div
+                        className: "small-5 columns"
+                        React.createElement DropdownList, items: @state.boat_types, inputName: "", valTitle: "id", nameTitle: "name", nullValName: "Выберите тип", changeEvent: @setCopyFrom
+                React.DOM.div
+                    className: "small-7 columns end"
+                    React.DOM.div
+                        className: 'button-group'
+                        if @state.formIsOpened
+                            React.DOM.button
+                                className: 'button success'
+                                type: 'submit'
+                                "Скопировать"
+                        React.DOM.a
+                            className: "button"
+                            onClick: @handleClick
+                            if @state.formIsOpened then "Скрыть" else "Скопировать с другого типа"
+                       

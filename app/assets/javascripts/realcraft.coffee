@@ -28,6 +28,9 @@ enDict = {
             bow_view: 'Bow view'
             scheme: 'Scheme'
             crew_accomodation: 'Crew accomodation'
+            model: 'Model'
+            no_videos_msg: "No videos were added."
+            no_photos_msg: "No photos were added."
          }
          
 ruDict = {
@@ -43,6 +46,9 @@ ruDict = {
             bow_view: 'Вид с носа'
             scheme: 'Схема'
             crew_accomodation: "Размещение пассажиров"
+            model: 'Модель'
+            no_videos_msg: "Не было добавлено ни одного видео."
+            no_photos_msg: "Не было добавлено ни одной фотографии."
          }
 @Dict = if IsRuLocale() then ruDict else enDict
 
@@ -74,7 +80,7 @@ changeTabsEvent = ->
 r = ->
     FoInit()
     #reqHash = GetReqHash()
-    #wResFunction()
+    wResFunction()
     #$("#rc-data-tabs").on 'change.zf.tabs', changeTabsEvent
     #if $('[data-tabs]').length > 0 and reqHash.length > 1 then $("#rc-data-tabs").foundation('selectTab', $(reqHash))
     #InitViewer()

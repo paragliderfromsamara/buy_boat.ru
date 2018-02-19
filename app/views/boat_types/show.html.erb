@@ -1,6 +1,8 @@
-<%= react_component 'BoatTypeShow', @data %>
+<%= render "manage_show_menu" %>
 
-<!--
+<%= react_component 'BoatMainInfo', {boat_type: @boat_type, trademarks: @trademarks, boat_series: @boat_series} %>
+
+<!-- 
 
 
 <div class = "row tb-pad-m">

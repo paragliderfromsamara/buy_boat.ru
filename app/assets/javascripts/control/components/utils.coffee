@@ -1,6 +1,12 @@
 #@BoatParameterType = React.createClass
 #    render: ->
 
+@GetYouTubeUrl = (str)->
+    if str is null || str is undefined then return null
+    re = /https?:\/\/(www.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/watch\?feature=(player_detailpage|player_embedded)&amp;v=)([A-Za-z0-9_-]*)(\&\S+)?(\?\S+)?/ 
+    match = re.exec(str)
+    if match is null then null else "https://www.youtube.com/embed/#{match[4]}"
+    
 @ErrorsCallout = React.createClass
     render: ->
         if @props.errors.length is 0 then null
@@ -68,5 +74,19 @@ simpleMenuItem = React.createClass
             id: @dzElementId()
             className: 'dropzone'
             null
+
+@HeaderWithSubHeader = React.createClass
+    render: ->
+        React.DOM.div
+            className: 'kra-header'
+            if @props.h3 isnt undefined
+                React.DOM.h3 null, @props.h3.toUpperCase()
+            if @props.h1 isnt undefined
+                React.DOM.h1 null, @props.h1.toUpperCase()
+            if @props.h4 isnt undefined
+                React.DOM.h4 null, @props.h4.toUpperCase()      
+
+
+            
         
         

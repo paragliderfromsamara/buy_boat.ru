@@ -114,6 +114,7 @@ boatPropertyValuesManageTableRow = React.createClass
                                 className: 'button secondary'
                                 onClick: @switchOnlyBinded
                                 React.createElement YesNoIconWithText, txts: ['Показать только используемые', 'Показать все'], figs: ['link', 'unlink'], value: !@state.onlyBinded
+
             React.DOM.table null,
                 React.DOM.thead null,
                     React.DOM.tr null,
@@ -131,6 +132,7 @@ boatPropertyValuesManageTableRow = React.createClass
             className: 'row'
             React.DOM.div
                 className: 'small-12 columns'
+                React.createElement CopyPropertiesFromForm, entity: "boat_type", copy_to: @props.modification.id, completeHandle: @props.updateProperties
                 if @props.modification.properties.length is 0 then @emptyList() else @notEmptyList()
                 
 
@@ -318,7 +320,69 @@ boatPropertyValuesManageTableRow = React.createClass
                          React.createElement(BoatParameterValueRowEditable, key: "row_#{numb++}", value: val, toggleHandle: @editValue, updateHandle: @updateValue, number: numb, edit: (@state.editedVal == val.id))          
                        
                    
-                   
+#Форма для выбора сущности из которой нужно копировать фото, или характеристики
+@CopyPropertiesFromForm = React.createClass
+    getInitialState: ->
+        boat_types: []
+        formIsOpened: false
+        copy_from: null
+    submitFormHandle: (e)->
+        e.preventDefault()
+        if @state.copy_from == "" or @state.copy_from == null or @state.copy_from == undefined
+            alert("Выберите модификацию")
+        else
+            c = confirm("Операция копирования характеристик необратима. Продолжить?")
+            if !c then return
+            console.log "copy_from: #{@state.copy_from}, copy_to: #{@props.copy_to}, entity: #{@props.entity}"
+            $.post(
+                    "/copy_property_values"
+                    {copy_entities: {copy_from: @state.copy_from, copy_to: @props.copy_to, entity: @props.entity}}
+                    (data)=>
+                        @props.completeHandle(data)
+                    "json"
+                  )
+    handleClick: (e)->
+        e.preventDefault()
+        flag = !@state.formIsOpened
+        if flag 
+            $.get(
+                     "/get_#{@props.entity}s_list"
+                     {}
+                     (data)=>
+                         f = []
+                         for m in data
+                             if "#{@props.copy_to}" isnt "#{m.id}" then f.push(m)
+                         @setState boat_types: f, formIsOpened: flag
+                     "json"
+                 )
+        else
+            @setState formIsOpened: flag
+    setCopyFrom: (e)->
+        e.preventDefault()
+        @setState copy_from: e.target.value   
+        #console.log e.target.value             
+    render: ->
+        React.DOM.form
+            onSubmit: @submitFormHandle
+            React.DOM.div
+                className: "row"
+                if @state.formIsOpened
+                    React.DOM.div
+                        className: "small-5 columns"
+                        React.createElement DropdownList, items: @state.boat_types, inputName: "", valTitle: "id", nameTitle: "name", nullValName: "Выберите тип", changeEvent: @setCopyFrom
+                React.DOM.div
+                    className: "small-7 columns end"
+                    React.DOM.div
+                        className: 'button-group'
+                        if @state.formIsOpened
+                            React.DOM.button
+                                className: 'button success'
+                                type: 'submit'
+                                "Скопировать"
+                        React.DOM.a
+                            className: "button"
+                            onClick: @handleClick
+                            if @state.formIsOpened then "Скрыть" else "Скопировать из другого типа"        
                    
                             
                     
