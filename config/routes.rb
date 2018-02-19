@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
 
-
   get 'shop_pages/index'
 
   get 'shop_pages/boats'
@@ -12,6 +11,8 @@ Rails.application.routes.draw do
   get 'photo/destroy'
 
   resources :property_types
+  post "/copy_property_values", to: "property_types#copy_property_values" #для копирования значений свойств с одного типа лодки или продукта на другой
+  
   #products
   resources :products
   get "/manage_products", to: "products#manage_index", as: :manage_products
@@ -63,6 +64,7 @@ Rails.application.routes.draw do
   get "/entity_photos/:entity/:entity_id", to: 'photos#entity_photos'
   put "/entity_photos/:id", to: 'photos#update_entity_photo'
   delete "/entity_photos/:id", to: "photos#destroy_entity_photo" #удаляем ссылки на фотографию от boat_type или product (удаление фотографии)
+  
   #end
   get "/test_page", to: "pages#test_page"
   get "/about", to: "pages#about", as: :about
@@ -93,12 +95,17 @@ Rails.application.routes.draw do
   resources :boat_types, only: [:create, :edit, :update, :destroy, :show]
   post '/boat_types/:id/add_configurator_entity', to: "boat_types#add_configurator_entity"  
   get "/manage_boat_types", to: "boat_types#manage_index", as: :manage_boat_types
-  get '/boat_types/:id/photos', to: "boat_types#photos", as: :boat_photos
+  get '/boat_types/:id/photos', to: "boat_types#photos", as: :boat_type_photos
+  get '/boat_types/:id/videos', to: 'boat_types#videos', as: :boat_type_videos
   get '/boat_types/:id/photos/:photo_id', to: "boat_types#photo", as: :boat_photo
   get '/boat_types/:id/property_values', to: 'boat_types#property_values'
   get '/boat_types/:id/modifications/:modification_id', to: 'boat_types#modification_show', as: :modification
   put '/boat_types/:id/property_values', to: 'boat_types#update_property_values'
   post '/boat_types/:id/modifications', to: 'boat_types#create_modification'
+  get '/boat_types/:id/modifications', to: 'boat_types#modifications', as: :boat_type_modifications
+  get '/get_boat_types_list', to: 'boat_types#get_boat_types_list'
+  post "/copy_photos", to: "boat_types#copy_photos"
+  get '/boat_types/:id/options', to: "boat_types#options", as: :boat_type_options
   resources :users
   
   resources :boat_property_types, only: [:index, :create] 
@@ -114,5 +121,9 @@ Rails.application.routes.draw do
   post "send_boat_request", to: 'realcraft_pages#send_boat_request', as: :realcraft_send_boat_request
   post "send_dealer_request", to: 'realcraft_pages#send_dealer_request', as: :realcraft_send_dealer_request
   
+  
+  #videos Part
+  resources :videos, only: [:create, :destroy]
+
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

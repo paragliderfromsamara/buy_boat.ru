@@ -21,6 +21,8 @@ class BoatType < ApplicationRecord
   has_many :photos, through: :entity_photos
   #belongs_to :photo
   
+  has_many :boat_videos, dependent: :delete_all
+  
   belongs_to :boat_series, optional: true, validate: false
   belongs_to :trademark#, optional: true #, validate: false, optional: true
   
@@ -73,8 +75,8 @@ class BoatType < ApplicationRecord
   def model_views
     views = []
     views.push({title: 'top_view', small: top_view.small.url, medium: top_view.medium.url, large: top_view.large.url}) if !top_view.blank?
-    views.push({title: 'bow_view', small: bow_view.small.url, medium: bow_view.medium.url, large: bow_view.large.url}) if !bow_view.nil?
-    views.push({title: 'aft_view', small: aft_view.small.url, medium: aft_view.medium.url, large: aft_view.large.url}) if !aft_view.nil?
+    views.push({title: 'bow_view', small: bow_view.small.url, medium: bow_view.medium.url, large: bow_view.large.url}) if !bow_view.blank?
+    views.push({title: 'aft_view', small: aft_view.small.url, medium: aft_view.medium.url, large: aft_view.large.url}) if !aft_view.blank?
     return views
   end
   
@@ -139,6 +141,19 @@ class BoatType < ApplicationRecord
                                                     ).order("boat_property_types.order_number ASC")
   end
   
+  def copy_photos_from(bt)
+    phsFromIds = bt.photos.ids
+    phsToIds = self.photos.ids#(:photo_id)
+    phsFromIds -= phsToIds
+    if phsFromIds.length > 0
+      phsFromIds = Photo.where(id: phsFromIds)
+      self.photos << phsFromIds
+    end
+    return self.entity_photos
+  end
+  
+
+  
   def property_values(locale = nil)
     #вытаскивает список характеристик типа лодки
     EntityPropertyValue.boat_type_property_values(self, locale)
@@ -169,6 +184,10 @@ class BoatType < ApplicationRecord
   def self.show_page_scope
     joins(:trademark).includes(:photos)#.active
   end 
+  
+  def self.all_modifications
+    where.not(boat_type_id: nil)
+  end
   
   def self.with_bfs
     active.includes(:boat_for_sales)
@@ -296,7 +315,11 @@ class BoatType < ApplicationRecord
   
   
   def catalog_name(locale='ru') #название типа лодки с наименованием производителя, серией и типом корпуса
-    %{#{self.trademark.name} #{self.name(locale)}}
+    if is_modification? 
+      %{#{self.trademark.name} #{self.boat_type.name(locale)} #{self.name(locale)}}
+    else
+        %{#{self.trademark.name} #{self.name(locale)}}
+    end
   #  %{#{self.trademark_name}#{%{ #{self.series_name}} if !self.series_name.nil?} #{self.body_type} #{%{ #{self.name}} if !self.name.blank?}}
   end
   
@@ -330,6 +353,11 @@ class BoatType < ApplicationRecord
       
     end 
     add_modifications_by_option_type_ids(mdfs_in_cnf_ids) if !mdfs_in_cnf_ids.blank?
+  end
+  
+  def self.modifications_with_types
+    types 
+    
   end
   
   def active_modifications
@@ -379,13 +407,15 @@ class BoatType < ApplicationRecord
       {
         id: self.id,
         body_type: self.body_type,
+        design_category: self.design_category,
         trademark: self.trademark.hash_view,
         modifications: self.modifications.map{|mdf| mdf.realcraft_hash(locale)},
         name: self.catalog_name(locale),
         description: description(locale),
         slogan: slogan(locale),
         photo: main_photo_hash_view, 
-        photos: self.photos_hash_view,
+        photos: self.entity_photos_hash_view,
+        videos: self.boat_videos.map{|v| v.hash_view},
         type: 'boat_type'
         #boat_for_sales: BoatForSale.filtered_collection(self.boat_for_sales.ids)#.select(:id, :amount)#.includes(:selected_options).map {|bfs| {id: bfs.id, selectedOptions: bfs.selected_options_for_show}} #.with_selected_options
       }
@@ -441,23 +471,18 @@ class BoatType < ApplicationRecord
        ru_slogan: self.ru_slogan,
        en_slogan: self.en_slogan,
        design_category: self.design_category,
-       modifications: self.modifications.map{|mdf| mdf.control_hash},
-       photos: self.entity_photos.includes(:photo).to_a.map{|ep| ep.hash_view},
-       properties: self.property_values_hash,
        use_on_ru: self.use_on_ru,
        use_on_en: self.use_on_en,
        is_active: self.is_active,
-       is_deprecated: self.is_deprecated
+       is_deprecated: self.is_deprecated,
     }
     else
       {
          id: self.id,
          ru_name: self.ru_name,
          en_name: self.en_name,
-         trademark_id: self.trademark_id,
          ru_description: self.ru_description,
          en_description: self.en_description,
-         photos: self.entity_photos.includes(:photo).to_a.map{|ep| ep.hash_view},
          properties: self.property_values_hash,
          use_on_ru: self.use_on_ru,
          use_on_en: self.use_on_en,
@@ -468,9 +493,8 @@ class BoatType < ApplicationRecord
          aft_view: aft_view.nil? ? '' : aft_view.url,
          accomodation_view_1: accomodation_view_1.nil? ? '' : accomodation_view_1.url,
          accomodation_view_2: accomodation_view_2.nil? ? '' : accomodation_view_2.url,
-         accomodation_view_3: accomodation_view_3.nil? ? '' : accomodation_view_3.url
-         
-         
+         accomodation_view_3: accomodation_view_3.nil? ? '' : accomodation_view_3.url,
+         photos: self.entity_photos.map {|ph| ph.hash_view}
       }
     end
   end

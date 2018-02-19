@@ -31,4 +31,8 @@ class ApplicationRecord < ActiveRecord::Base
     photos.map {|ph| ph.hash_view}
   end
   
+  def entity_photos_hash_view
+    return [] if entity_photos.blank?
+    entity_photos.map {|ph| ph.hash_view}
+  end
 end

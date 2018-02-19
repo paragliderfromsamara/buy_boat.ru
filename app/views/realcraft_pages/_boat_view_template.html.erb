@@ -3,7 +3,7 @@
       <div id = "slogan">
             <div class = "row">
                 <div class = "small-12 medium-6 large-5 columns">
-                    <div class = " tb-pad-s"><%= rc_header(@boat[:name], t(:model), "#{t :design_category} #{@boat[:design_category]}")  %></div>
+                    <div class = "tb-pad-s"><%= rc_header(@boat[:name], t(:model), "#{t :design_category} #{@boat[:design_category]}")  %></div>
                     <p class = "show-for-large" title = "<%= @boat["header_description_#{cur_locale}".to_sym] %>">
                 <%= truncate @boat["header_description_#{cur_locale}".to_sym], length: 380 %>
                     </p>

@@ -107,6 +107,17 @@ class EntityPropertyValue < ApplicationRecord
     !has_attribute?(:value_type) ? property_type.value_type : value_type
   end
   
+  def self.copy_properties_from(entity_from, entity_to)
+    prop_vals = entity_from.property_values
+    if prop_vals.length > 0
+      prop_vals = prop_vals.to_a.map {|v| {set_en_value: v.get_value("en"), set_ru_value: v.get_value("ru"), is_binded: v.is_binded, property_type_id: v.property_type_id}}
+      entity_to.entity_property_values.delete_all
+      entity_to.entity_property_values.create(prop_vals)
+      entity_to.reload
+    end
+  end
+  
+  
   private
   
   #def default_entity_hash(property_type)

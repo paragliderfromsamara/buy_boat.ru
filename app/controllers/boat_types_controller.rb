@@ -1,10 +1,10 @@
 class BoatTypesController < ApplicationController
   before_action :check_grants, only: [:create, :edit, :update, :destroy, :manage_index, :update_property_values, :create_modification]
-  before_action :set_boat_type, only: [:show, :modification_show,:edit, :update, :destroy, :add_configurator_entity, :update_property_values, :property_values, :create_modification]
+  before_action :set_boat_type, only: [:show, :options, :modification_show,:edit, :update, :destroy, :add_configurator_entity, :update_property_values, :property_values, :create_modification, :photos, :modifications, :videos]
   before_action :set_trademarks_and_boat_series, only: [:show, :manage_index]
 
   def manage_index
-    @title = @header = "Управление типами лодок"
+    @title = "Управление типами лодок"
     @boat_types = BoatType.base_types.to_a.map{ |bt| bt.hash_view('control')}
     @data = {boat_types: @boat_types, boat_series_list: @boat_series, trademarks: @trademarks}
   end
@@ -28,12 +28,39 @@ class BoatTypesController < ApplicationController
   # GET /boat_types/1
   # GET /boat_types/1.json
   def show
-    @title = @header = current_site + ' ' + @boat_type.catalog_name 
-    @boat_type = @boat_type.hash_view(current_site, cur_locale.to_s)
-    @data = is_control? ? {boat_type: @boat_type, trademarks: @trademarks, boat_series: @boat_series, form_token: form_authenticity_token} : {boat_type: @boat_type}
+    @title = @header = @boat_type.catalog_name 
+    
+    #@data = is_control? ? {boat_type: @boat_type.hash_view(current_site, cur_locale.to_s), trademarks: @trademarks, boat_series: @boat_series} : {boat_type: @boat_type}
     respond_to do |format|
       format.html 
-      format.json { render json: @boat_type}
+      format.json { render json: @data}
+    end
+  end
+  
+  def photos
+    @title = @boat_type.catalog_name
+    photos = @boat_type.entity_photos.map {|ph| ph.hash_view}
+    @data = is_control? ? {boat_type: @boat_type.hash_view(current_site, cur_locale.to_s), photos: photos, form_token: form_authenticity_token} : photos
+    respond_to do |format|
+      format.html {render "show"}
+      format.json {render json: @data}
+    end
+  end
+  
+  def modifications
+    @title = @header = @boat_type.catalog_name + ": Компоновки"
+    modifications = @boat_type.modifications.to_a.map{|m| m.hash_view(current_site, cur_locale.to_s)}
+    @data = is_control? ? {boat_type: @boat_type.hash_view(current_site, cur_locale.to_s), modifications: modifications, form_token: form_authenticity_token} : modifications
+    respond_to do |format|
+      format.html
+      format.json {render json: @data}
+    end
+  end
+  
+  def videos
+    @title = @header = @boat_type.catalog_name + ": Видео"
+    respond_to do |format|
+      format.html
     end
   end
   
@@ -47,8 +74,8 @@ class BoatTypesController < ApplicationController
     end
   end
   
-  def configurator
-    
+  def options
+    @title = @header = @boat_type.catalog_name + ": Опции"
   end
 
   # GET /boat_types/1/edit
@@ -131,19 +158,68 @@ class BoatTypesController < ApplicationController
   # DELETE /boat_types/1
   # DELETE /boat_types/1.json
   def destroy
-    @boat_type.destroy
-    respond_to do |format|
-      format.html { redirect_to manage_boat_types_url, notice: 'Тип лодки был успешно удалён' }
-      format.json { head :no_content }
+    if !@boat_type.is_modification?
+      @boat_type.destroy
+      respond_to do |format|
+        format.html { redirect_to manage_boat_types_url, notice: 'Тип лодки был успешно удалён' }
+        format.json { head :no_content }
+      end
+    else
+      respond_to do |format|
+        if @boat_type.boat_type.modifications.size > 1 
+          @boat_type.destroy
+          format.json { head :no_content }
+        else
+          format.json {render json: {message: 'Нельзя удалить компоновку, если она единственная'}, status: :unprocessable_entity }
+        end
+      end
     end
   end
-
+  
+  def get_boat_types_list
+    listType = params[:type].blank? ? 'properties' : params[:type]
+    mdfs = BoatType.all_modifications
+    mdfs = listType == "photos" ? mdfs.map {|m| {id: m.id, name: m.catalog_name} if !m.photos.blank?} : mdfs.map {|m| {id: m.id, name: m.catalog_name}}
+    mdfs.compact!
+    render json: mdfs.to_json
+  end
+  
+  def copy_photos
+    prms = copy_params
+    copy_from = BoatType.find_by(id: prms[:copy_from])
+    copy_to = BoatType.find_by(id: prms[:copy_to])
+    if !copy_from.nil? and !copy_to.nil?
+      photos = copy_to.copy_photos_from(copy_from)
+      photos = photos.map {|ph| ph.hash_view}
+      render json: photos
+    else
+      render json: []
+    end
+   
+  end
+  
+  def copy_properties
+    prms = copy_params
+    copy_from = BoatType.find_by(id: prms[:copy_from])
+    copy_to = BoatType.find_by(id: prms[:copy_to])
+    if !copy_from.nil? and !copy_to.nil?
+      photos = copy_to.copy_properties_from(copy_from)
+      photos = photos.map {|ph| ph.hash_view}
+      render json: photos
+    else
+      render json: []
+    end
+    
+  end
+  
   private
     def check_grants
       redirect_to "/404" if !could_manage_boat_types? || !is_control?
     end 
     # Use callbacks to share common setup or constraints between actions.
     def set_boat_type
+      #boat_type = 
+      #redirect_to boat_type.boat_type and return if boat_type.is_modification? 
       @boat_type = BoatType.find(params[:id])
     end
     
@@ -158,6 +234,10 @@ class BoatTypesController < ApplicationController
     
     def boat_properties_params
       params.require(:boat_type).permit(entity_property_values_attributes: [:property_type_id, :is_binded, :set_ru_value, :set_en_value])
+    end
+    
+    def copy_params
+      params.require(:copy_entities).permit(:copy_from, :copy_to)
     end
     
     def configurator_entities_params

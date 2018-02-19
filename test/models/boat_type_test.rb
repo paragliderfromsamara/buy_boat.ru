@@ -194,6 +194,24 @@ class BoatTypeTest < ActiveSupport::TestCase
     end
   end
   
+  
+  test "Функция copy_photos_from должна копировать фотографии из одной модификации к другой" do
+    boat_type_1 = default_boat_type
+    boat_type_2 = default_boat_type
+    boat_type_3 = default_boat_type
+    modification_from = boat_type_1.modifications.first
+    modification_to = boat_type_2.modifications.first
+    phs = [{is_slider: false}, {is_slider: false}, {is_slider: false}]
+    modification_from.photos.create(phs)
+    assert_equal phs.length, modification_from.photos.length, "Не удалось добавить фотографий для теста"
+    modification_to.copy_photos_from(modification_from)
+    assert_equal modification_from.photos.length, modification_to.photos.length
+    modification_3 = boat_type_3.modifications.first
+    modification_3.photos.create(phs)
+    modification_3.copy_photos_from(modification_to)
+    assert_equal phs.length*2, modification_3.photos.length, "Не удалось добавить фотографии к существующим в коллекции модификации"
+  end
+  
   private
   
   def default_boat_type(add_hash = {})
@@ -218,5 +236,8 @@ class BoatTypeTest < ActiveSupport::TestCase
     arr.each {|e| ents[(i+=1).to_s.to_sym] = e}
     return ents
   end
+  
+  
+  
   
 end

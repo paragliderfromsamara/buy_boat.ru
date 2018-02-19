@@ -27,14 +27,16 @@ class TrademarksController < ApplicationController
   # POST /trademarks
   # POST /trademarks.json
   def create
-    @trademark = Trademark.new(trademark_params)
-    @title = @header = "Новая торговая марка"
+    prms = trademark_params
+    prms[:updater_id] = prms[:creator_id]= current_user.id
+    @trademark = Trademark.new(prms)
+    #@title = @header = "Новая торговая марка"
     respond_to do |format|
       if @trademark.save
-        format.html { redirect_to @trademark, notice: 'Торговая марка успешно добавлена' }
-        format.json { render :show, status: :created, location: @trademark}
+        #format.html { redirect_to @trademark, notice: 'Торговая марка успешно добавлена' }
+        format.json { render json: @trademark}
       else
-        format.html { render :new }
+        #format.html { render :new }
         format.json { render json: @trademark.errors, status: :unprocessable_entity }
       end
     end
@@ -43,13 +45,15 @@ class TrademarksController < ApplicationController
   # PATCH/PUT /trademarks/1
   # PATCH/PUT /trademarks/1.json
   def update
-    @title = @header = "Изменение торговой марка"
+    #@title = @header = "Изменение торговой марки"
+    prms = trademark_params
+    prms[:updater_id] = current_user.id
     respond_to do |format|
       if @trademark.update(trademark_params)
-        format.html { redirect_to @trademark, notice: 'Торговая марка успешно изменена' }
-        format.json { render :show, status: :ok, location: @trademark }
+        #format.html { redirect_to @trademark, notice: 'Торговая марка успешно изменена' }
+        format.json { render json: @trademark }
       else
-        format.html { render :edit }
+        #format.html { render :edit }
         format.json { render json: @trademark.errors, status: :unprocessable_entity }
       end
     end
@@ -77,6 +81,6 @@ class TrademarksController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def trademark_params
-      params.require(:trademark).permit(:name, :www, :email, :phone, :logo, :vertical_logo, :white_logo, :creator_id, :updater_id, :site_tag)
+      params.require(:trademark).permit(:name, :www, :email, :phone, :logo, :vertical_logo, :white_logo, :site_tag, :delete_logo, :creator_id, :updater_id)
     end
 end
