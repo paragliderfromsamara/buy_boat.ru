@@ -6,9 +6,25 @@ tmTableDataRow = React.createClass
     clickEditBut: (e)->
         e.preventDefault()
         @props.editHandle(@props.tm)
+    delHandle: (e)->
+        e.preventDefault()
+        c = confirm "Удаление торговой марки приведёт к удалению всех типов лодок связанных с ней. Продолжить?"
+        if c
+            $.ajax(
+                    url: "/trademarks/#{@props.tm.id}"
+                    type: "DELETE"
+                    data: {}
+                    dataType: 'json'
+                    success: (data)=>
+                        @props.removeHandle(@props.tm)
+               )
     render: ->
         React.DOM.tr null,
-            React.DOM.td null, "лого"
+            React.DOM.td null, 
+                if @props.tm.logo["url"] is null then "не загружен"
+                else
+                    React.DOM.img 
+                        src: @props.tm.logo["small"]["url"]
             React.DOM.td null, @props.tm.name
             React.DOM.td null, @altText(@props.tm.email)
             React.DOM.td null, @altText(@props.tm.www)
@@ -19,7 +35,7 @@ tmTableDataRow = React.createClass
                     React.createElement FIcon, fig: "pencil"
             React.DOM.td null, 
                 React.DOM.a
-                    href: "/trademarks/#{@props.tm.id}"
+                    onClick: @delHandle
                     React.createElement FIcon, fig: "x"
         
 @ManageTrademarksTable = React.createClass
@@ -36,6 +52,11 @@ tmTableDataRow = React.createClass
     updHandle: (tm)->
         tms = @state.trademarks.slice()
         tms = tms.map (t)-> if tm.id is t.id then tm else t
+        @setState trademarks: tms
+    removeTm: (tm)->
+        tms = []
+        for t in @state.trademarks
+            if t.id isnt tm.id then tms.push(t)
         @setState trademarks: tms
     createHandle: (tm)->
         tms = @state.trademarks.slice()
@@ -72,7 +93,7 @@ tmTableDataRow = React.createClass
                                         React.DOM.th null, null
                                 React.DOM.tbody null,
                                     for tm in @state.trademarks
-                                        React.createElement tmTableDataRow, key: "tm-#{tm.id}", tm: tm, editHandle: @setEditMode
+                                        React.createElement tmTableDataRow, key: "tm-#{tm.id}", tm: tm, editHandle: @setEditMode, removeHandle: @removeTm
                                 
                                 
                         
@@ -90,7 +111,8 @@ tmLogoCell = React.createClass
     hasPhoto: ->
         @props.tm["#{@props.view.attr}"]["url"] isnt '' and @props.tm["#{@props.view.attr}"]["url"] isnt null and @props.tm["#{@props.view.attr}"]["url"] isnt undefined
     showMode: ->
-        React.DOM.div null,
+        React.DOM.div
+            style: if @props.view.attr is "white_logo" then {backgroundColor: "gray", height: "100%"} else null
             React.DOM.a
                 className: 'button expanded'
                 onClick: @handleRemove
@@ -134,6 +156,7 @@ tmLogoCell = React.createClass
 @TrademarkForm = React.createClass
     getInitialState: ->
         isNew: @props.trademark is undefined
+        trademark: if @props.trademark is undefined then null else @props.trademark
         name: if @props.trademark is undefined then "" else @altText(@props.trademark.name)
         www: if @props.trademark is undefined then "" else @altText(@props.trademark.www)
         email: if @props.trademark is undefined then "" else @altText(@props.trademark.email)
@@ -172,6 +195,9 @@ tmLogoCell = React.createClass
         @setState "#{e.target.name}" : val
     updHandle: (tm)->
         @props.updHandle(tm)
+    updLogoHandle: (tm)->
+        @updHandle(tm)
+        @setState trademark: tm
     render: ->
         React.DOM.form
             onSubmit: @submitHandle
@@ -233,7 +259,7 @@ tmLogoCell = React.createClass
                             placeholder: "Контактный номер"
                             onChange: @changeInputHandle
                             value: @state.phone
-            if !@state.isNew then React.createElement TMLogoLoader, tm: @props.trademark, form_token: @props.form_token, updHandle: @updHandle
+            if !@state.isNew then React.createElement TMLogoLoader, tm: @state.trademark, form_token: @props.form_token, updHandle: @updLogoHandle
                         
                     
 

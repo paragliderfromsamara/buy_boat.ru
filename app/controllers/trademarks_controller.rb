@@ -1,5 +1,5 @@
 class TrademarksController < ApplicationController
-  before_action :set_trademark, only: [:show, :edit, :update, :destroy]
+  before_action :set_trademark, only: [:show, :update, :destroy]
   before_action :check_grants
   # GET /trademarks
   # GET /trademarks.json
@@ -11,17 +11,6 @@ class TrademarksController < ApplicationController
   # GET /trademarks/1
   # GET /trademarks/1.json
   def show
-  end
-
-  # GET /trademarks/new
-  def new
-    @title = @header = "Новая торговая марка"
-    @trademark = Trademark.new
-  end
-
-  # GET /trademarks/1/edit
-  def edit
-    @title = @header = "Изменение торговой марка"
   end
 
   # POST /trademarks
@@ -51,7 +40,7 @@ class TrademarksController < ApplicationController
     respond_to do |format|
       if @trademark.update(trademark_params)
         #format.html { redirect_to @trademark, notice: 'Торговая марка успешно изменена' }
-        format.json { render json: @trademark }
+        format.json { render json: @trademark.to_json }
       else
         #format.html { render :edit }
         format.json { render json: @trademark.errors, status: :unprocessable_entity }
@@ -64,7 +53,7 @@ class TrademarksController < ApplicationController
   def destroy
     @trademark.destroy
     respond_to do |format|
-      format.html { redirect_to trademarks_url, notice: 'trademark was successfully destroyed.' }
+      #format.html { redirect_to trademarks_url, notice: 'trademark was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
