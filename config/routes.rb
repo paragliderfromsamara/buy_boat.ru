@@ -70,7 +70,7 @@ Rails.application.routes.draw do
   get "/about", to: "pages#about", as: :about
   get "/boats/:id", to: "pages#boat", as: :tm_site_boat
   
-  resources :boat_series
+  resources :boat_series, only: [:index, :create, :update, :destroy, :show]
   resources :trademarks, only: [:index, :create, :update, :destroy, :show]
   root to: 'pages#index'
   
