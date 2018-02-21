@@ -1,13 +1,7 @@
 #@BoatParameterType = React.createClass
 #    render: ->
 boatTypeAttrs = ['ru_name', 'en_name', 'boat_series_id', 'trademark_id', 'boat_type_id', 'ru_description', 'en_description', 'ru_slogan', 'en_slogan']
-getErrorsFromResponse = (r)->
-    errs = []
-    for attr in boatTypeAttrs
-        if r["#{attr}"] isnt undefined
-            for err in r["#{attr}"]
-                errs.push err
-    return errs
+
     
 
 @BoatTypesTableRow = React.createClass
@@ -160,7 +154,7 @@ getErrorsFromResponse = (r)->
         e.preventDefault()
         @setState isOpen: !@state.isOpen
     fillErrors: (errors)->
-        errs = getErrorsFromResponse(errors)
+        errs = GetErrorsFromResponse(errors, boatTypeAttrs)
         @setState errors: errs
         #console.log errs
     drawErrors: ->
@@ -325,7 +319,7 @@ BTSMenuItems = [
                   data.curPart = state
                   @setState @updState(data)
               error: (jqXHR, textStatus, errorThrown)=>
-                  errs = getErrorsFromResponse(jqXHR.responseJSON)
+                  errs = GetErrorsFromResponse(jqXHR.responseJSON, boatTypeAttrs)
                   console.log errs
                   @setState errors: errs
               dataType: 'json'
@@ -420,7 +414,7 @@ BTSMenuItems = [
                       @setState modifications: mdfs, curModification: mdfs[0]
                       @props.updHandle({modifications: mdfs})
                   error: (jqXHR, textStatus, errorThrown)=>
-                      errs = getErrorsFromResponse(jqXHR.responseJSON)
+                      errs = GetErrorsFromResponse(jqXHR.responseJSON, boatTypeAttrs)
                       console.log errs
                       @setState errors: errs
                   dataType: 'json'
@@ -434,7 +428,7 @@ BTSMenuItems = [
           success: (data)=>
               @addModificationToState(data)
           error: (jqXHR, textStatus, errorThrown)=>
-              errs = getErrorsFromResponse(jqXHR.responseJSON)
+              errs = GetErrorsFromResponse(jqXHR.responseJSON, boatTypeAttrs)
               console.log errs
               @setState errors: errs
           dataType: 'json'
@@ -595,7 +589,7 @@ BTSMenuItems = [
                     @props.updMdfFunc(data)
                     @setState editMode: false
                 error: (jqXHR)=>
-                    @setState errors: getErrorsFromResponse(jqXHR.responseJSON)
+                    @setState errors: GetErrorsFromResponse(jqXHR.responseJSON, boatTypeAttrs)
                     console.log jqXHR.responseJSON
     showMode: ->
         React.DOM.table null,
@@ -769,7 +763,7 @@ BTSMenuItems = [
                 @setState boat_type: data                
                 @switchEditMode()
             error: (jqXHR)=>
-                @setState errors: getErrorsFromResponse(jqXHR.responseJSON)
+                @setState errors: GetErrorsFromResponse(jqXHR.responseJSON, boatTypeAttrs)
                 #XHRErrMsg(jqXHR)         
     showMode: ->
         React.DOM.table null,

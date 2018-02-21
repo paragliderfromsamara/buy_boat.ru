@@ -1,6 +1,6 @@
 #@BoatParameterType = React.createClass
 #    render: ->
-
+trademarkAttrs = ["name", "email", "www", "site_tag", "phone"]
 tmTableDataRow = React.createClass
     altText: (t)-> if $.trim(t) is "" then "Не указан" else t
     clickEditBut: (e)->
@@ -161,6 +161,7 @@ tmLogoCell = React.createClass
         www: if @props.trademark is undefined then "" else @altText(@props.trademark.www)
         email: if @props.trademark is undefined then "" else @altText(@props.trademark.email)
         phone: if @props.trademark is undefined then "" else @altText(@props.trademark.phone)
+        errors: []
     altText: (t)-> if $.trim(t) is "" then "" else t
     tmData: ->
         {
@@ -172,11 +173,13 @@ tmLogoCell = React.createClass
     submitHandle: (e)->
         e.preventDefault()
         if @state.isNew
-            $.post(
-                    "/trademarks"
-                    {trademark: @tmData()}
-                    (data)=> @props.createHandle(data)
-                    "json"
+            $.ajax(
+                    url: "/trademarks"
+                    type: "POST"
+                    data: {trademark: @tmData()}
+                    dataType: "json"
+                    success: (data)=> @props.createHandle(data)
+                    error: (jqXHR)=> @setState errors: GetErrorsFromResponse(jqXHR.responseJSON, trademarkAttrs)
                   )
         else
             $.ajax(
@@ -188,6 +191,7 @@ tmLogoCell = React.createClass
                         @props.updHandle(data)
                         @props.backHandle()
                         alert "Торговая марка #{@state.name} успешно обновлена"
+                    error: (jqXHR)=> @setState errors: GetErrorsFromResponse(jqXHR.responseJSON, trademarkAttrs)
                    )
         
     changeInputHandle: (e)->
@@ -217,6 +221,7 @@ tmLogoCell = React.createClass
                                 className: 'button'
                                 "Назад"
                     React.DOM.h5 null, if @state.isNew then "Добавление торговой марки" else "Изменение торговой марки"
+            React.createElement ErrorsCallout, errors: @state.errors
             React.DOM.div
                 className: "row"
                 React.DOM.div

@@ -1,9 +1,10 @@
 class Trademark < ApplicationRecord
   attr_accessor :logo_cache, :vertical_logo_cache, :white_logo_cache, :delete_logo
-  belongs_to :creator, class_name: "User" #кто создал
-  belongs_to :updater, class_name: "User" #кто изменил
+
   
   before_save :check_logo_del_flag
+  
+  validate :name_presence, :name_uniqueness
   
   has_many :boat_types, dependent: :destroy
 
@@ -19,6 +20,23 @@ class Trademark < ApplicationRecord
       vertical_logo: sorted_logo(self.vertical_logo),
       white_logo: sorted_logo(self.white_logo)
     }
+  end
+  
+  def name_presence
+    msg = "Торговая марка не может быть без названия"
+    if new_record?
+      errors.add(:name, msg) if name.blank?  
+    else
+      errors.add(:name, msg) if name.blank? && !name.nil?
+    end
+  end
+  
+  
+  def name_uniqueness
+    return if name.nil?
+    msg = "Торговая марка #{name} уже существует"
+    names = name.blank? ? [] : Trademark.where.not(id: id).pluck(:name).map{|n| n.nil? ? '' : n.mb_chars.downcase.to_s}
+    errors.add(:name, msg) if !names.index(name.mb_chars.downcase.to_s.strip).nil?
   end
   
   private

@@ -158,7 +158,13 @@
     p = GetPropertyByTag(props, tag)
     if p is null then 'нет' else p.value
 
-
+@GetErrorsFromResponse = (r, attrsList)->
+    errs = []
+    for attr in attrsList
+        if r["#{attr}"] isnt undefined
+            for err in r["#{attr}"]
+                errs.push err
+    return errs
 #AppReadyFunc = ->
     #Тут вносятся общие функции активируемые при загрузке страницы
     #$(document).foundation()
